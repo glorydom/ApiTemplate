@@ -417,3 +417,128 @@ INSERT INTO `upms_user_role` VALUES ('4', '1', '1');
 INSERT INTO `upms_user_role` VALUES ('5', '1', '2');
 INSERT INTO `upms_user_role` VALUES ('6', '2', '1');
 INSERT INTO `upms_user_role` VALUES ('7', '2', '2');
+
+
+-- ----------------------------
+-- Table structure for ucenter_oauth
+-- ----------------------------
+DROP TABLE IF EXISTS `ucenter_oauth`;
+CREATE TABLE `ucenter_oauth` (
+  `oauth_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(20) DEFAULT NULL COMMENT '认证方式名称',
+  PRIMARY KEY (`oauth_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='认证方式表';
+
+-- ----------------------------
+-- Records of ucenter_oauth
+-- ----------------------------
+INSERT INTO `ucenter_oauth` VALUES ('1', '手机');
+INSERT INTO `ucenter_oauth` VALUES ('2', '微信');
+INSERT INTO `ucenter_oauth` VALUES ('3', 'QQ');
+INSERT INTO `ucenter_oauth` VALUES ('4', '微博');
+
+-- ----------------------------
+-- Table structure for ucenter_user
+-- ----------------------------
+DROP TABLE IF EXISTS `ucenter_user`;
+CREATE TABLE `ucenter_user` (
+  `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `password` varchar(32) DEFAULT NULL COMMENT '密码(MD5(密码+盐))',
+  `salt` varchar(32) DEFAULT NULL COMMENT '盐',
+  `nickname` varchar(20) DEFAULT NULL COMMENT '昵称',
+  `sex` tinyint(4) DEFAULT '0' COMMENT '性别(0:未知,1:男,2:女)',
+  `avatar` varchar(100) DEFAULT NULL COMMENT '头像',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间',
+  `create_ip` varchar(50) DEFAULT NULL COMMENT '注册IP地址',
+  `last_login_time` timestamp NOT NULL DEFAULT '2017-00-00 00:00:00' COMMENT '最后登录时间',
+  `last_login_ip` varchar(50) DEFAULT NULL COMMENT '最后登录IP地址',
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+-- ----------------------------
+-- Records of ucenter_user
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for ucenter_user_details
+-- ----------------------------
+DROP TABLE IF EXISTS `ucenter_user_details`;
+CREATE TABLE `ucenter_user_details` (
+  `user_id` int(10) unsigned NOT NULL COMMENT '编号',
+  `signature` varchar(300) DEFAULT NULL COMMENT '个性签名',
+  `real_name` varchar(20) DEFAULT NULL COMMENT '真实姓名',
+  `birthday` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '出生日期',
+  `question` varchar(100) DEFAULT NULL COMMENT '帐号安全问题',
+  `answer` varchar(100) DEFAULT NULL COMMENT '帐号安全答案',
+  PRIMARY KEY (`user_id`),
+  CONSTRAINT `FK_Reference_41` FOREIGN KEY (`user_id`) REFERENCES `ucenter_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户详情表';
+
+-- ----------------------------
+-- Records of ucenter_user_details
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for ucenter_user_log
+-- ----------------------------
+DROP TABLE IF EXISTS `ucenter_user_log`;
+CREATE TABLE `ucenter_user_log` (
+  `user_log_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `user_id` int(10) unsigned DEFAULT NULL COMMENT '用户编号',
+  `content` varbinary(100) DEFAULT NULL COMMENT '内容',
+  `ip` varchar(20) DEFAULT NULL COMMENT '操作IP地址',
+  `agent` varbinary(200) DEFAULT NULL COMMENT '操作环境',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
+  PRIMARY KEY (`user_log_id`),
+  KEY `FK_Reference_44` (`user_id`),
+  CONSTRAINT `FK_Reference_44` FOREIGN KEY (`user_id`) REFERENCES `ucenter_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户操作日志表';
+
+-- ----------------------------
+-- Records of ucenter_user_log
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for ucenter_user_oauth
+-- ----------------------------
+DROP TABLE IF EXISTS `ucenter_user_oauth`;
+CREATE TABLE `ucenter_user_oauth` (
+  `user_oauth_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `user_id` int(10) unsigned NOT NULL COMMENT '帐号编号',
+  `oauth_id` int(10) unsigned NOT NULL COMMENT '认证方式编号',
+  `open_id` varbinary(50) NOT NULL COMMENT '第三方ID',
+  `status` tinyint(4) unsigned DEFAULT NULL COMMENT '绑定状态(0:解绑,1:绑定)',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`user_oauth_id`),
+  KEY `FK_Reference_42` (`user_id`),
+  KEY `FK_Reference_43` (`oauth_id`),
+  CONSTRAINT `FK_Reference_42` FOREIGN KEY (`user_id`) REFERENCES `ucenter_user` (`user_id`),
+  CONSTRAINT `FK_Reference_43` FOREIGN KEY (`oauth_id`) REFERENCES `ucenter_oauth` (`oauth_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户认证方式表';
+
+-- ----------------------------
+-- Records of ucenter_user_oauth
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for upms_log
+-- ----------------------------
+DROP TABLE IF EXISTS `upms_log`;
+CREATE TABLE `upms_log` (
+  `log_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `description` varchar(100) DEFAULT NULL COMMENT '操作描述',
+  `username` varchar(20) DEFAULT NULL COMMENT '操作用户',
+  `start_time` bigint(20) DEFAULT NULL COMMENT '操作时间',
+  `spend_time` int(11) DEFAULT NULL COMMENT '消耗时间',
+  `base_path` varchar(500) DEFAULT NULL COMMENT '根路径',
+  `uri` varchar(500) DEFAULT NULL COMMENT 'URI',
+  `url` varchar(500) DEFAULT NULL COMMENT 'URL',
+  `method` varchar(10) DEFAULT NULL COMMENT '请求类型',
+  `parameter` mediumtext,
+  `user_agent` varchar(500) DEFAULT NULL COMMENT '用户标识',
+  `ip` varchar(30) DEFAULT NULL COMMENT 'IP地址',
+  `result` mediumtext,
+  `permissions` varchar(100) DEFAULT NULL COMMENT '权限值',
+  PRIMARY KEY (`log_id`),
+  KEY `log_id` (`log_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=779 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志';

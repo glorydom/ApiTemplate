@@ -29,6 +29,11 @@
             <artifactId>admin</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.huicong.api</groupId>
+            <artifactId>ui</artifactId>
+            <version>1.0</version>
+        </dependency>
         <!-- servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>

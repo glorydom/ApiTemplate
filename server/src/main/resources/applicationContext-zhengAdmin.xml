@@ -6,11 +6,13 @@
     <!-- 启动解压zhengAdmin-x.x.x.jar到resources目录 -->
     <bean id="zhengAdminUtil" class="com.zheng.common.util.ZhengAdminUtil"></bean>
 
+    <!-- 启动解压ui-x.x.x.jar到resources/ui目录 -->
+    <bean id="uiUtil" class="com.zheng.common.util.UIUtil"></bean>
+
     <bean id="propertyConfigurer" class="com.zheng.common.plugin.EncryptPropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:jdbc.properties</value>
-                <value>classpath:redis.properties</value>
             </list>
         </property>
     </bean>

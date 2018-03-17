@@ -25,11 +25,11 @@ public class ZhengAdminUtil implements InitializingBean, ServletContextAware {
     public void setServletContext(ServletContext servletContext) {
         LOGGER.info("===== 开始解压admin =====");
         String version = PropertiesFileUtil.getInstance("zheng-admin-client").get("zheng.admin.version");
-        LOGGER.info("zheng-admin.jar 版本: {}", version);
+        LOGGER.info("admin.jar 版本: {}", version);
         String jarPath = servletContext.getRealPath("/WEB-INF/lib/admin-" + version + ".jar");
-        LOGGER.info("zheng-admin.jar 包路径: {}", jarPath);
+        LOGGER.info("admin.jar 包路径: {}", jarPath);
         String resources = servletContext.getRealPath("/") + File.separator +"resources" + File.separator + "admin";
-        LOGGER.info("zheng-admin.jar 解压到: {}", resources);
+        LOGGER.info("admin.jar 解压到: {}", resources);
         JarUtil.decompress(jarPath, resources);
         LOGGER.info("===== 解压zheng-admin完成 =====");
     }

@@ -12,6 +12,11 @@
 
     <!-- 拦截器 -->
     <mvc:interceptors>
+        <!-- 公共拦截器 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.ui.interceptor.UcenterWebInterceptor"></bean>
+        </mvc:interceptor>
         <!-- 获取登录信息 -->
         <mvc:interceptor>
             <mvc:mapping path="/manage/**"/>
@@ -19,9 +24,8 @@
         </mvc:interceptor>
     </mvc:interceptors>
 
-    <!-- Jsp视图 -->
+     <!--Jsp视图 -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="order" value="1"/>
         <property name="prefix" value="/WEB-INF/jsp"/>
         <property name="suffix" value=""/>
         <property name="contentType" value="text/html; charset=utf-8"/>
