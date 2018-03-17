@@ -4,7 +4,6 @@ import com.zheng.common.base.BaseController;
 import com.zheng.common.constants.ucenter.UcenterResult;
 import com.zheng.common.constants.ucenter.UcenterResultConstant;
 import com.zheng.ucenter.rpc.api.UcenterUserService;
-import dao.model.UcenterUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
