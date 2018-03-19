@@ -41,13 +41,20 @@ public class UpmsUserTest {
                     criteria.andAvatarEqualTo("jack_threadPoolTaskExecutor-5");
                     UpmsUser upmsUser  = service.selectFirstByExample(example);
                     String phone = upmsUser.getPhone();
-                    phone = phone == null ? "":phone;
+                    phone = phone == null ? "0":phone;
+                    int version = Integer.parseInt(phone);
+                    criteria.andPhoneEqualTo(version+ "");
 
-                    upmsUser.setPhone(phone + threadName.substring(threadName.length()-1));
+                    upmsUser.setPhone(phone + 1 + "");
                     try{
 
-                        service.updateByExample(upmsUser, example);
-                        System.out.println(threadName + "try to update user : " + upmsUser + " into databast");
+                        int affectCount = service.updateByExample(upmsUser, example);
+                        if(affectCount == 1){
+
+                            System.out.println(threadName + "success to update user : " + upmsUser + " into databast");
+                        }else{
+                            System.out.println(threadName + "failed to update user : " + upmsUser + " into databast");
+                        }
                     }catch (Exception e){
                         System.out.println("exception occurs for -> " + threadName + ". and the exception is: "  + e);
                     }
