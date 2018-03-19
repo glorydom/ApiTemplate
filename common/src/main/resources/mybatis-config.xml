@@ -56,6 +56,7 @@
 			-->
 			<property name="closeConn" value="true"/>
 		</plugin>
+		<plugin interceptor="com.chrhc.mybatis.locker.interceptor.OptimisticLocker"/>
 	</plugins>
 
 </configuration>
