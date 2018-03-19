@@ -15,7 +15,7 @@
         <!-- 公共拦截器 -->
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <bean class="com.ui.interceptor.UcenterWebInterceptor"></bean>
+            <bean class="com.ucenter.interceptor.UcenterWebInterceptor"></bean>
         </mvc:interceptor>
         <!-- 获取登录信息 -->
         <mvc:interceptor>

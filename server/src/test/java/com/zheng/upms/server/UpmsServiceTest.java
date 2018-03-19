@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 单元测试
@@ -15,10 +16,10 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({
-        "classpath:applicationContext.xml",
-        "classpath:applicationContext-dubbo-consumer.xml"
+        "classpath*:applicationContext*.xml",
+        "classpath*:spring/*.xml"
 })
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
+@Transactional
 public class UpmsServiceTest {
 
     @Autowired

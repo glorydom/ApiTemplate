@@ -1,4 +1,4 @@
-package com.ui.interceptor;
+package com.ucenter.interceptor;
 
 import com.zheng.common.util.PropertiesFileUtil;
 import org.slf4j.Logger;

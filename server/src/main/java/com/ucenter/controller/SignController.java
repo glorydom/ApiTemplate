@@ -1,8 +1,9 @@
-package com.ui.controller;
+package com.ucenter.controller;
 
 import com.zheng.common.base.BaseController;
 import com.zheng.common.constants.ucenter.UcenterResult;
 import com.zheng.common.constants.ucenter.UcenterResultConstant;
+import com.zheng.ucenter.dao.model.UcenterUser;
 import com.zheng.ucenter.rpc.api.UcenterUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,6 +52,9 @@ public class SignController extends BaseController {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         LOGGER.info("email-->{}, password --> {}", email, password);
+        Integer i = 1;
+        UcenterUser ucenterUser = new UcenterUser();
+        ucenterUser.setCreateIp( "" + i ++);
 
         return new UcenterResult(UcenterResultConstant.SUCCESS, "login");
     }
