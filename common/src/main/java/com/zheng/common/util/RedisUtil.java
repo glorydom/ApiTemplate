@@ -134,7 +134,7 @@ public class RedisUtil {
 	 */
 	public synchronized static void set(String key, String value, int seconds) {
 		try {
-            LOGGER.warn("since the backend technology is ehcache, so the time is not used");
+            LOGGER.warn("this cache will be expire in {} seconds", seconds);
             Element element = new Element(key, value, false);
             element.setTimeToIdle(seconds);
 			cache.put(element);
@@ -418,13 +418,18 @@ public class RedisUtil {
 	 * @return
 	 */
 	public synchronized static List<String> lrange(String key, int start, int end){
-		List<String> result = null;
+		List<String> result = new ArrayList<String>();
 		try {
 			Element element = cache.get(key);
 			if(element != null){
 				List<String> list = (List<String>) element.getObjectValue();
-				long total = list.size();
-				result = list.subList(start, end);
+				int total = list.size();
+				if( start >= 0 && start < total ){
+                    result = list.subList(start, end > total ? total : end);
+
+                } else {
+
+                }
 
 			}
 		}catch (Exception e){
