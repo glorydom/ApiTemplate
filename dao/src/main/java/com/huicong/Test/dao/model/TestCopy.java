@@ -1,7 +1,5 @@
 package com.huicong.Test.dao.model;
 
-import com.zheng.common.annotation.version;
-
 import java.io.Serializable;
 
 
