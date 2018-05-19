@@ -1,11 +1,6 @@
-package com.zheng.common.base;
+package com.dto.huiyi.meeting.entity;
 
-/**
- * 统一返回结果类
- * Created by shuzheng on 2017/2/18.
- */
-public class BaseResult {
-
+public class CHQSResult<T>{
     /**
      * 状态码：1成功，其他为失败
      */
@@ -19,13 +14,9 @@ public class BaseResult {
     /**
      * 数据结果集
      */
-    public Object data;
+    public T data;
 
-    public BaseResult(int code, String message, Object data) {
-        this.code = code;
-        this.message = message;
-        this.data = data;
-    }
+
 
     public int getCode() {
         return code;
@@ -43,14 +34,13 @@ public class BaseResult {
         this.message = message;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
-
-    public BaseResult() {
+    public CHQSResult() {
     }
 }

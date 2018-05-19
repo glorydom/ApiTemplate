@@ -13,9 +13,9 @@ public class Generator {
 
 	// 根据命名规范，只修改此常量值即可
 	private static String MODULE = "dao";
-	private static String DATABASE = "plaza";
-	private static String TABLE_PREFIX = "upms_";
-	private static String PACKAGE_NAME = "com.huicong.upms";  //注意设置该变量，它会想service项目的该文件夹下覆盖写入东西
+	private static String DATABASE = "activiti";
+	private static String TABLE_PREFIX = "MEETING_";
+	private static String PACKAGE_NAME = "com.huiyi.meeting";  //注意设置该变量，它会想service项目的该文件夹下覆盖写入东西
 	private static String JDBC_DRIVER = PropertiesFileUtil.getInstance("generator").get("generator.jdbc.driver");
 	private static String JDBC_URL = PropertiesFileUtil.getInstance("generator").get("generator.jdbc.url");
 	private static String JDBC_USERNAME = PropertiesFileUtil.getInstance("generator").get("generator.jdbc.username");

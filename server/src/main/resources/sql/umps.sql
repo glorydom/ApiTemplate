@@ -1,9 +1,9 @@
-/////////////////////////////////////////////////////////////////////////
-sql for upms(user management script)
+-- ----------------------------
+-- sql for upms(user management script)
 
 
 
-/////////////////////////////////////////////////////////////////////////
+-- ----------------------------
 
 
 -- ----------------------------
@@ -450,7 +450,7 @@ CREATE TABLE `ucenter_user` (
   `avatar` varchar(100) DEFAULT NULL COMMENT '头像',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间',
   `create_ip` varchar(50) DEFAULT NULL COMMENT '注册IP地址',
-  `last_login_time` timestamp NOT NULL DEFAULT '2017-00-00 00:00:00' COMMENT '最后登录时间',
+  `last_login_time` timestamp NOT NULL DEFAULT '2017-01-00 00:00:00' COMMENT '最后登录时间',
   `last_login_ip` varchar(50) DEFAULT NULL COMMENT '最后登录IP地址',
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';

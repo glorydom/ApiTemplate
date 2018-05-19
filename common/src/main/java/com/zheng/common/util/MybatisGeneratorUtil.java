@@ -143,6 +143,8 @@ public class MybatisGeneratorUtil {
         System.out.println("serviceImplPath -> " + serviceImplPath);
 		for (int i = 0; i < tables.size(); i++) {
 			String model = StringUtil.lineToHump(ObjectUtils.toString(tables.get(i).get("table_name")));
+			//remove the prefix
+			model = model.replace(tablePrefix+"_", "");
 			String service = servicePath + "/" + model + "Service.java";
 			String serviceMock = servicePath + "/" + model + "ServiceMock.java";
 			String serviceImpl = serviceImplPath + "/" + model + "ServiceImpl.java";

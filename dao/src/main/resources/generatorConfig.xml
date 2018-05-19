@@ -52,24 +52,15 @@
                         password="plaza" />
 
         <!-- model生成 -->
-        <javaModelGenerator targetPackage="com.huicong.upms.dao.model" targetProject="C:/Users/huihui.b.zhang/Desktop/my/template/dao/src/main/java" />
+        <javaModelGenerator targetPackage="com.huiyi.meeting.dao.model" targetProject="C:/Users/huihui.b.zhang/Desktop/my/template/dao/src/main/java" />
 
         <!-- MapperXML生成 -->
-        <sqlMapGenerator targetPackage="com.huicong.upms.dao.mapper" targetProject="C:/Users/huihui.b.zhang/Desktop/my/template/service/src/main/java" />
+        <sqlMapGenerator targetPackage="com.huiyi.meeting.dao.mapper" targetProject="C:/Users/huihui.b.zhang/Desktop/my/template/service/src/main/java" />
 
         <!-- Mapper接口生成 -->
-        <javaClientGenerator targetPackage="com.huicong.upms.dao.mapper" targetProject="C:/Users/huihui.b.zhang/Desktop/my/template/dao/src/main/java" type="XMLMAPPER" />
+        <javaClientGenerator targetPackage="com.huiyi.meeting.dao.mapper" targetProject="C:/Users/huihui.b.zhang/Desktop/my/template/dao/src/main/java" type="XMLMAPPER" />
 
         <!-- 需要映射的表 -->
-                                    <table tableName="upms_log" domainObjectName="UpmsLog"></table>
-                                                <table tableName="upms_organization" domainObjectName="UpmsOrganization"></table>
-                                                <table tableName="upms_permission" domainObjectName="UpmsPermission"></table>
-                                                <table tableName="upms_role" domainObjectName="UpmsRole"></table>
-                                                <table tableName="upms_role_permission" domainObjectName="UpmsRolePermission"></table>
-                                                <table tableName="upms_system" domainObjectName="UpmsSystem"></table>
-                                                <table tableName="upms_user" domainObjectName="UpmsUser"></table>
-                                                <table tableName="upms_user_organization" domainObjectName="UpmsUserOrganization"></table>
-                                                <table tableName="upms_user_permission" domainObjectName="UpmsUserPermission"></table>
-                                                <table tableName="upms_user_role" domainObjectName="UpmsUserRole"></table>
+                                    <table tableName="MEETING_meeting" domainObjectName="MeetingMeeting"></table>
                         </context>
 </generatorConfiguration>

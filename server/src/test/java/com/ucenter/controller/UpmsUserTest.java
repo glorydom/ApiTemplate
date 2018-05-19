@@ -97,7 +97,7 @@ public class UpmsUserTest {
 
     }
 
-    @Test
+//    @Test
     public void OptimisticLockTest(){
 //        for(int i =0; i< 10 ; i++){
 //            taskExecutor.submit(new Runnable() {

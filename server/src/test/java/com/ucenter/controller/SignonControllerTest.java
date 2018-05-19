@@ -42,7 +42,7 @@ public class SignonControllerTest {
 
 
     @Transactional
-    @Test
+//    @Test
     public void uCenterCreateTest() throws InterruptedException {
         UcenterUser ucenterUser = new UcenterUser();
         ucenterUser.setNickname("jack");

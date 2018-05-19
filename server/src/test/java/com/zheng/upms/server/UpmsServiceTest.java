@@ -25,7 +25,7 @@ public class UpmsServiceTest {
     @Autowired
     private UpmsSystemService upmsSystemService;
 
-    @Test
+//    @Test
     public void index() {
         int count = upmsSystemService.countByExample(new UpmsSystemExample());
         System.out.println(count);
