@@ -6,6 +6,7 @@ import com.dto.huiyi.meeting.entity.CHQSResult;
 import com.dto.huiyi.meeting.entity.ProcessInstanceDto;
 import com.dto.huiyi.meeting.entity.meetingDto.ProcessStartParameter;
 import com.dto.huiyi.meeting.util.Constants;
+import com.dto.huiyi.meeting.util.TimeDateFormat;
 import com.huiyi.meeting.dao.mapper.MeetingMeetingMapper;
 import com.huiyi.meeting.dao.model.MeetingMeeting;
 import com.huiyi.meeting.dao.model.MeetingMeetingExample;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.dto.huiyi.meeting.util.Constants.ERROR_CODE;
@@ -88,9 +90,11 @@ public class MeetingController {
         String chqsUrl = Constants.CHQSURL + "process/start";
         CHQSResult result = null;
         // prepare the parameters
-        Date startDate = meeting.getBeginat();
+        // date format: 2011-03-11T12:13:14
+        Date beginAt = meeting.getBeginat();
+        String activitiTime = TimeDateFormat.formatTime(beginAt);
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("startDate", startDate);
+        parameters.put("beginAt", activitiTime);  //
 
         ProcessStartParameter processStartParameter = new ProcessStartParameter();
         processStartParameter.setBussinessId(bussiness_key);
