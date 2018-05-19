@@ -40,7 +40,7 @@ DROP TABLE IF EXISTS `upms_organization`;
 CREATE TABLE `upms_organization` (
   `organization_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
   `pid` int(10) DEFAULT NULL COMMENT '所属上级',
-  `name` varchar(20) DEFAULT NULL COMMENT '组织名称',
+  `name` varchar(20) NOT NULL unique COMMENT '组织名称',
   `description` varchar(1000) DEFAULT NULL COMMENT '组织描述',
   `ctime` bigint(20) DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`organization_id`)
@@ -310,7 +310,7 @@ CREATE TABLE `upms_system` (
 -- ----------------------------
 -- Records of upms_system
 -- ----------------------------
-INSERT INTO `upms_system` VALUES ('1', 'zmdi zmdi-shield-security', '/resources/admin/images/zheng-upms.png', '#29A176', 'http://upms.zhangshuzheng.cn:1111', '1', 'zheng-upms-server', '权限管理系统', '用户权限管理系统（RBAC细粒度用户权限、统一后台、单点登录、会话管理）', '1', '1');
+INSERT INTO `upms_system` VALUES ('1', 'zmdi zmdi-shield-security', '/resources/admin/images/zheng-upms.png', '#29A176', 'http://localhost:1111', '1', 'zheng-upms-server', '权限管理系统', '用户权限管理系统（RBAC细粒度用户权限、统一后台、单点登录、会话管理）', '1', '1');
 INSERT INTO `upms_system` VALUES ('2', 'zmdi zmdi-wikipedia', '/resources/admin/images/zheng-cms.png', '#455EC5', 'http://cms.zhangshuzheng.cn:2222', '1', 'zheng-cms-admin', '内容管理系统', '内容管理系统（门户、博客、论坛、问答等）', '2', '2');
 INSERT INTO `upms_system` VALUES ('3', 'zmdi zmdi-paypal-alt', '/resources/admin/images/zheng-pay.png', '#F06292', 'http://pay.zhangshuzheng.cn:3331', '1', 'zheng-pay-admin', '支付管理系统', '支付管理系统', '3', '3');
 INSERT INTO `upms_system` VALUES ('4', 'zmdi zmdi-account', '/resources/admin/images/zheng-ucenter.png', '#6539B4', 'http://ucenter.zhangshuzheng.cn:4441', '1', 'zheng-ucenter-home', '用户管理系统', '用户管理系统', '4', '4');
@@ -322,7 +322,7 @@ INSERT INTO `upms_system` VALUES ('5', 'zmdi zmdi-cloud', '/resources/admin/imag
 DROP TABLE IF EXISTS `upms_user`;
 CREATE TABLE `upms_user` (
   `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `username` varchar(20) NOT NULL COMMENT '帐号',
+  `username` varchar(20) NOT NULL unique COMMENT '帐号',
   `password` varchar(32) NOT NULL COMMENT '密码MD5(密码+盐)',
   `salt` varchar(32) DEFAULT NULL COMMENT '盐',
   `realname` varchar(20) DEFAULT NULL COMMENT '姓名',

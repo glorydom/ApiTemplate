@@ -55,6 +55,7 @@ $(function() {
 			{field: 'organizationId', title: '编号', sortable: true, align: 'center'},
 			{field: 'name', title: '组织名称'},
             {field: 'description', title: '组织描述'},
+            {field: 'pid', title: '父组织ID'},
 			{field: 'action', title: '操作', align: 'center', formatter: 'actionFormatter', events: 'actionEvents', clickToSelect: false}
 		]
 	});
