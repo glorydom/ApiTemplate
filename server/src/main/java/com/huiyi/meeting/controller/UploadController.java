@@ -3,6 +3,7 @@ package com.huiyi.meeting.controller;
 import com.dto.huiyi.meeting.util.Constants;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,11 @@ import java.util.Date;
 
 @Controller
 @RequestMapping("/file")
-@Api(value = "上传文件", description = "文件上传统一管理")
+@Api(value = "上传文件", description = "文件上传统一管理，上传的文件部分类型")
 public class UploadController {
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)
+    @ApiOperation(value = "上传文件")
     @ResponseBody
     public BaseResult upload(HttpServletRequest request,
                              @RequestParam("file") MultipartFile file) throws IOException {
@@ -37,6 +39,7 @@ public class UploadController {
     }
 
     @RequestMapping("download")
+    @ApiOperation(value = "下载文件")
     public ResponseEntity<byte[]> download(String fileName) throws IOException {
         String dfileName = new String(fileName.getBytes("utf-8"), "utf-8");
         HttpHeaders headers = new HttpHeaders();

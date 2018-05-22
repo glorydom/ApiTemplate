@@ -61,6 +61,10 @@
         <javaClientGenerator targetPackage="com.huiyi.meeting.dao.mapper" targetProject="C:/Users/huihui.b.zhang/Desktop/my/template/dao/src/main/java" type="XMLMAPPER" />
 
         <!-- 需要映射的表 -->
-                                    <table tableName="MEETING_meeting" domainObjectName="MeetingMeeting"></table>
+                                    <table tableName="MEETING_Forum" domainObjectName="MeetingForum"></table>
+                                                <table tableName="MEETING_Parti_Forum" domainObjectName="MeetingPartiForum"></table>
+                                                <table tableName="MEETING_Participant" domainObjectName="MeetingParticipant"></table>
+                                                <table tableName="MEETING_ScriptManual" domainObjectName="MeetingScriptmanual"></table>
+                                                <table tableName="MEETING_meeting" domainObjectName="MeetingMeeting"></table>
                         </context>
 </generatorConfiguration>
