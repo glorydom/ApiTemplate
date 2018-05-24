@@ -27,6 +27,7 @@
                 /druid/** = user
                 /swagger-ui.html = user
                 /resources/** = anon
+                /chqs/** = user
                 /** = anon
             </value>
         </property>

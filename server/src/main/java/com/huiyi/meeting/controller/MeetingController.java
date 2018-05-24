@@ -27,7 +27,7 @@ import static com.dto.huiyi.meeting.util.Constants.ERROR_CODE;
 import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 
 @Controller
-@RequestMapping("/meeting")
+@RequestMapping("/chqs/meeting")
 @Api(value = "会议管理", description = "对会议进行创建，查询，挂起，取消操作")
 public class MeetingController {
 

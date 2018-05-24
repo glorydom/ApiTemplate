@@ -1,7 +1,7 @@
 package com.dto.huiyi.meeting.util;
 
 public class Constants {
-    public static final String CHQSURL = "http://localhost:9000/chqs/";
+    public static final String CHQSURL = "http://localhost:8080/chunhuaqiushi/";
 
 
     public static final int SUCCESS_CODE = 200;

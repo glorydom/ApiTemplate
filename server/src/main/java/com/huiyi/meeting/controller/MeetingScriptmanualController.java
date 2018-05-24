@@ -35,7 +35,7 @@ import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 
 
 @Controller
-@RequestMapping("/MeetingScriptmanual")
+@RequestMapping("/chqs/MeetingScriptmanual")
 @Api(value = "会议演讲稿管理", description = "对会议演讲稿进行创建，查询，删除等操作")
 @Transactional
 public class MeetingScriptmanualController {
