@@ -81,5 +81,19 @@ CREATE TABLE `MEETING_Forum` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='专题讨论会forum';
 
 
+#会前物品准备清单
+DROP TABLE IF EXISTS `MEETING_Preparation_Item`;
+CREATE TABLE `MEETING_Preparation_Item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `item` varchar(100) DEFAULT NULL COMMENT '事项',
+  `itemDescription` varchar(500) DEFAULT NULL COMMENT '事项说明',
+  `amount` int(11) DEFAULT NULL COMMENT '物品数量',
+  `price` float DEFAULT NULL COMMENT '物品单价',
+  `unit` varchar(10) DEFAULT NULL COMMENT '单位',
+  `attachment`  varchar(100) DEFAULT NULL COMMENT '附件',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='专题讨论会forum';
+
 
 

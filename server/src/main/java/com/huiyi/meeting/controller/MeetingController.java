@@ -73,10 +73,14 @@ public class MeetingController {
 
         if(meeting != null){
             if(meeting.getBeginat() == null) meeting.setBeginat(new Date()); // 开始时间为空的话，设置为立即开始
+            // set timestamp to retrive it
+            long timestamp = new Date().getTime();
+            meeting.setCreationtimestamp(timestamp);
             int affectCount = meetingMeetingService.insert(meeting);
+
             if(affectCount == 1){
                 MeetingMeetingExample example = new MeetingMeetingExample();
-                example.createCriteria().andBeginatEqualTo(meeting.getBeginat());
+                example.createCriteria().andCreationtimestampEqualTo(timestamp);
                 List<MeetingMeeting> ms = meetingMeetingMapper.selectByExample(example);
                 meeting = ms.get(0);
             }
@@ -85,7 +89,7 @@ public class MeetingController {
 
         // start the meeting process
         String process_id = MeetingMeeting.class.getSimpleName();
-        String bussiness_key = process_id + "." + id;
+        String bussiness_key = process_id + "_" + id;
         String chqsUrl = Constants.CHQSURL + "process/start";
         CHQSResult result = null;
         // prepare the parameters
@@ -116,16 +120,14 @@ public class MeetingController {
     }
 
     @ApiOperation(value = "取消一场会议")
-    @RequestMapping(value = "cancelMeeting/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "cancel/{id}", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult cancelMeeting(@PathVariable int id){
-        String bussinessKey = MeetingMeeting.class.getSimpleName() + "." + id;
+        String bussinessKey = MeetingMeeting.class.getSimpleName() + "_" + id;
         String chqsUrl = Constants.CHQSURL + "process/stopByBussinesskey/" + bussinessKey;
-
         try {
             CHQSResult result = httpClientService.getCHQSData(chqsUrl, null, new TypeReference<CHQSResult>(){});
             if(result!=null && result.getCode() == SUCCESS_CODE){
-
                 return new BaseResult(SUCCESS_CODE, "success", null);
             }else{
                 return new BaseResult(ERROR_CODE, "system error", null);

@@ -64,6 +64,7 @@
                                     <table tableName="MEETING_Forum" domainObjectName="MeetingForum"></table>
                                                 <table tableName="MEETING_Parti_Forum" domainObjectName="MeetingPartiForum"></table>
                                                 <table tableName="MEETING_Participant" domainObjectName="MeetingParticipant"></table>
+                                                <table tableName="MEETING_Preparation_Item" domainObjectName="MeetingPreparationItem"></table>
                                                 <table tableName="MEETING_ScriptManual" domainObjectName="MeetingScriptmanual"></table>
                                                 <table tableName="MEETING_meeting" domainObjectName="MeetingMeeting"></table>
                         </context>
