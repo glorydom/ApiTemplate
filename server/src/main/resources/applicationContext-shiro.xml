@@ -27,13 +27,13 @@
                 /druid/** = user
                 /swagger-ui.html = user
                 /resources/** = anon
-                /chqs/** = user
+                <!--  /chqs/** = user -->
                 /** = anon
-            </value>
-        </property>
-    </bean>
+</value>
+</property>
+</bean>
 
-    <!-- 重写authc过滤器 -->
+<!-- 重写authc过滤器 -->
     <bean id="upmsAuthenticationFilter" class="com.zheng.upms.client.shiro.filter.UpmsAuthenticationFilter"/>
 
     <!-- 强制退出会话过滤器 -->
