@@ -29,7 +29,8 @@
                 /druid/** = user
                 /swagger-ui.html = user
                 /resources/** = anon
-                /chqs/** = jwtv
+                /api/** = anon
+                /chqs/** = user
                 <!--/token/** = jwtg-->
                 /** = anon
             </value>
@@ -76,7 +77,7 @@
     <bean id="sessionDAO" class="com.zheng.upms.client.shiro.session.UpmsSessionDao"/>
 
     <!-- 会话Cookie模板 -->
-    <bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+    <bean id="sessionIdCookie" class="com.zheng.upms.server.filter.MySimpleCookie">
         <!-- 不会暴露给客户端 -->
         <property name="httpOnly" value="true"/>
         <!-- 设置Cookie的过期时间，秒为单位，默认-1表示关闭浏览器时过期Cookie -->
