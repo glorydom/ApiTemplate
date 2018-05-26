@@ -101,7 +101,7 @@
                 <configuration>
                     <scanIntervalSeconds>3</scanIntervalSeconds>
                     <webApp>
-                        <contextPath>/</contextPath>
+                        <contextPath>/server</contextPath>
                     </webApp>
                     <httpConnector>
                         <port>1111</port>
