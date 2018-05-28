@@ -19,6 +19,7 @@ import com.zheng.common.base.BaseResult;
 import com.zheng.common.validator.NotNullValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +68,7 @@ public class MeetingScriptmanualController {
 
         //process related parameters
         Map<String, Object> parameters = new HashMap<>();
-
+        parameters.put("entity", meetingScriptmanual);
         return ControllerUtil.startNewBussinessProcess(meetingScriptmanual, meetingScriptmanual.getId(), parameters, httpClientService);
     }
 
@@ -90,7 +91,7 @@ public class MeetingScriptmanualController {
             return new BaseResult(ERROR_CODE, "nothing is done, you should not close this task", null);
         }
 
-        String userId = "张三";
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
         String taskId = parameter.getTaskId();
         String chqsUrl = chqsUrlbase + "/complete";
         TaskCompleteDto completeDto = new TaskCompleteDto();
@@ -99,7 +100,6 @@ public class MeetingScriptmanualController {
         completeDto.setUserId(userId);
         Map<String, Object> p = new HashMap<>();
         completeDto.setCompletionArguments(p);
-
         String jsonPrameter = JSON.toJSONString(completeDto);
 
         CHQSResult chqsResult = null;
@@ -140,6 +140,31 @@ public class MeetingScriptmanualController {
         MeetingScriptmanual scriptmanual = meetingScriptmanualService.selectByPrimaryKey(id);
 
         return new BaseResult(Constants.SUCCESS_CODE, "", scriptmanual);
+    }
+
+    @ApiOperation(value = "根据会议ID列出所有的演讲稿")
+    @RequestMapping(value = "list/{meetingKey}", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult listScriptManual(@PathVariable String meetingKey) {
+        // bussinessKey:  MeetingScriptmanual.2
+        if(null == meetingKey){
+            return new BaseResult(Constants.ERROR_CODE, "parameter is not correct, should be like: MeetingScriptmanual_2", null);
+        }
+        List<MeetingScriptmanual> ms = null;
+
+        int meetingId = 0;
+        try {
+            String ids = meetingKey.split("_")[1];
+            meetingId = Integer.parseInt(ids);
+
+            MeetingScriptmanualExample example = new MeetingScriptmanualExample();
+            example.createCriteria().andMeetingidEqualTo(meetingId);
+            ms = meetingScriptmanualMapper.selectByExample(example);
+        }catch (Exception e){
+            return new BaseResult(Constants.ERROR_CODE, "parameter is not correct, should be like: MeetingScriptmanual_2", null);
+        }
+
+        return new BaseResult(Constants.SUCCESS_CODE, "", ms);
     }
 
 

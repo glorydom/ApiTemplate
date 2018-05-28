@@ -19,7 +19,7 @@ public class ControllerUtil {
     public static BaseResult startNewBussinessProcess(Object entity, int bussinessId, Map<String, Object> parameters,
                                                       HttpClientService httpClientService){
         String process_id = entity.getClass().getSimpleName();
-        String bussiness_key = process_id + "." + bussinessId;
+        String bussiness_key = process_id + "_" + bussinessId;
         String chqsUrl = Constants.CHQSURL + "process/start";
         CHQSResult result = null;
         // prepare the parameters

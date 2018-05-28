@@ -2,6 +2,7 @@ package com.huiyi.meeting.controller;
 
 import com.alibaba.fastjson.TypeReference;
 import com.dto.huiyi.meeting.entity.CHQSResult;
+import com.dto.huiyi.meeting.entity.chqs.TaskDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huicong.upms.dao.model.UpmsUserExample;
 import com.huicong.upms.rpc.api.UpmsUserService;
@@ -45,10 +46,10 @@ public class TaskController {
     public BaseResult searchMygroupTask() {
         String username = (String) SecurityUtils.getSubject().getPrincipal();
 
-        CHQSResult result = null;
+        CHQSResult<List<TaskDto>> result = null;
         String chqsUrl = chqsUrlbase + "/list/group/" + username;
         try {
-            result = httpClientService.getCHQSData(chqsUrl, null, new TypeReference<CHQSResult>() {
+            result = httpClientService.getCHQSData(chqsUrl, null, new TypeReference<CHQSResult<List<TaskDto>>>() {
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -93,11 +94,12 @@ public class TaskController {
     @ResponseBody
     public BaseResult searchMyTask() {
         String myID = (String) SecurityUtils.getSubject().getPrincipal();
-        CHQSResult result = null;
+        System.out.println("search my job and my id is: " + myID);
+        CHQSResult<List<TaskDto>> result = null;
         Map<String, String> param = new HashMap<String, String>();
-        String chqsUrl = chqsUrlbase + "/listBySingleUser/" + myID;
+        String chqsUrl = chqsUrlbase + "/list/user/" + myID;
         try {
-            result = httpClientService.getCHQSData(chqsUrl, param, new TypeReference<CHQSResult>() {
+            result = httpClientService.getCHQSData(chqsUrl, param, new TypeReference<CHQSResult<List<TaskDto>>>() {
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -106,6 +108,11 @@ public class TaskController {
             e.printStackTrace();
             return new BaseResult(ERROR_CODE, "system error", null);
         }
+
+//        List<TaskDto> dtos = result.getData();
+//        for(TaskDto d:dtos){
+//            System.out.println(d);
+//        }
         return new BaseResult(SUCCESS_CODE, "Success", result.getData());
     }
 

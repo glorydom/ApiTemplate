@@ -1,0 +1,13 @@
+INSERT INTO `upms_user_organization` VALUES (19, 1, 1);
+INSERT INTO `upms_user_organization` VALUES (20, 1, 4);
+INSERT INTO `upms_user_organization` VALUES (21, 1, 5);
+INSERT INTO `upms_user_organization` VALUES (22, 1, 6);
+INSERT INTO `upms_user_organization` VALUES (23, 1, 7);
+INSERT INTO `upms_user_organization` VALUES (24, 3, 11);
+INSERT INTO `upms_user_organization` VALUES (25, 4, 12);
+INSERT INTO `upms_user_organization` VALUES (28, 7, 14);
+INSERT INTO `upms_user_organization` VALUES (29, 5, 13);
+INSERT INTO `upms_user_organization` VALUES (30, 5, 15);
+INSERT INTO `upms_user_organization` VALUES (31, 8, 16);
+INSERT INTO `upms_user_organization` VALUES (32, 6, 14);
+INSERT INTO `upms_user_organization` VALUES (33, 6, 16);

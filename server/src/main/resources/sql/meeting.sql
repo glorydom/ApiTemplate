@@ -96,4 +96,19 @@ CREATE TABLE `MEETING_Preparation_Item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='专题讨论会forum';
 
 
+#专场论坛征询10个问题
+DROP TABLE IF EXISTS `MEETING_Topic`;
+CREATE TABLE `MEETING_Topic` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `topic` varchar(100) DEFAULT NULL COMMENT '话题',
+  `details` varchar(500) DEFAULT NULL COMMENT '',
+  `proposer` int(11) DEFAULT NULL COMMENT '提出者',
+  `status` varchar(20) DEFAULT NULL COMMENT '状态：提出 | 审核通过 | 审核不通过 | 上传至问答平台',
+  `meetingId` int(11) NOT NULL COMMENT '与该界会议关联',
+  `forumId` int(11) NOT NULL COMMENT '与该专题研讨会关联',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='专场论坛征询10个问题';
+
+
 
