@@ -68,6 +68,13 @@ public class MeetingTopicController {
         return ControllerUtil.startNewBussinessProcess(meetingTopic, meetingTopic.getId(), parameters, httpClientService);
     }
 
+    @ApiOperation(value = "完成MeetingTopic任务")
+    @RequestMapping(value = "complete", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResult complete(@RequestBody MeetingTopic meetingTopic){
+
+        return null;
+    }
 
 
 

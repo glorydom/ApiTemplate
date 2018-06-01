@@ -52,8 +52,10 @@ public class MeetingController {
 
             for(ProcessInstanceDto d: processInstanceDtos.getData()){
                 String bussinessKey = d.getBusinessKey();
-                int id = Integer.parseInt(bussinessKey.split("_")[1]);
-                activeMeetings.add(meetingMeetingService.selectByPrimaryKey(id));
+                if(bussinessKey.split("_")[0].equalsIgnoreCase(MeetingMeeting.class.getSimpleName())){
+                    int id = Integer.parseInt(bussinessKey.split("_")[1]);
+                    activeMeetings.add(meetingMeetingService.selectByPrimaryKey(id));
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

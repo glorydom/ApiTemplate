@@ -3,6 +3,7 @@ package com.huiyi.meeting.controller;
 import com.alibaba.fastjson.TypeReference;
 import com.dto.huiyi.meeting.entity.CHQSResult;
 import com.dto.huiyi.meeting.entity.chqs.TaskDto;
+import com.dto.huiyi.meeting.entity.chqs.TaskHistoryDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huicong.upms.dao.model.UpmsUserExample;
 import com.huicong.upms.rpc.api.UpmsUserService;
@@ -33,6 +34,8 @@ import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 public class TaskController {
 
     private String chqsUrlbase = Constants.CHQSURL + "task";
+
+    private String chqsUrlHistory = Constants.CHQSURL + "history";
 
     @Autowired
     private UpmsUserService upmsUserService;
@@ -115,6 +118,30 @@ public class TaskController {
 //        }
         return new BaseResult(SUCCESS_CODE, "Success", result.getData());
     }
+
+
+    @ApiOperation(value = "查询任务历史的批注信息")
+    @RequestMapping(value = "comment/history/{taskId}", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult listComment(@PathVariable String taskId) {
+        CHQSResult<List<TaskHistoryDto>> result = null;
+        Map<String, String> param = new HashMap<String, String>();
+        String chqsUrl = chqsUrlHistory + "/comment/" + taskId;
+        try {
+            result = httpClientService.getCHQSData(chqsUrl, param, new TypeReference<CHQSResult<List<TaskHistoryDto>>>() {
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new BaseResult(ERROR_CODE, "system error", null);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return new BaseResult(ERROR_CODE, "system error", null);
+        }
+
+
+        return new BaseResult(SUCCESS_CODE, "Success", result.getData());
+    }
+
 
 
 

@@ -30,7 +30,7 @@ CREATE TABLE `MEETING_ScriptManual` (
   `category` varchar(50) DEFAULT NULL COMMENT '该稿件的类别，比如是什么产品的',
   `ownerId` int(11) DEFAULT NULL COMMENT '该ID应该是participant的',
   `seminarId` int(11) DEFAULT NULL,
-  `meetingId` int(11) DEFAULT NULL COMMENT '该ID应该是一届会议的',
+  `meetingId` int(11) DEFAULT NULL COMMENT '该ID就是会议的BussinessKey的后半部分',
   `attachmentManual` varchar(100) DEFAULT NULL COMMENT '演讲稿',
   `attachmentTranslated` varchar(100) DEFAULT NULL COMMENT '演讲稿翻译版',
   `creationTimestamp` bigint DEFAULT NULL,
