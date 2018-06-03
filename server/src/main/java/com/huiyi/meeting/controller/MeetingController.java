@@ -15,6 +15,7 @@ import com.huiyi.service.HttpClientService;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 @Controller
 @RequestMapping("/chqs/meeting")
 @Api(value = "会议管理", description = "对会议进行创建，查询，挂起，取消操作")
-public class MeetingController {
+public class MeetingController extends BaseController {
 
     @Autowired
     MeetingMeetingMapper meetingMeetingMapper;
@@ -41,6 +42,7 @@ public class MeetingController {
     MeetingMeetingService meetingMeetingService;
 
     @ApiOperation(value = "查询所有正在进行中的会议")
+    @RequiresPermissions("chqs:meeting:manage")
     @RequestMapping(value = "listActives", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult listMeeting(){
@@ -66,6 +68,7 @@ public class MeetingController {
     }
 
     @ApiOperation(value = "开始一场会议")
+    @RequiresPermissions("chqs:meeting:create")
     @RequestMapping(value = "startMeeting", method = RequestMethod.POST)
     @ResponseBody
     public BaseResult startMeeting(@RequestBody MeetingMeeting meeting){
@@ -122,6 +125,7 @@ public class MeetingController {
     }
 
     @ApiOperation(value = "取消一场会议")
+    @RequiresPermissions("chqs:meeting:delete")
     @RequestMapping(value = "cancel/{id}", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult cancelMeeting(@PathVariable int id){
@@ -144,6 +148,7 @@ public class MeetingController {
     }
 
     @ApiOperation(value = "查看一场会议")
+    @RequiresPermissions("chqs:meeting:read")
     @RequestMapping(value = "checkMeeting/{id}", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult viewMeeting(@PathVariable int id){
