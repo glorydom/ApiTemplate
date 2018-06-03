@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.baidu.unbiz.fluentvalidator.ComplexResult;
 import com.baidu.unbiz.fluentvalidator.FluentValidator;
 import com.baidu.unbiz.fluentvalidator.ResultCollectors;
+import com.dto.huiyi.meeting.util.Constants;
 import com.huicong.upms.dao.model.*;
 import com.huicong.upms.rpc.api.*;
 import com.zheng.common.base.BaseController;
+import com.zheng.common.base.BaseResult;
 import com.zheng.common.constants.upms.UpmsResult;
 import com.zheng.common.constants.upms.UpmsResultConstant;
 import com.zheng.common.util.MD5Util;
@@ -242,6 +244,6 @@ public class UpmsUserController extends BaseController {
     @ResponseBody
     public Object listusers() {
         List<UpmsUser> users = upmsUserService.selectByExample(new UpmsUserExample());
-        return new UpmsResult(UpmsResultConstant.SUCCESS, users);
+        return new BaseResult(Constants.SUCCESS_CODE, "success", users);
     }
 }

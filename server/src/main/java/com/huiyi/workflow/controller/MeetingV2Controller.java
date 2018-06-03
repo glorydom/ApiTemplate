@@ -18,12 +18,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baidu.unbiz.fluentvalidator.ComplexResult;
+import com.baidu.unbiz.fluentvalidator.FluentValidator;
+import com.baidu.unbiz.fluentvalidator.ResultCollectors;
+import com.dto.huiyi.meeting.util.Constants;
 import com.huiyi.meeting.dao.model.MeetingMeeting;
 import com.huiyi.meeting.dao.model.MeetingMeetingExample;
+import com.huiyi.meeting.dao.model.MeetingTaskCandidate;
 import com.huiyi.meeting.rpc.api.MeetingMeetingService;
+import com.huiyi.meeting.rpc.api.MeetingTaskCandidateService;
 import com.huiyi.workflow.service.BaseWorkFlowService;
 import com.zheng.common.base.BaseController;
 import com.zheng.common.base.BaseResult;
+import com.zheng.common.validator.LengthValidator;
+import com.zheng.common.validator.NumberValidator;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,8 +45,10 @@ public class MeetingV2Controller extends BaseController {
 	@Autowired
     MeetingMeetingService meetingMeetingService;
 	@Autowired
-	BaseWorkFlowService baseWorkFlowService;
+	MeetingTaskCandidateService meetingTaskCandidateService;
 	
+	@Autowired
+	BaseWorkFlowService baseWorkFlowService;
 	
 	@RequestMapping(value="/index", method = RequestMethod.GET)
 	public String index(ModelMap modelMap) {
@@ -99,7 +109,42 @@ public class MeetingV2Controller extends BaseController {
 	@ApiOperation(value="保存会议任务执行人候选人")
 	@ResponseBody
 	public Object saveMeetingTaskCandidate(@RequestParam("meetingId") String meetingId, @RequestParam("taskId") String taskId, @RequestParam("userId") String userId) {
-		
-		return new BaseResult(1, "success", 1);
+		ComplexResult result = FluentValidator.checkAll()
+                .on(meetingId, new NumberValidator("会议ID"))
+                .on(taskId, new LengthValidator(1, 64, "工作流任务ID"))
+                .on(userId, new NumberValidator("用户"))
+                .doValidate()
+                .result(ResultCollectors.toComplex());
+        if (!result.isSuccess()) {
+            return new BaseResult(Constants.ERROR_CODE, "failed", result.getErrors());
+        }
+		MeetingTaskCandidate record = new MeetingTaskCandidate();
+		record.setMeetingid(Integer.parseInt(meetingId));
+		record.setTaskid(taskId);
+		record.setUserid(Integer.parseInt(userId));
+		meetingTaskCandidateService.insert(record);
+		return new BaseResult(Constants.SUCCESS_CODE, "success", record);
+	}
+	
+	@RequestMapping(value="/saveWholeMeetingTaskCandidates", method = RequestMethod.GET)
+	@ApiOperation(value="保存整个会议任务执行人候选人")
+	@ResponseBody
+	public Object saveWholeMeetingTaskCandidates(@RequestParam("list") List<MeetingTaskCandidate> list) {
+		if (list == null || list.size() == 1) {
+			return new BaseResult(Constants.ACCESS_ERROR, "failed", "没有需要保存的数据！");
+		}
+		for(MeetingTaskCandidate mtc : list) {
+			ComplexResult result = FluentValidator.checkAll()
+					.on(mtc.getTaskid(), new LengthValidator(1, 64, "工作流任务ID"))
+					.doValidate()
+					.result(ResultCollectors.toComplex());
+			if (!result.isSuccess()) {
+				return new BaseResult(Constants.ERROR_CODE, "failed", result.getErrors());
+			}
+		}
+		for(MeetingTaskCandidate mtc : list) {
+			meetingTaskCandidateService.insert(mtc);
+		}
+		return new BaseResult(1, "success", null);
 	}
 }
