@@ -1,18 +1,24 @@
 package com.huiyi.workflow.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.activiti.bpmn.model.UserTask;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,9 +28,14 @@ import com.baidu.unbiz.fluentvalidator.ComplexResult;
 import com.baidu.unbiz.fluentvalidator.FluentValidator;
 import com.baidu.unbiz.fluentvalidator.ResultCollectors;
 import com.dto.huiyi.meeting.util.Constants;
+import com.huicong.upms.dao.model.UpmsUser;
+import com.huicong.upms.dao.model.UpmsUserExample;
+import com.huicong.upms.rpc.api.UpmsUserService;
+import com.huiyi.meeting.dao.model.CustomMeetingTask;
 import com.huiyi.meeting.dao.model.MeetingMeeting;
 import com.huiyi.meeting.dao.model.MeetingMeetingExample;
 import com.huiyi.meeting.dao.model.MeetingTaskCandidate;
+import com.huiyi.meeting.dao.model.MeetingTaskCandidateExample;
 import com.huiyi.meeting.rpc.api.MeetingMeetingService;
 import com.huiyi.meeting.rpc.api.MeetingTaskCandidateService;
 import com.huiyi.workflow.service.BaseWorkFlowService;
@@ -46,6 +57,8 @@ public class MeetingV2Controller extends BaseController {
     MeetingMeetingService meetingMeetingService;
 	@Autowired
 	MeetingTaskCandidateService meetingTaskCandidateService;
+	@Autowired
+	UpmsUserService upmsUserService;
 	
 	@Autowired
 	BaseWorkFlowService baseWorkFlowService;
@@ -129,7 +142,8 @@ public class MeetingV2Controller extends BaseController {
 	@RequestMapping(value="/saveWholeMeetingTaskCandidates", method = RequestMethod.GET)
 	@ApiOperation(value="保存整个会议任务执行人候选人")
 	@ResponseBody
-	public Object saveWholeMeetingTaskCandidates(@RequestParam("list") List<MeetingTaskCandidate> list) {
+	@Transactional
+	public Object saveWholeMeetingTaskCandidates(@RequestBody List<MeetingTaskCandidate> list) {
 		if (list == null || list.size() == 1) {
 			return new BaseResult(Constants.ACCESS_ERROR, "failed", "没有需要保存的数据！");
 		}
@@ -142,9 +156,66 @@ public class MeetingV2Controller extends BaseController {
 				return new BaseResult(Constants.ERROR_CODE, "failed", result.getErrors());
 			}
 		}
+		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
+		example.createCriteria().andMeetingidEqualTo(list.get(0).getMeetingid());
+		List<MeetingTaskCandidate> existing = meetingTaskCandidateService.selectByExample(example);
+		for(MeetingTaskCandidate mtc : existing) {
+			mtc.setId(null);
+		}
+//		meetingTaskCandidateService.deleteByExample(example);
+		
+		List<Integer> toBeRemoved = new ArrayList<Integer>();
 		for(MeetingTaskCandidate mtc : list) {
+			if(existing.contains(mtc)) {
+				toBeRemoved.add(mtc.getId());
+				continue;
+			}
 			meetingTaskCandidateService.insert(mtc);
 		}
-		return new BaseResult(1, "success", null);
+		String ids = StringUtils.join(toBeRemoved, "-");
+		meetingTaskCandidateService.deleteByPrimaryKeys(ids);
+		return new BaseResult(Constants.SUCCESS_CODE, "success", null);
 	}
+	
+	@RequestMapping(value="/findWholeMeetingTaskCandidates/{meetingId}", method = RequestMethod.GET)
+	@ApiOperation(value="查询整个会议任务执行人候选人")
+	@ResponseBody
+	public Object findWholeMeetingTaskCandidates(@PathVariable("meetingId") String meetingId) {
+		
+		List<UpmsUser> allUsers = upmsUserService.selectByExample(new UpmsUserExample());
+		Map<Integer,UpmsUser> userMap = new HashMap<Integer,UpmsUser>();
+		for(UpmsUser u : allUsers) {
+			userMap.put(u.getUserId(), u);
+		}
+		
+		List<UserTask> allTasks = baseWorkFlowService.listAllUserTasks(MeetingMeeting.class.getSimpleName());
+		Map<String,String> taskMap = new HashMap<String,String>();
+		for(UserTask t : allTasks)
+			taskMap.put(t.getId(), t.getName());
+		
+		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
+		example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId));
+		List<MeetingTaskCandidate> list = meetingTaskCandidateService.selectByExample(example);
+		Map<String,CustomMeetingTask> map = new HashMap<>();
+		for(MeetingTaskCandidate mtc: list) {
+			String taskId = mtc.getTaskid();
+			CustomMeetingTask customMeetingTask =  map.get(taskId);
+			if(customMeetingTask == null) {
+				customMeetingTask = new CustomMeetingTask();
+				customMeetingTask.setTaskId(mtc.getTaskid());
+				customMeetingTask.setTaskName(taskMap.get(taskId));
+				
+				map.put(mtc.getTaskid(), customMeetingTask);
+			}
+			Set<UpmsUser> userList = customMeetingTask.getUserList();
+			if(userList == null) {
+				userList = new HashSet<>();
+				customMeetingTask.setUserList(userList);
+			}
+			userList.add(userMap.get(mtc.getUserid()));
+		}
+		List<CustomMeetingTask> taskList = new ArrayList<CustomMeetingTask>(map.values());
+		return new BaseResult(Constants.SUCCESS_CODE, "success", taskList);
+	}
+	
 }

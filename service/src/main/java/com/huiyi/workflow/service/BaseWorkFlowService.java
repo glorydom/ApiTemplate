@@ -5,12 +5,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
 
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.repository.Deployment;
@@ -73,6 +78,29 @@ public class BaseWorkFlowService {
 		param.put("beginAt", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(new Date()));
 		runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey, param);
 		return true;
+	}
+	
+	public List<UserTask> listAllUserTasks(String processName){
+		ProcessDefinition pd = findProcessDefinition(processName);
+        BpmnModel model = repositoryService.getBpmnModel(pd.getId());
+        List<UserTask> taskList = new ArrayList<UserTask>();
+        if(model != null) {
+            Collection<FlowElement> flowElements = model.getMainProcess().getFlowElements();
+            for(FlowElement e : flowElements) {
+                if( e instanceof UserTask) {
+                	taskList.add((UserTask) e);
+                }
+            }
+        }
+
+        return taskList;
+    }
+	
+	public ProcessDefinition findProcessDefinition(String processName) {
+		List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processName).orderByProcessDefinitionVersion().desc().list();
+		if(list != null && list.size()>0)
+			return list.get(0);
+		return null;
 	}
 	
 	public void findDeployment(String processName,String businessKey) {
