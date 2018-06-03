@@ -1,11 +1,14 @@
 package com.huiyi.meeting.dao.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.huicong.upms.dao.model.UpmsUser;
 
-public class CustomMeetingTask {
+public class CustomMeetingTask implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private String taskId;
 	private String taskName;

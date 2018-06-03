@@ -29,7 +29,7 @@ import io.swagger.annotations.ApiOperation;
 
 
 @Controller
-@RequestMapping("/manage/workflow")
+@RequestMapping("/chqs/workflow")
 @Api(value="工作流管理")
 public class WorkflowController extends BaseController{
 

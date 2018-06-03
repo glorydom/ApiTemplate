@@ -47,7 +47,7 @@ import com.zheng.common.validator.NumberValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@RequestMapping("/manage/meeting")
+@RequestMapping("/chqs/meetingManagement")
 @Controller
 @Api(value="会议管理")
 public class MeetingV2Controller extends BaseController {
