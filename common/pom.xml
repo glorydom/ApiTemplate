@@ -276,6 +276,19 @@
             <artifactId>aspectjweaver</artifactId>
             <version>1.8.8</version>
         </dependency>
+        
+        <!-- activiti -->
+	    <dependency>
+	      <groupId>org.activiti</groupId>
+	      <artifactId>activiti-engine</artifactId>
+	      <version>5.17.0</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.activiti</groupId>
+	      <artifactId>activiti-spring</artifactId>
+	      <version>5.17.0</version>
+	    </dependency>
+	    
         <!-- servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
