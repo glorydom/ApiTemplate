@@ -35,7 +35,7 @@ var $table = $('#table');
 $(function() {
 	// bootstrap table初始化
 	$table.bootstrapTable({
-		url: '${basePath}/manage/meeting/list',
+		url: '${basePath}/chqs/meetingManagement/list',
 		height: getHeight(),
 		striped: true,
 		search: true,
@@ -106,7 +106,7 @@ function triggerProcess(){
 						}
 						$.ajax({
 							type: 'get',
-							url: '${basePath}/manage/meeting/process/' + ids.join("-"),
+							url: '${basePath}/chqs/meetingManagement/process/' + ids.join("-"),
 							success: function(result) {
 								if (result.code != 1) {
 									if (result.data instanceof Array) {
@@ -177,7 +177,7 @@ function createAction() {
 	createDialog = $.dialog({
 		animationSpeed: 300,
 		title: '新增会议',
-		content: 'url:${basePath}/manage/meeting/create',
+		content: 'url:${basePath}/chqs/meetingManagement/create',
 		onContentReady: function () {
 			initMaterialInput();
 		}
@@ -217,7 +217,7 @@ function deleteAction() {
 						}
 						$.ajax({
 							type: 'get',
-							url: '${basePath}/manage/meeting/delete/' + ids.join("-"),
+							url: '${basePath}/chqs/meetingManagement/delete/' + ids.join("-"),
 							success: function(result) {
 								if (result.code != 1) {
 									if (result.data instanceof Array) {

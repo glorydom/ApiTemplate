@@ -33,7 +33,7 @@ var $table = $('#table');
 $(function() {
 	// bootstrap table初始化
 	$table.bootstrapTable({
-		url: '${basePath}/manage/workflow/list',
+		url: '${basePath}/chqs/workflow/list',
 		height: getHeight(),
 		striped: true,
 		search: true,
@@ -74,7 +74,7 @@ function createAction() {
 	createDialog = $.dialog({
 		animationSpeed: 300,
 		title: '新增工作流',
-		content: 'url:${basePath}/manage/workflow/create',
+		content: 'url:${basePath}/chqs/workflow/create',
 		onContentReady: function () {
 			initMaterialInput();
 		}
@@ -114,7 +114,7 @@ function deleteAction() {
 						}
 						$.ajax({
 							type: 'get',
-							url: '${basePath}/manage/workflow/delete/' + ids.join("-"),
+							url: '${basePath}/chqs/workflow/delete/' + ids.join("-"),
 							success: function(result) {
 								if (result.code != 1) {
 									if (result.data instanceof Array) {
