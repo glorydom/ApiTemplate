@@ -7,6 +7,7 @@ import com.dto.huiyi.meeting.entity.chqs.TaskHistoryDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huicong.upms.dao.model.UpmsUserExample;
 import com.huicong.upms.rpc.api.UpmsUserService;
+import com.huiyi.meeting.dao.model.MeetingParticipant;
 import com.huiyi.service.HttpClientService;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;

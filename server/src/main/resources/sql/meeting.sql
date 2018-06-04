@@ -40,22 +40,37 @@ CREATE TABLE `MEETING_ScriptManual` (
 
 
 
-#与会者
+#与会人员
 DROP TABLE IF EXISTS `MEETING_Participant`;
 CREATE TABLE `MEETING_Participant` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `phone` varchar(20) DEFAULT NULL,
-  `name` varchar(20) DEFAULT NULL,
-  `paidParticipant` varchar(10) DEFAULT NULL COMMENT '是否付费: 付费|非付费',
+  `name` varchar(40) NOT NULL COMMENT '人员名字',
+  `gender` varchar(5)  COMMENT '性别',
+  `telephone` varchar(20)  COMMENT 'telphone',
+  `age` int(11)  COMMENT 'age',
+  `address` varchar(40)  COMMENT 'address',
+  `productOfInterest` varchar(100) NOT NULL COMMENT '感兴趣的产品， 使用逗号分隔',
+  `hotel` varchar(10) COMMENT '酒店名',
+  `hotelAddress` varchar(10) COMMENT '酒店地址',
+  `hotelStatus` varchar(10)  COMMENT '没有 | 进行中 | 结束',
+  `arrivalTime` date COMMENT '到达时间',
+  `leaveTime` date COMMENT '离开时间',
+  `trafficTool` varchar(10) COMMENT '交通工具',
+  `recipiantStatus` varchar(10)  COMMENT '接人状态：没有 | 进行中 | 结束',
+  `seatStatus` varchar(10)  COMMENT '会场座位是否已经安排：没有 | 进行中 | 结束',
+  `seat` varchar(20)  COMMENT '会场中的位置  横纵坐标',
+  `forumOfInterest` varchar(100) DEFAULT NULL COMMENT '参加那几场专题会, 专场会（forum)的id使用逗号分割，',
+  `charged` varchar(10) DEFAULT NULL COMMENT '是否付费: 付费|非付费',
   `invoiced`  varchar(10) DEFAULT NULL COMMENT '是否开票: 已开票|未开票',
   `disguisedGuestCardContent` varchar(30) DEFAULT NULL COMMENT '嘉宾牌内容',
-  `company` int(11) DEFAULT NULL COMMENT '所属的公司',
+  `company` varchar(50) DEFAULT NULL COMMENT '所属的公司',
+  `meetingId` int(11) DEFAULT NULL COMMENT '参加的是哪一届会议',
   `ticketId` varchar(100) DEFAULT NULL COMMENT '门票',
   `sponsor` varchar(50) DEFAULT NULL COMMENT '赞助商',
-  `meetingId` int(11) DEFAULT NULL COMMENT '该ID应该是一届会议的',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会议中，嘉宾使用的演讲稿';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='与会嘉宾';
+
 
 #与会者与专题讨论会的对应关系
 DROP TABLE IF EXISTS `MEETING_Parti_Forum`;
@@ -119,6 +134,25 @@ CREATE TABLE `MEETING_Task_Candidate` (
   `userId` int(11) NOT NULL COMMENT '用户ID',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='任务执行者候选人';
+
+
+#通用任务模型
+DROP TABLE IF EXISTS `MEETING_Common_Task`;
+CREATE TABLE `MEETING_Common_Task` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `taskType` varchar(40) NOT NULL COMMENT '任务类型，应该包含固定个数的类型，比如准备材料， 上传问题到平台',
+  `taskStatus` varchar(10) NOT NULL COMMENT '新建 | 进行中 | 结束',
+  `taskDescription` varchar(1000) NOT NULL COMMENT '任务详细描述',
+  `taskTitle` varchar(40) NOT NULL COMMENT '任务简单描述',
+  `taskAttachment` varchar(1000) NOT NULL COMMENT '任务附件，可以上传多个附件，他们被拼接为一个字符串',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通用任务的模型';
+
+
+
+
+
 
 
 

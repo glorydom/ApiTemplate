@@ -42,7 +42,7 @@ public class MeetingController extends BaseController {
     MeetingMeetingService meetingMeetingService;
 
     @ApiOperation(value = "查询所有正在进行中的会议")
-    @RequiresPermissions("chqs:meeting:manage")
+//    @RequiresPermissions("chqs:meeting:manage")
     @RequestMapping(value = "listActives", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult listMeeting(){
@@ -68,7 +68,7 @@ public class MeetingController extends BaseController {
     }
 
     @ApiOperation(value = "开始一场会议")
-    @RequiresPermissions("chqs:meeting:create")
+//    @RequiresPermissions("chqs:meeting:create")
     @RequestMapping(value = "startMeeting", method = RequestMethod.POST)
     @ResponseBody
     public BaseResult startMeeting(@RequestBody MeetingMeeting meeting){
@@ -125,7 +125,7 @@ public class MeetingController extends BaseController {
     }
 
     @ApiOperation(value = "取消一场会议")
-    @RequiresPermissions("chqs:meeting:delete")
+//    @RequiresPermissions("chqs:meeting:delete")
     @RequestMapping(value = "cancel/{id}", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult cancelMeeting(@PathVariable int id){
@@ -148,7 +148,7 @@ public class MeetingController extends BaseController {
     }
 
     @ApiOperation(value = "查看一场会议")
-    @RequiresPermissions("chqs:meeting:read")
+//    @RequiresPermissions("chqs:meeting:read")
     @RequestMapping(value = "checkMeeting/{id}", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult viewMeeting(@PathVariable int id){

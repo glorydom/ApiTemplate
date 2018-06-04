@@ -1,7 +1,18 @@
 package com.dto.huiyi.meeting.entity;
 
 public class DeployedProcess {
+    private String id;
     private String processKey;
+    private int version;
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getProcessKey() {
         return processKey;
@@ -11,25 +22,13 @@ public class DeployedProcess {
         this.processKey = processKey;
     }
 
-    @Override
-    public String toString() {
-        return "DeployedProcess{" +
-                "processKey='" + processKey + '\'' +
-                '}';
+    public int getVersion() {
+        return version;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DeployedProcess that = (DeployedProcess) o;
-
-        return processKey != null ? processKey.equals(that.processKey) : that.processKey == null;
+    public void setVersion(int version) {
+        this.version = version;
     }
 
-    @Override
-    public int hashCode() {
-        return processKey != null ? processKey.hashCode() : 0;
-    }
+
 }

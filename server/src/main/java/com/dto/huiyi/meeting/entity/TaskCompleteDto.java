@@ -3,6 +3,9 @@ package com.dto.huiyi.meeting.entity;
 import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * 任务完成时传递的参数
+ */
 public class TaskCompleteDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
