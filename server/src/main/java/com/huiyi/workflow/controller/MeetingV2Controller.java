@@ -190,13 +190,18 @@ public class MeetingV2Controller extends BaseController {
 		
 		List<UserTask> allTasks = baseWorkFlowService.listAllUserTasks(MeetingMeeting.class.getSimpleName());
 		Map<String,String> taskMap = new HashMap<String,String>();
-		for(UserTask t : allTasks)
+		Map<String,CustomMeetingTask> map = new HashMap<>();
+		for(UserTask t : allTasks) {
 			taskMap.put(t.getId(), t.getName());
+			CustomMeetingTask cmt = new CustomMeetingTask();
+			cmt.setTaskId(t.getId());
+			cmt.setTaskName(t.getName());
+			map.put(t.getId(), cmt);
+		}
 		
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
 		example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId));
 		List<MeetingTaskCandidate> list = meetingTaskCandidateService.selectByExample(example);
-		Map<String,CustomMeetingTask> map = new HashMap<>();
 		for(MeetingTaskCandidate mtc: list) {
 			String taskId = mtc.getTaskid();
 			CustomMeetingTask customMeetingTask =  map.get(taskId);
