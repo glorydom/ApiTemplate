@@ -52,6 +52,17 @@ public class MeetingParticipantController extends BaseController {
         return new BaseResult(Constants.SUCCESS_CODE, "", null);
     }
 
+    @ApiOperation(value = "人员详情")
+    @RequestMapping(value = "get/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    /**
+     * 这个API肯定是在搜寻之后才发起的，所以传入参数必须有id,如果没有就返回 Constants.ERROR_CODE
+     */
+    public BaseResult get(@PathVariable int id){
+
+        return new BaseResult(Constants.SUCCESS_CODE, "", null);
+    }
+
 
     @ApiOperation(value = "人员信息更新")
     @RequestMapping(value = "update/{id}", method = RequestMethod.POST)
