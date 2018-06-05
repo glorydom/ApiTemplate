@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.baidu.unbiz.fluentvalidator.ComplexResult;
 import com.baidu.unbiz.fluentvalidator.FluentValidator;
 import com.baidu.unbiz.fluentvalidator.ResultCollectors;
+import com.dto.huiyi.meeting.entity.config.TaskAssigneeDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huicong.upms.dao.model.UpmsUser;
 import com.huicong.upms.dao.model.UpmsUserExample;
@@ -143,21 +144,33 @@ public class MeetingV2Controller extends BaseController {
 	@ApiOperation(value="保存整个会议任务执行人候选人")
 	@ResponseBody
 	@Transactional
-	public Object saveWholeMeetingTaskCandidates(@RequestBody List<MeetingTaskCandidate> list) {
-		if (list == null || list.size() == 1) {
+	public Object saveWholeMeetingTaskCandidates(@RequestBody TaskAssigneeDto taskAssigneeDto) {
+		if (taskAssigneeDto == null || taskAssigneeDto.getTaskSettings() ==null ) {
 			return new BaseResult(Constants.ACCESS_ERROR, "failed", "没有需要保存的数据！");
 		}
-		for(MeetingTaskCandidate mtc : list) {
-			ComplexResult result = FluentValidator.checkAll()
-					.on(mtc.getTaskid(), new LengthValidator(1, 64, "工作流任务ID"))
-					.doValidate()
-					.result(ResultCollectors.toComplex());
-			if (!result.isSuccess()) {
-				return new BaseResult(Constants.ERROR_CODE, "failed", result.getErrors());
+		int meetingId = taskAssigneeDto.getMeetingId();
+		List<MeetingTaskCandidate> list = new ArrayList<>();
+		for(CustomMeetingTask cmt: taskAssigneeDto.getTaskSettings()) {
+			String taskId = cmt.getTaskId();
+			for(UpmsUser u : cmt.getUserList()) {
+				MeetingTaskCandidate meetingTaskCandidate = new MeetingTaskCandidate();
+				meetingTaskCandidate.setMeetingid(meetingId);
+				meetingTaskCandidate.setTaskid(taskId);
+				meetingTaskCandidate.setUserid(u.getUserId());
+				list.add(meetingTaskCandidate);
 			}
 		}
+//		for(MeetingTaskCandidate mtc : list) {
+//			ComplexResult result = FluentValidator.checkAll()
+//					.on(mtc.getTaskid(), new LengthValidator(1, 64, "工作流任务ID"))
+//					.doValidate()
+//					.result(ResultCollectors.toComplex());
+//			if (!result.isSuccess()) {
+//				return new BaseResult(Constants.ERROR_CODE, "failed", result.getErrors());
+//			}
+//		}
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
-		example.createCriteria().andMeetingidEqualTo(list.get(0).getMeetingid());
+		example.createCriteria().andMeetingidEqualTo(taskAssigneeDto.getMeetingId());
 		List<MeetingTaskCandidate> existing = meetingTaskCandidateService.selectByExample(example);
 		for(MeetingTaskCandidate mtc : existing) {
 			mtc.setId(null);
