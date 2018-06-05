@@ -30,7 +30,11 @@
       </timerEventDefinition>
     </intermediateCatchEvent>
     <sequenceFlow id="sid-258DF209-5900-4189-93C3-E153CD3E528D" sourceRef="sid-1A0ED49F-FDFC-41F3-B131-217B1F8EA36E" targetRef="sid-8A035564-AFD1-4100-B319-27563B6D11A8"></sequenceFlow>
-    <userTask id="sid-7C68B521-3871-4FFB-8494-CCC7A8053567" name="查看稿件" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="checkScriptManual"></userTask>
+    <userTask id="sid-7C68B521-3871-4FFB-8494-CCC7A8053567" name="查看稿件" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="checkScriptManual">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="sid-000E6E20-EFC6-4470-A795-F010BBBF33E8" sourceRef="sid-438AB38E-A235-4541-B036-538FB8EFA3D4" targetRef="sid-7C68B521-3871-4FFB-8494-CCC7A8053567"></sequenceFlow>
     <endEvent id="sid-C06DACF9-607A-4B01-8AC3-C1CF48A07A96"></endEvent>
     <sequenceFlow id="sid-87A79C3E-C68A-4E2B-ACA6-08CEEA58D413" sourceRef="sid-7C68B521-3871-4FFB-8494-CCC7A8053567" targetRef="sid-C06DACF9-607A-4B01-8AC3-C1CF48A07A96">

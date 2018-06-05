@@ -1,45 +1,32 @@
 package com.huiyi.meeting.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.dto.huiyi.meeting.entity.CHQSResult;
-import com.dto.huiyi.meeting.entity.meetingDto.ProcessStartParameter;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huiyi.service.HttpClientService;
 import com.zheng.common.base.BaseResult;
-
-import java.io.IOException;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.runtime.ProcessInstance;
 import java.util.Map;
-
-import static com.dto.huiyi.meeting.util.Constants.ERROR_CODE;
 import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 
 public class ControllerUtil {
 
-    public static BaseResult startNewBussinessProcess(Object entity, int bussinessId, Map<String, Object> parameters,
-                                                      HttpClientService httpClientService){
+    public static BaseResult startNewBussinessProcess(RuntimeService runtimeService, Object entity, int bussinessId, Map<String, Object> parameters
+                                                      ){
         String process_id = entity.getClass().getSimpleName();
         String bussiness_key = process_id + "_" + bussinessId;
-        String chqsUrl = Constants.CHQSURL + "process/start";
         CHQSResult result = null;
         // prepare the parameters
         // date format: 2011-03-11T12:13:14
-        ProcessStartParameter processStartParameter = new ProcessStartParameter();
-        processStartParameter.setBussinessId(bussiness_key);
-        processStartParameter.setParameters(parameters);
-        processStartParameter.setProcessId(process_id);
-        try {
-            result = httpClientService.postCHQSJson(chqsUrl, JSON.toJSONString(processStartParameter), new TypeReference<CHQSResult>(){});
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new BaseResult(ERROR_CODE, "system error", null);
+
+        if(null != parameters){
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(process_id,
+                    bussiness_key, parameters);
+            return new BaseResult(Constants.SUCCESS_CODE, "success", null);
+        }else {
+            return new BaseResult(Constants.ERROR_CODE, "no parameters", parameters);
         }
 
-        if(result.code == Constants.SUCCESS_CODE){
-            return new BaseResult(SUCCESS_CODE, "success", entity);
-        }
-
-        return new BaseResult(ERROR_CODE, "system error", null);
     }
 
 

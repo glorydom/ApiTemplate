@@ -7,6 +7,7 @@ import com.huiyi.service.HttpClientService;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.activiti.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,7 @@ import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 public class MeetingTopicController {
 
     @Autowired
-    HttpClientService httpClientService;
+    private RuntimeService runtimeService;
 
     @Autowired
     MeetingTopicService meetingTopicService;
@@ -65,7 +66,7 @@ public class MeetingTopicController {
         // start the meeting process
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("entity", meetingTopic);
-        return ControllerUtil.startNewBussinessProcess(meetingTopic, meetingTopic.getId(), parameters, httpClientService);
+        return ControllerUtil.startNewBussinessProcess(runtimeService ,meetingTopic, meetingTopic.getId(), parameters);
     }
 
     @ApiOperation(value = "完成MeetingTopic任务")

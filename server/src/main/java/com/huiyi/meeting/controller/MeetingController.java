@@ -1,9 +1,5 @@
 package com.huiyi.meeting.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.dto.huiyi.meeting.entity.CHQSResult;
-import com.dto.huiyi.meeting.entity.ProcessInstanceDto;
 import com.dto.huiyi.meeting.entity.meetingDto.ProcessStartParameter;
 import com.dto.huiyi.meeting.util.Constants;
 import com.dto.huiyi.meeting.util.TimeDateFormat;
@@ -15,16 +11,12 @@ import com.huiyi.service.HttpClientService;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
-
-import static com.dto.huiyi.meeting.util.Constants.ERROR_CODE;
 import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 
 @Controller
@@ -33,10 +25,11 @@ import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 public class MeetingController extends BaseController {
 
     @Autowired
-    MeetingMeetingMapper meetingMeetingMapper;
+    private RuntimeService runtimeService;
 
     @Autowired
-    HttpClientService httpClientService;
+    MeetingMeetingMapper meetingMeetingMapper;
+
 
     @Autowired
     MeetingMeetingService meetingMeetingService;
@@ -47,24 +40,20 @@ public class MeetingController extends BaseController {
     @ResponseBody
     public BaseResult listMeeting(){
         List<MeetingMeeting> activeMeetings = new ArrayList<>();
-        try {
-            CHQSResult<List<ProcessInstanceDto>> processInstanceDtos =  httpClientService.getCHQSData(Constants.CHQSURL + "process/listActiveProcess", null, new TypeReference<CHQSResult<List<ProcessInstanceDto>>>(){});
-            if(processInstanceDtos == null)
-                return new BaseResult(SUCCESS_CODE, "empty", null);
 
-            for(ProcessInstanceDto d: processInstanceDtos.getData()){
-                String bussinessKey = d.getBusinessKey();
+        List<ProcessInstance> list = runtimeService.createProcessInstanceQuery()
+                .active()
+                .list();
+        if(list != null ){
+            for(ProcessInstance ps : list){
+                String bussinessKey = ps.getBusinessKey();
                 if(bussinessKey.split("_")[0].equalsIgnoreCase(MeetingMeeting.class.getSimpleName())){
                     int id = Integer.parseInt(bussinessKey.split("_")[1]);
                     activeMeetings.add(meetingMeetingService.selectByPrimaryKey(id));
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
         }
-        return new BaseResult(SUCCESS_CODE, "success", activeMeetings);
+        return new BaseResult(Constants.SUCCESS_CODE, "success", activeMeetings);
     }
 
     @ApiOperation(value = "开始一场会议")
@@ -95,8 +84,6 @@ public class MeetingController extends BaseController {
         // start the meeting process
         String process_id = MeetingMeeting.class.getSimpleName();
         String bussiness_key = process_id + "_" + id;
-        String chqsUrl = Constants.CHQSURL + "process/start";
-        CHQSResult result = null;
         // prepare the parameters
         // date format: 2011-03-11T12:13:14
         Date beginAt = meeting.getBeginat();
@@ -108,20 +95,7 @@ public class MeetingController extends BaseController {
         processStartParameter.setBussinessId(bussiness_key);
         processStartParameter.setParameters(parameters);
         processStartParameter.setProcessId(process_id);
-        try {
-            result = httpClientService.postCHQSJson(chqsUrl, JSON.toJSONString(processStartParameter), new TypeReference<CHQSResult>(){});
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new BaseResult(ERROR_CODE, "system error", null);
-        }
-
-        if(result.code == Constants.SUCCESS_CODE){
-            MeetingMeeting createdMeeting = meetingMeetingService.selectByPrimaryKey(id);
-            return new BaseResult(SUCCESS_CODE, "success", createdMeeting);
-        }
-
-        return new BaseResult(ERROR_CODE, "system error", null);
-
+        return ControllerUtil.startNewBussinessProcess(runtimeService, meeting, id, parameters);
     }
 
     @ApiOperation(value = "取消一场会议")
@@ -130,21 +104,12 @@ public class MeetingController extends BaseController {
     @ResponseBody
     public BaseResult cancelMeeting(@PathVariable int id){
         String bussinessKey = MeetingMeeting.class.getSimpleName() + "_" + id;
-        String chqsUrl = Constants.CHQSURL + "process/stopByBussinesskey/" + bussinessKey;
-        try {
-            CHQSResult result = httpClientService.getCHQSData(chqsUrl, null, new TypeReference<CHQSResult>(){});
-            if(result!=null && result.getCode() == SUCCESS_CODE){
-                return new BaseResult(SUCCESS_CODE, "success", null);
-            }else{
-                return new BaseResult(ERROR_CODE, "system error", null);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        return new BaseResult(ERROR_CODE, "system error", null);
+        ProcessInstance ps = runtimeService.createProcessInstanceQuery()
+                .processInstanceBusinessKey(bussinessKey)
+                .singleResult();
+        String processId = ps.getProcessInstanceId();
+        runtimeService.deleteProcessInstance(processId, "取消");
+        return new BaseResult(Constants.SUCCESS_CODE, "success", null);
     }
 
     @ApiOperation(value = "查看一场会议")

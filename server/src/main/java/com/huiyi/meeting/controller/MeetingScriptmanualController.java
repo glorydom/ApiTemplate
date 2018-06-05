@@ -19,6 +19,9 @@ import com.zheng.common.base.BaseResult;
 import com.zheng.common.validator.NotNullValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.impl.identity.Authentication;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,13 +47,17 @@ public class MeetingScriptmanualController {
     private final String chqsUrlbase = Constants.CHQSURL + "task";
 
     @Autowired
+    private TaskService taskService;
+
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
     private MeetingScriptmanualService meetingScriptmanualService;
 
     @Autowired
     private MeetingScriptmanualMapper meetingScriptmanualMapper;
 
-    @Autowired
-    HttpClientService httpClientService;
 
     @ApiOperation(value = "启动创建一个新的演讲稿的流程")
     @RequestMapping(value = "create", method = RequestMethod.POST)
@@ -69,7 +76,7 @@ public class MeetingScriptmanualController {
         //process related parameters
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("entity", meetingScriptmanual);
-        return ControllerUtil.startNewBussinessProcess(meetingScriptmanual, meetingScriptmanual.getId(), parameters, httpClientService);
+        return ControllerUtil.startNewBussinessProcess(runtimeService, meetingScriptmanual, meetingScriptmanual.getId(), parameters);
     }
 
     @ApiOperation(value = "执行有关演讲稿的任务")
@@ -93,31 +100,18 @@ public class MeetingScriptmanualController {
 
         String userId = (String) SecurityUtils.getSubject().getPrincipal();
         String taskId = parameter.getTaskId();
-        String chqsUrl = chqsUrlbase + "/complete";
-        TaskCompleteDto completeDto = new TaskCompleteDto();
-        completeDto.setComment(parameter.getComment());
-        completeDto.setTaskId(taskId);
-        completeDto.setUserId(userId);
-        Map<String, Object> p = new HashMap<>();
-        completeDto.setCompletionArguments(p);
-        String jsonPrameter = JSON.toJSONString(completeDto);
 
-        CHQSResult chqsResult = null;
-        try {
-            chqsResult = httpClientService.postCHQSJson(chqsUrl, jsonPrameter, new TypeReference<CHQSResult>() {
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new BaseResult(ERROR_CODE, "system error", null);
-        }
+        Map<String, Object> p = new HashMap<>();
+
+        Authentication.setAuthenticatedUserId(userId);//批注人的名称  一定要写，不然查看的时候不知道人物信息
+        // 添加批注信息
+        taskService.addComment(taskId, null, parameter.getComment());//comment为批注内容
+        // 完成任务
+        taskService.complete(taskId,p);//vars是一些变量
 
         meetingScriptmanualService.updateByPrimaryKey(scriptmanual);
+        return new BaseResult(Constants.SUCCESS_CODE, "success", null);
 
-        if(null != result){
-            return new BaseResult(SUCCESS_CODE, "success", chqsResult.getData());
-        }else{
-            return new BaseResult(ERROR_CODE, "system error", null);
-        }
     }
 
     @ApiOperation(value = "根据ID获取演讲稿任务")
