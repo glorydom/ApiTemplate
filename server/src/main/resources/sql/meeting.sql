@@ -145,9 +145,49 @@ CREATE TABLE `MEETING_Common_Task` (
   `taskDescription` varchar(1000) NOT NULL COMMENT '任务详细描述',
   `taskTitle` varchar(40) NOT NULL COMMENT '任务简单描述',
   `taskAttachment` varchar(1000) NOT NULL COMMENT '任务附件，可以上传多个附件，他们被拼接为一个字符串',
+  `startTime` date DEFAULT NULL COMMENT '开始时间',
+  `endTime` date DEFAULT NULL COMMENT '结束时间',
+  `taskOwner` varchar(10) NOT NULL COMMENT '任务创建者ID',
+  `taskExecutor` varchar(10) NOT NULL COMMENT '任务执行者',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通用任务的模型';
+
+
+#机场火车站的配置
+DROP TABLE IF EXISTS `MEETING_Station`;
+CREATE TABLE `MEETING_Station` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(40) DEFAULT NULL COMMENT '目前支持一下几种：  机场 | 火车站 ',
+  `province` varchar(10) DEFAULT NULL COMMENT '',
+  `city` varchar(20) DEFAULT NULL COMMENT 'city',
+  `town` varchar(20) DEFAULT NULL COMMENT 'town',
+  `address` varchar(50) DEFAULT NULL COMMENT 'address',
+  `personInCharge` varchar(20) DEFAULT NULL COMMENT '负责人ID',
+  `taskAttachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场火车站的配置';
+
+
+#会议室地址
+DROP TABLE IF EXISTS `MEETING_Room`;
+CREATE TABLE `MEETING_Room` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `province` varchar(10) DEFAULT NULL COMMENT '',
+  `city` varchar(20) DEFAULT NULL COMMENT 'city',
+  `town` varchar(20) DEFAULT NULL COMMENT 'town',
+  `address` varchar(50) DEFAULT NULL COMMENT 'address',
+  `validFlag` varchar(5) DEFAULT NULL COMMENT '是否有效 Y | N',
+  `startValid` date DEFAULT NULL COMMENT '有效开始期',
+  `endValid` date DEFAULT NULL COMMENT '有效截止期',
+  `personInCharge` varchar(20) DEFAULT NULL COMMENT '负责人ID',
+  `taskAttachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
+  `capacity` int(11)  DEFAULT NULL COMMENT '支持多少人',
+  `price` float(11)  DEFAULT NULL COMMENT '支持多少人',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场火车站的配置';
 
 
 
