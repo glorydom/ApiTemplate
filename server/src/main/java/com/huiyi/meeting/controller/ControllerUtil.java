@@ -2,7 +2,6 @@ package com.huiyi.meeting.controller;
 
 import com.dto.huiyi.meeting.entity.CHQSResult;
 import com.dto.huiyi.meeting.util.Constants;
-import com.huiyi.service.HttpClientService;
 import com.zheng.common.base.BaseResult;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.runtime.ProcessInstance;

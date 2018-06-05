@@ -1,13 +1,11 @@
 package com.huiyi.meeting.controller;
 
-import com.dto.huiyi.meeting.entity.meetingDto.ProcessStartParameter;
 import com.dto.huiyi.meeting.util.Constants;
 import com.dto.huiyi.meeting.util.TimeDateFormat;
 import com.huiyi.meeting.dao.mapper.MeetingMeetingMapper;
 import com.huiyi.meeting.dao.model.MeetingMeeting;
 import com.huiyi.meeting.dao.model.MeetingMeetingExample;
 import com.huiyi.meeting.rpc.api.MeetingMeetingService;
-import com.huiyi.service.HttpClientService;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -64,7 +62,6 @@ public class MeetingController extends BaseController {
 
         int id = -1;
         //save one meeting
-
         if(meeting != null){
             if(meeting.getBeginat() == null) meeting.setBeginat(new Date()); // 开始时间为空的话，设置为立即开始
             // set timestamp to retrive it
@@ -91,10 +88,6 @@ public class MeetingController extends BaseController {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("beginAt", activitiTime);  //
 
-        ProcessStartParameter processStartParameter = new ProcessStartParameter();
-        processStartParameter.setBussinessId(bussiness_key);
-        processStartParameter.setParameters(parameters);
-        processStartParameter.setProcessId(process_id);
         return ControllerUtil.startNewBussinessProcess(runtimeService, meeting, id, parameters);
     }
 

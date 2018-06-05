@@ -44,8 +44,6 @@ import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 @Transactional
 public class MeetingScriptmanualController {
 
-    private final String chqsUrlbase = Constants.CHQSURL + "task";
-
     @Autowired
     private TaskService taskService;
 

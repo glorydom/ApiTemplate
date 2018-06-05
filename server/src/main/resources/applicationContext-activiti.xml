@@ -10,7 +10,10 @@
     <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
         <property name="dataSource" ref="dataSource" />
         <property name="transactionManager" ref="transactionManager" />
-        <property name="databaseSchemaUpdate" value="update" />
+        <property name="databaseSchemaUpdate" value="true" />
+        <property name="jobExecutorActivate" value="true" />
+        <!--使用其他系统的表，需要创建相关视图-->
+        <property name="dbIdentityUsed" value="false"/>
         <property name="deploymentResources"
         >
             <list>
