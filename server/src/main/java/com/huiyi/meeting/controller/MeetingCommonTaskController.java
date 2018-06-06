@@ -3,14 +3,12 @@ package com.huiyi.meeting.controller;
 import com.dto.huiyi.meeting.entity.commonTaskDto.CommonTaskCompleteParameter;
 import com.dto.huiyi.meeting.entity.commonTaskDto.CommonTaskStartParameter;
 import com.dto.huiyi.meeting.util.Constants;
+import com.huiyi.meeting.dao.model.MeetingCommonTask;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/chqs/commonTask")
@@ -21,7 +19,7 @@ public class MeetingCommonTaskController extends BaseController {
 //    @RequiresPermissions("chqs:meeting:manage")
     @RequestMapping(value = "start", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResult startTask(@RequestBody CommonTaskStartParameter commonTaskStartParameter){
+    public BaseResult startTask(@RequestBody MeetingCommonTask meetingCommonTask){
 
         return  new BaseResult(Constants.SUCCESS_CODE, "", null);
     }
@@ -34,6 +32,30 @@ public class MeetingCommonTaskController extends BaseController {
      */
     public BaseResult partialCompleteTask(@RequestBody CommonTaskCompleteParameter commonTaskCompleteParameter){
 
+
+        return  new BaseResult(Constants.SUCCESS_CODE, "", null);
+    }
+
+    @ApiOperation(value = "获取给我的任务")
+    @RequestMapping(value = "list/assigntome", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult getMyTasks(){
+
+        return  new BaseResult(Constants.SUCCESS_CODE, "", null);
+    }
+
+    @ApiOperation(value = "获取给其他人的任务")
+    @RequestMapping(value = "list/assign2others", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult getOtherTasks(){
+
+        return  new BaseResult(Constants.SUCCESS_CODE, "", null);
+    }
+
+    @ApiOperation(value = "获取我能看到的任务")
+    @RequestMapping(value = "list/icanview", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult getViewTasks(){
 
         return  new BaseResult(Constants.SUCCESS_CODE, "", null);
     }

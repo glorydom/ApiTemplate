@@ -140,18 +140,19 @@ public class MeetingV2Controller extends BaseController {
 		return new BaseResult(Constants.SUCCESS_CODE, "success", record);
 	}
 	
-	@RequestMapping(value="/saveWholeMeetingTaskCandidates", method = RequestMethod.GET)
+	@RequestMapping(value="/saveWholeMeetingTaskCandidates", method = RequestMethod.POST)
 	@ApiOperation(value="保存整个会议任务执行人候选人")
 	@ResponseBody
 	@Transactional
 	public Object saveWholeMeetingTaskCandidates(@RequestBody TaskAssigneeDto taskAssigneeDto) {
 		if (taskAssigneeDto == null || taskAssigneeDto.getTaskSettings() ==null ) {
-			return new BaseResult(Constants.ACCESS_ERROR, "failed", "没有需要保存的数据！");
+			return new BaseResult(Constants.ERROR_CODE, "failed", "没有需要保存的数据！");
 		}
 		int meetingId = taskAssigneeDto.getMeetingId();
 		List<MeetingTaskCandidate> list = new ArrayList<>();
 		for(CustomMeetingTask cmt: taskAssigneeDto.getTaskSettings()) {
 			String taskId = cmt.getTaskId();
+			// 前端如果传来的人是空的 怎么处理？
 			for(UpmsUser u : cmt.getUserList()) {
 				MeetingTaskCandidate meetingTaskCandidate = new MeetingTaskCandidate();
 				meetingTaskCandidate.setMeetingid(meetingId);

@@ -125,6 +125,7 @@ CREATE TABLE `MEETING_Topic` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='专场论坛征询10个问题';
 
+
 #任务执行者候选人
 DROP TABLE IF EXISTS `MEETING_Task_Candidate`;
 CREATE TABLE `MEETING_Task_Candidate` (
@@ -141,14 +142,15 @@ DROP TABLE IF EXISTS `MEETING_Common_Task`;
 CREATE TABLE `MEETING_Common_Task` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `taskType` varchar(40) NOT NULL COMMENT '任务类型，应该包含固定个数的类型，比如准备材料， 上传问题到平台',
-  `taskStatus` varchar(10) NOT NULL COMMENT '新建 | 进行中 | 结束',
-  `taskDescription` varchar(1000) NOT NULL COMMENT '任务详细描述',
-  `taskTitle` varchar(40) NOT NULL COMMENT '任务简单描述',
-  `taskAttachment` varchar(1000) NOT NULL COMMENT '任务附件，可以上传多个附件，他们被拼接为一个字符串',
+  `taskStatus` varchar(10) DEFAULT NULL COMMENT '新建 | 进行中 | 结束',
+  `taskViewers` varchar(500) DEFAULT NULL COMMENT 'userId 使用逗号分割',
+  `taskOwner` varchar(100) NOT NULL COMMENT '任务所有者',
+  `taskExecutors` varchar(100) DEFAULT NULL COMMENT 'userId 使用逗号分割',
+  `taskDescription` varchar(1000) DEFAULT NULL COMMENT '任务详细描述',
+  `taskTitle` varchar(40) DEFAULT NULL COMMENT '任务简单描述',
+  `taskAttachment` varchar(1000) DEFAULT NULL COMMENT '任务附件，可以上传多个附件，他们被拼接为一个字符串',
   `startTime` date DEFAULT NULL COMMENT '开始时间',
   `endTime` date DEFAULT NULL COMMENT '结束时间',
-  `taskOwner` varchar(10) NOT NULL COMMENT '任务创建者ID',
-  `taskExecutor` varchar(10) NOT NULL COMMENT '任务执行者',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通用任务的模型';
@@ -167,10 +169,10 @@ CREATE TABLE `MEETING_Station` (
   `taskAttachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场火车站的配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场，火车站的配置';
 
 
-#会议室地址
+#会议室
 DROP TABLE IF EXISTS `MEETING_Room`;
 CREATE TABLE `MEETING_Room` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -190,9 +192,49 @@ CREATE TABLE `MEETING_Room` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场火车站的配置';
 
 
+#酒店
+DROP TABLE IF EXISTS `MEETING_Room`;
+CREATE TABLE `MEETING_Room` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `province` varchar(10) DEFAULT NULL COMMENT '',
+  `city` varchar(20) DEFAULT NULL COMMENT 'city',
+  `town` varchar(20) DEFAULT NULL COMMENT 'town',
+  `address` varchar(50) DEFAULT NULL COMMENT 'address',
+  `validFlag` varchar(5) DEFAULT NULL COMMENT '是否有效 Y | N',
+  `startValid` date DEFAULT NULL COMMENT '有效开始期',
+  `endValid` date DEFAULT NULL COMMENT '有效截止期',
+  `personInCharge` varchar(20) DEFAULT NULL COMMENT '负责人ID',
+  `taskAttachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='酒店配置';
 
 
+#人员安置任务
+DROP TABLE IF EXISTS `MEETING_Participant_Recipiant_Task`;
+CREATE TABLE `MEETING_Participant_Recipiant_Task` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `participantId` int(11) DEFAULT NULL COMMENT '参会人员(MEETING_Participant)的id',
+  `batchId` int(11)  DEFAULT NULL COMMENT '批次，来源于：MEETING_Participant_Recipiant_Batch_Task',
+  `completeStatus` varchar(10) DEFAULT NULL COMMENT '完成状态： 开始 | 进行中 | 结束',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='人员安置任务';
 
 
-
+#任务批处理  对一批人的安置
+DROP TABLE IF EXISTS `MEETING_Participant_Recipiant_Batch_Task`;
+CREATE TABLE `MEETING_Participant_Recipiant_Batch_Task` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(20) DEFAULT NULL COMMENT '任务类型，仅仅支持以下类型： 接机 | 安排酒店 | 安排会议室',
+  `stationId` int(11)  DEFAULT NULL COMMENT '火车站，机场id',
+  `hotelId` int(11)  DEFAULT NULL COMMENT '酒店id',
+  `meetingRoomId` int(11)  DEFAULT NULL COMMENT '会议室id',
+  `startTime` date DEFAULT NULL COMMENT '有效截止期',
+  `endTime` date DEFAULT NULL COMMENT '有效截止期',
+  `personInCharge` varchar(20) DEFAULT NULL COMMENT '负责人ID',
+  `attachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='对一批人的安置';
 

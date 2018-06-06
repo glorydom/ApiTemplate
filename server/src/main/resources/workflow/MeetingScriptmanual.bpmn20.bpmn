@@ -2,56 +2,56 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
   <process id="MeetingScriptmanual" isExecutable="true">
     <startEvent id="sid-34E8C461-9616-42B3-956B-4523051E2AF6"></startEvent>
-    <userTask id="sid-529CE5FE-6421-4813-A2B8-3086A1AA27B1" name="催稿" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="createScriptManual"></userTask>
-    <sequenceFlow id="sid-03342F37-BEB8-4198-AC7D-D5BA24B16854" sourceRef="sid-34E8C461-9616-42B3-956B-4523051E2AF6" targetRef="sid-529CE5FE-6421-4813-A2B8-3086A1AA27B1"></sequenceFlow>
-    <userTask id="sid-6ED09AF2-3020-4D6E-B33D-7C70EE152245" name="翻译" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="translateScriptmanual"></userTask>
-    <sequenceFlow id="sid-F75B5EDF-BDB2-49D2-BCE5-AD73A9C8B72A" sourceRef="sid-529CE5FE-6421-4813-A2B8-3086A1AA27B1" targetRef="sid-6ED09AF2-3020-4D6E-B33D-7C70EE152245"></sequenceFlow>
-    <userTask id="sid-8ADD2F3F-97D2-482C-90C8-4A1DF7E4AC3D" name="检查" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="auditScriptManual"></userTask>
-    <sequenceFlow id="sid-E8C7CBE3-BA1D-4539-AE68-4D05BA521EE7" sourceRef="sid-6ED09AF2-3020-4D6E-B33D-7C70EE152245" targetRef="sid-8ADD2F3F-97D2-482C-90C8-4A1DF7E4AC3D"></sequenceFlow>
-    <userTask id="sid-96287E55-4220-42DC-873E-4568EDF999C0" name="排版" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="Typesetting"></userTask>
-    <sequenceFlow id="sid-06317552-90A6-431D-8056-8C2FB0BEA0BE" sourceRef="sid-8ADD2F3F-97D2-482C-90C8-4A1DF7E4AC3D" targetRef="sid-96287E55-4220-42DC-873E-4568EDF999C0"></sequenceFlow>
-    <userTask id="sid-F6B67588-6FAA-4C1F-8892-E87B4C6C9491" name="印刷" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="printScriptmanual"></userTask>
-    <sequenceFlow id="sid-BEBB4583-D638-4F43-988B-1D875E649455" sourceRef="sid-96287E55-4220-42DC-873E-4568EDF999C0" targetRef="sid-F6B67588-6FAA-4C1F-8892-E87B4C6C9491"></sequenceFlow>
-    <sequenceFlow id="sid-107F015C-5149-4FF9-9D17-0CEF9E42E25D" sourceRef="sid-F6B67588-6FAA-4C1F-8892-E87B4C6C9491" targetRef="sid-DBD48E52-F150-473B-9F64-FE2914FC0BA6"></sequenceFlow>
+    <userTask id="MeetingScriptmanual_1" name="催稿" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="createScriptManual"></userTask>
+    <sequenceFlow id="sid-03342F37-BEB8-4198-AC7D-D5BA24B16854" sourceRef="sid-34E8C461-9616-42B3-956B-4523051E2AF6" targetRef="MeetingScriptmanual_1"></sequenceFlow>
+    <userTask id="MeetingScriptmanual_2" name="翻译" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="translateScriptmanual"></userTask>
+    <sequenceFlow id="sid-F75B5EDF-BDB2-49D2-BCE5-AD73A9C8B72A" sourceRef="MeetingScriptmanual_1" targetRef="MeetingScriptmanual_2"></sequenceFlow>
+    <userTask id="MeetingScriptmanual_3" name="检查" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="auditScriptManual"></userTask>
+    <sequenceFlow id="sid-E8C7CBE3-BA1D-4539-AE68-4D05BA521EE7" sourceRef="MeetingScriptmanual_2" targetRef="MeetingScriptmanual_3"></sequenceFlow>
+    <userTask id="MeetingScriptmanual_4" name="排版" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="Typesetting"></userTask>
+    <sequenceFlow id="sid-06317552-90A6-431D-8056-8C2FB0BEA0BE" sourceRef="MeetingScriptmanual_3" targetRef="MeetingScriptmanual_4"></sequenceFlow>
+    <userTask id="MeetingScriptmanual_5" name="印刷" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="printScriptmanual"></userTask>
+    <sequenceFlow id="sid-BEBB4583-D638-4F43-988B-1D875E649455" sourceRef="MeetingScriptmanual_4" targetRef="MeetingScriptmanual_5"></sequenceFlow>
+    <sequenceFlow id="sid-107F015C-5149-4FF9-9D17-0CEF9E42E25D" sourceRef="MeetingScriptmanual_5" targetRef="sid-DBD48E52-F150-473B-9F64-FE2914FC0BA6"></sequenceFlow>
     <parallelGateway id="sid-DBD48E52-F150-473B-9F64-FE2914FC0BA6"></parallelGateway>
-    <userTask id="sid-6D66709E-3596-4253-AF51-4EAF883E762E" name="提炼备份版" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="summaryScriptManual"></userTask>
-    <sequenceFlow id="sid-25E5A55C-1B8A-4FAE-AAF0-B316084A4DF0" sourceRef="sid-DBD48E52-F150-473B-9F64-FE2914FC0BA6" targetRef="sid-6D66709E-3596-4253-AF51-4EAF883E762E"></sequenceFlow>
+    <userTask id="MeetingScriptmanual_6" name="提炼备份版" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="summaryScriptManual"></userTask>
+    <sequenceFlow id="sid-25E5A55C-1B8A-4FAE-AAF0-B316084A4DF0" sourceRef="sid-DBD48E52-F150-473B-9F64-FE2914FC0BA6" targetRef="MeetingScriptmanual_6"></sequenceFlow>
     <endEvent id="sid-AB6BC81C-F3B0-453D-BD8A-95D12E614516"></endEvent>
-    <sequenceFlow id="sid-B9E53DE0-E0F1-4947-864B-9444AF32DAB2" sourceRef="sid-6D66709E-3596-4253-AF51-4EAF883E762E" targetRef="sid-AB6BC81C-F3B0-453D-BD8A-95D12E614516"></sequenceFlow>
-    <userTask id="sid-030223F6-D44A-41DB-B234-5053732EF1CC" name="回发" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="sendBackScriptmanual"></userTask>
-    <sequenceFlow id="sid-A9EE7D8E-2E39-4060-B247-028966ED822E" sourceRef="sid-DBD48E52-F150-473B-9F64-FE2914FC0BA6" targetRef="sid-030223F6-D44A-41DB-B234-5053732EF1CC"></sequenceFlow>
-    <sequenceFlow id="flow1" sourceRef="sid-030223F6-D44A-41DB-B234-5053732EF1CC" targetRef="sid-AB6BC81C-F3B0-453D-BD8A-95D12E614516"></sequenceFlow>
+    <sequenceFlow id="sid-B9E53DE0-E0F1-4947-864B-9444AF32DAB2" sourceRef="MeetingScriptmanual_6" targetRef="sid-AB6BC81C-F3B0-453D-BD8A-95D12E614516"></sequenceFlow>
+    <userTask id="MeetingScriptmanual_7" name="回发" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="sendBackScriptmanual"></userTask>
+    <sequenceFlow id="sid-A9EE7D8E-2E39-4060-B247-028966ED822E" sourceRef="sid-DBD48E52-F150-473B-9F64-FE2914FC0BA6" targetRef="MeetingScriptmanual_7"></sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="MeetingScriptmanual_7" targetRef="sid-AB6BC81C-F3B0-453D-BD8A-95D12E614516"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_MeetingScriptmanual">
     <bpmndi:BPMNPlane bpmnElement="MeetingScriptmanual" id="BPMNPlane_MeetingScriptmanual">
       <bpmndi:BPMNShape bpmnElement="sid-34E8C461-9616-42B3-956B-4523051E2AF6" id="BPMNShape_sid-34E8C461-9616-42B3-956B-4523051E2AF6">
         <omgdc:Bounds height="35.0" width="35.0" x="70.0" y="153.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-529CE5FE-6421-4813-A2B8-3086A1AA27B1" id="BPMNShape_sid-529CE5FE-6421-4813-A2B8-3086A1AA27B1">
+      <bpmndi:BPMNShape bpmnElement="MeetingScriptmanual_1" id="BPMNShape_MeetingScriptmanual_1">
         <omgdc:Bounds height="80.0" width="100.0" x="146.0" y="131.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-6ED09AF2-3020-4D6E-B33D-7C70EE152245" id="BPMNShape_sid-6ED09AF2-3020-4D6E-B33D-7C70EE152245">
+      <bpmndi:BPMNShape bpmnElement="MeetingScriptmanual_2" id="BPMNShape_MeetingScriptmanual_2">
         <omgdc:Bounds height="80.0" width="100.0" x="300.0" y="131.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-8ADD2F3F-97D2-482C-90C8-4A1DF7E4AC3D" id="BPMNShape_sid-8ADD2F3F-97D2-482C-90C8-4A1DF7E4AC3D">
+      <bpmndi:BPMNShape bpmnElement="MeetingScriptmanual_3" id="BPMNShape_MeetingScriptmanual_3">
         <omgdc:Bounds height="80.0" width="100.0" x="450.0" y="131.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-96287E55-4220-42DC-873E-4568EDF999C0" id="BPMNShape_sid-96287E55-4220-42DC-873E-4568EDF999C0">
+      <bpmndi:BPMNShape bpmnElement="MeetingScriptmanual_4" id="BPMNShape_MeetingScriptmanual_4">
         <omgdc:Bounds height="80.0" width="100.0" x="585.0" y="131.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-F6B67588-6FAA-4C1F-8892-E87B4C6C9491" id="BPMNShape_sid-F6B67588-6FAA-4C1F-8892-E87B4C6C9491">
+      <bpmndi:BPMNShape bpmnElement="MeetingScriptmanual_5" id="BPMNShape_MeetingScriptmanual_5">
         <omgdc:Bounds height="80.0" width="100.0" x="721.0" y="131.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-DBD48E52-F150-473B-9F64-FE2914FC0BA6" id="BPMNShape_sid-DBD48E52-F150-473B-9F64-FE2914FC0BA6">
         <omgdc:Bounds height="40.0" width="40.0" x="855.0" y="151.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-6D66709E-3596-4253-AF51-4EAF883E762E" id="BPMNShape_sid-6D66709E-3596-4253-AF51-4EAF883E762E">
+      <bpmndi:BPMNShape bpmnElement="MeetingScriptmanual_6" id="BPMNShape_MeetingScriptmanual_6">
         <omgdc:Bounds height="80.0" width="100.0" x="960.0" y="131.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-AB6BC81C-F3B0-453D-BD8A-95D12E614516" id="BPMNShape_sid-AB6BC81C-F3B0-453D-BD8A-95D12E614516">
         <omgdc:Bounds height="35.0" width="35.0" x="1150.0" y="153.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-030223F6-D44A-41DB-B234-5053732EF1CC" id="BPMNShape_sid-030223F6-D44A-41DB-B234-5053732EF1CC">
+      <bpmndi:BPMNShape bpmnElement="MeetingScriptmanual_7" id="BPMNShape_MeetingScriptmanual_7">
         <omgdc:Bounds height="80.0" width="100.0" x="973.0" y="240.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="sid-03342F37-BEB8-4198-AC7D-D5BA24B16854" id="BPMNEdge_sid-03342F37-BEB8-4198-AC7D-D5BA24B16854">
