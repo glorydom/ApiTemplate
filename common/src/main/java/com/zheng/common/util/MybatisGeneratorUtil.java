@@ -1,17 +1,21 @@
 package com.zheng.common.util;
 
+import static com.zheng.common.util.StringUtil.lineToHump;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.velocity.VelocityContext;
 import org.mybatis.generator.api.MyBatisGenerator;
 import org.mybatis.generator.config.Configuration;
 import org.mybatis.generator.config.xml.ConfigurationParser;
 import org.mybatis.generator.internal.DefaultShellCallback;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static com.zheng.common.util.StringUtil.lineToHump;
 
 /**
  * 代码生成类
@@ -64,7 +68,9 @@ public class MybatisGeneratorUtil {
 		}
 
 		String targetProject = module;
-		String basePath = MybatisGeneratorUtil.class.getResource("/").getPath().replace("/target/classes/", "").replace(targetProject, "").replaceFirst("/", "");
+		String basePath = MybatisGeneratorUtil.class.getResource("/").getPath().replace("/target/classes/", "").replace(targetProject, "");
+		if (os.toLowerCase().startsWith("win")) 
+			basePath = basePath.replaceFirst("/", "");
 		String generatorConfigXml = MybatisGeneratorUtil.class.getResource("/").getPath().replace("/target/classes/", "") + "/src/main/resources/generatorConfig.xml";
 		targetProject = basePath + targetProject;
         System.out.println("basePath -> " + basePath);
