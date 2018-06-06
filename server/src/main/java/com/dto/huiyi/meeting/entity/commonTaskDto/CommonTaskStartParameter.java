@@ -9,7 +9,8 @@ public class CommonTaskStartParameter implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private MeetingCommonTask meetingCommonTask;
-    private String assignee; // userId
+    private String delegate; // 代办人 userId
+    private String owner; // userId
 
     public MeetingCommonTask getMeetingCommonTask() {
         return meetingCommonTask;
@@ -19,11 +20,19 @@ public class CommonTaskStartParameter implements Serializable {
         this.meetingCommonTask = meetingCommonTask;
     }
 
-    public String getAssignee() {
-        return assignee;
+    public String getDelegate() {
+        return delegate;
     }
 
-    public void setAssignee(String assignee) {
-        this.assignee = assignee;
+    public void setDelegate(String delegate) {
+        this.delegate = delegate;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }
