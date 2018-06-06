@@ -125,6 +125,7 @@ CREATE TABLE `MEETING_Topic` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='专场论坛征询10个问题';
 
+
 #任务执行者候选人
 DROP TABLE IF EXISTS `MEETING_Task_Candidate`;
 CREATE TABLE `MEETING_Task_Candidate` (
@@ -167,10 +168,10 @@ CREATE TABLE `MEETING_Station` (
   `taskAttachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场火车站的配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场，火车站的配置';
 
 
-#会议室地址
+#会议室
 DROP TABLE IF EXISTS `MEETING_Room`;
 CREATE TABLE `MEETING_Room` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -190,9 +191,49 @@ CREATE TABLE `MEETING_Room` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场火车站的配置';
 
 
+#酒店
+DROP TABLE IF EXISTS `MEETING_Room`;
+CREATE TABLE `MEETING_Room` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `province` varchar(10) DEFAULT NULL COMMENT '',
+  `city` varchar(20) DEFAULT NULL COMMENT 'city',
+  `town` varchar(20) DEFAULT NULL COMMENT 'town',
+  `address` varchar(50) DEFAULT NULL COMMENT 'address',
+  `validFlag` varchar(5) DEFAULT NULL COMMENT '是否有效 Y | N',
+  `startValid` date DEFAULT NULL COMMENT '有效开始期',
+  `endValid` date DEFAULT NULL COMMENT '有效截止期',
+  `personInCharge` varchar(20) DEFAULT NULL COMMENT '负责人ID',
+  `taskAttachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='酒店配置';
 
 
+#人员安置任务
+DROP TABLE IF EXISTS `MEETING_Participant_Recipiant_Task`;
+CREATE TABLE `MEETING_Participant_Recipiant_Task` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `participantId` int(11) DEFAULT NULL COMMENT '参会人员(MEETING_Participant)的id',
+  `batchId` int(11)  DEFAULT NULL COMMENT '批次，来源于：MEETING_Participant_Recipiant_Batch_Task',
+  `completeStatus` varchar(10) DEFAULT NULL COMMENT '完成状态： 开始 | 进行中 | 结束',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='人员安置任务';
 
 
-
+#任务批处理  对一批人的安置
+DROP TABLE IF EXISTS `MEETING_Participant_Recipiant_Batch_Task`;
+CREATE TABLE `MEETING_Participant_Recipiant_Batch_Task` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(20) DEFAULT NULL COMMENT '任务类型，仅仅支持以下类型： 接机 | 安排酒店 | 安排会议室',
+  `stationId` int(11)  DEFAULT NULL COMMENT '火车站，机场id',
+  `hotelId` int(11)  DEFAULT NULL COMMENT '酒店id',
+  `meetingRoomId` int(11)  DEFAULT NULL COMMENT '会议室id',
+  `startTime` date DEFAULT NULL COMMENT '有效截止期',
+  `endTime` date DEFAULT NULL COMMENT '有效截止期',
+  `personInCharge` varchar(20) DEFAULT NULL COMMENT '负责人ID',
+  `attachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='对一批人的安置';
 

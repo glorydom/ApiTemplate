@@ -65,8 +65,12 @@
                                                 <table tableName="MEETING_Forum" domainObjectName="MeetingForum"></table>
                                                 <table tableName="MEETING_Parti_Forum" domainObjectName="MeetingPartiForum"></table>
                                                 <table tableName="MEETING_Participant" domainObjectName="MeetingParticipant"></table>
+                                                <table tableName="MEETING_Participant_Recipiant_Batch_Task" domainObjectName="MeetingParticipantRecipiantBatchTask"></table>
+                                                <table tableName="MEETING_Participant_Recipiant_Task" domainObjectName="MeetingParticipantRecipiantTask"></table>
                                                 <table tableName="MEETING_Preparation_Item" domainObjectName="MeetingPreparationItem"></table>
+                                                <table tableName="MEETING_Room" domainObjectName="MeetingRoom"></table>
                                                 <table tableName="MEETING_ScriptManual" domainObjectName="MeetingScriptmanual"></table>
+                                                <table tableName="MEETING_Station" domainObjectName="MeetingStation"></table>
                                                 <table tableName="MEETING_Task_Candidate" domainObjectName="MeetingTaskCandidate"></table>
                                                 <table tableName="MEETING_Topic" domainObjectName="MeetingTopic"></table>
                                                 <table tableName="MEETING_meeting" domainObjectName="MeetingMeeting"></table>
