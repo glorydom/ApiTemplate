@@ -3,6 +3,7 @@ package com.huiyi.meeting.controller;
 import com.dto.huiyi.meeting.entity.commonTaskDto.CommonTaskCompleteParameter;
 import com.dto.huiyi.meeting.entity.commonTaskDto.CommonTaskStartParameter;
 import com.dto.huiyi.meeting.util.Constants;
+import com.huiyi.meeting.dao.model.MeetingCommonTask;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +22,7 @@ public class MeetingCommonTaskController extends BaseController {
 //    @RequiresPermissions("chqs:meeting:manage")
     @RequestMapping(value = "start", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResult startTask(@RequestBody CommonTaskStartParameter commonTaskStartParameter){
+    public BaseResult startTask(@RequestBody MeetingCommonTask meetingCommonTask){
 
         return  new BaseResult(Constants.SUCCESS_CODE, "", null);
     }
