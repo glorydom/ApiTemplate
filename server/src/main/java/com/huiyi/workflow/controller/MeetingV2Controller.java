@@ -28,6 +28,7 @@ import com.baidu.unbiz.fluentvalidator.ComplexResult;
 import com.baidu.unbiz.fluentvalidator.FluentValidator;
 import com.baidu.unbiz.fluentvalidator.ResultCollectors;
 import com.dto.huiyi.meeting.entity.config.TaskAssigneeDto;
+import com.dto.huiyi.meeting.entity.config.TaskAssigneeSingleDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huicong.upms.dao.model.UpmsUser;
 import com.huicong.upms.dao.model.UpmsUserExample;
@@ -150,45 +151,49 @@ public class MeetingV2Controller extends BaseController {
 		}
 		int meetingId = taskAssigneeDto.getMeetingId();
 		List<MeetingTaskCandidate> list = new ArrayList<>();
-		for(CustomMeetingTask cmt: taskAssigneeDto.getTaskSettings()) {
-			String taskId = cmt.getTaskId();
+		for(TaskAssigneeSingleDto tasd: taskAssigneeDto.getTaskSettings()) {
 			// 前端如果传来的人是空的 怎么处理？
-			for(UpmsUser u : cmt.getUserList()) {
+			if(tasd.getUserList() == null)
+				continue;
+			String taskId = tasd.getTaskId();
+			for(Integer uid : tasd.getUserList()) {
 				MeetingTaskCandidate meetingTaskCandidate = new MeetingTaskCandidate();
 				meetingTaskCandidate.setMeetingid(meetingId);
 				meetingTaskCandidate.setTaskid(taskId);
-				meetingTaskCandidate.setUserid(u.getUserId());
+				meetingTaskCandidate.setUserid(uid);
 				list.add(meetingTaskCandidate);
 			}
 		}
-//		for(MeetingTaskCandidate mtc : list) {
-//			ComplexResult result = FluentValidator.checkAll()
-//					.on(mtc.getTaskid(), new LengthValidator(1, 64, "工作流任务ID"))
-//					.doValidate()
-//					.result(ResultCollectors.toComplex());
-//			if (!result.isSuccess()) {
-//				return new BaseResult(Constants.ERROR_CODE, "failed", result.getErrors());
-//			}
-//		}
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
 		example.createCriteria().andMeetingidEqualTo(taskAssigneeDto.getMeetingId());
-		List<MeetingTaskCandidate> existing = meetingTaskCandidateService.selectByExample(example);
-		for(MeetingTaskCandidate mtc : existing) {
-			mtc.setId(null);
+		if(list.size()==0) {
+			meetingTaskCandidateService.deleteByExample(example);
+			return new BaseResult(Constants.SUCCESS_CODE, "success", 0);
 		}
-//		meetingTaskCandidateService.deleteByExample(example);
-		
-		List<Integer> toBeRemoved = new ArrayList<Integer>();
+		List<MeetingTaskCandidate> existing = meetingTaskCandidateService.selectByExample(example);
+		Map<MeetingTaskCandidate,Integer> existingMap = new HashMap<>();
+		List<Integer> existingIds = new ArrayList<Integer>();
+		for(MeetingTaskCandidate mtc : existing) {
+			int id = mtc.getId();
+			mtc.setId(null);
+			existingIds.add(id);
+			existingMap.put(mtc, id);
+		}
+		int total = 0;
+		List<Integer> duplicatedIds = new ArrayList<Integer>();
 		for(MeetingTaskCandidate mtc : list) {
 			if(existing.contains(mtc)) {
-				toBeRemoved.add(mtc.getId());
+				duplicatedIds.add(existingMap.get(mtc));
 				continue;
 			}
-			meetingTaskCandidateService.insert(mtc);
+			total += meetingTaskCandidateService.insert(mtc);
 		}
-		String ids = StringUtils.join(toBeRemoved, "-");
-		meetingTaskCandidateService.deleteByPrimaryKeys(ids);
-		return new BaseResult(Constants.SUCCESS_CODE, "success", null);
+		existingIds.removeAll(duplicatedIds);
+		if(existingIds.size()>0) {
+			String ids = StringUtils.join(existingIds, "-");
+			total += meetingTaskCandidateService.deleteByPrimaryKeys(ids);
+		}
+		return new BaseResult(Constants.SUCCESS_CODE, "success", total);
 	}
 	
 	@RequestMapping(value="/findWholeMeetingTaskCandidates/{meetingId}", method = RequestMethod.GET)

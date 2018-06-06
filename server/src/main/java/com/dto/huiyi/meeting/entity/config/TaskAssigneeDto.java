@@ -11,7 +11,7 @@ public class TaskAssigneeDto implements Serializable {
 
     private int meetingId;
     private String meetingsubject;
-    private List<CustomMeetingTask> taskSettings;
+    private List<TaskAssigneeSingleDto> taskSettings;
 
     public int getMeetingId() {
         return meetingId;
@@ -29,11 +29,11 @@ public class TaskAssigneeDto implements Serializable {
         this.meetingsubject = meetingsubject;
     }
 
-    public List<CustomMeetingTask> getTaskSettings() {
+    public List<TaskAssigneeSingleDto> getTaskSettings() {
         return taskSettings;
     }
 
-    public void setTaskSettings(List<CustomMeetingTask> taskSettings) {
+    public void setTaskSettings(List<TaskAssigneeSingleDto> taskSettings) {
         this.taskSettings = taskSettings;
     }
 }
