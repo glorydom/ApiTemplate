@@ -151,7 +151,6 @@ CREATE TABLE `MEETING_Common_Task` (
   `taskAttachment` varchar(1000) DEFAULT NULL COMMENT '任务附件，可以上传多个附件，他们被拼接为一个字符串',
   `startTime` date DEFAULT NULL COMMENT '开始时间',
   `endTime` date DEFAULT NULL COMMENT '结束时间',
-  `taskExecutor` varchar(10) DEFAULT NULL COMMENT '任务执行者',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通用任务的模型';
