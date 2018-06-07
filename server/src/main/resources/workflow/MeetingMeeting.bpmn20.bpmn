@@ -41,7 +41,7 @@
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
     <sequenceFlow id="flow8" sourceRef="sid-438AB38E-A235-4541-B036-538FB8EFA3D4" targetRef="usertask1"></sequenceFlow>
-    <userTask id="usertask5" name="嘉宾牌整理" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="ParticipantCardCollection"></userTask>
+    <userTask id="usertask5" name="嘉宾牌整理" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="participantCardCollection"></userTask>
     <sequenceFlow id="flow9" sourceRef="sid-438AB38E-A235-4541-B036-538FB8EFA3D4" targetRef="usertask5"></sequenceFlow>
     <userTask id="usertask6" name="核对"></userTask>
     <sequenceFlow id="flow10" sourceRef="usertask5" targetRef="usertask6"></sequenceFlow>
@@ -78,7 +78,7 @@
     <sequenceFlow id="flow25" sourceRef="usertask11" targetRef="endevent7"></sequenceFlow>
     <parallelGateway id="parallelgateway3" name="Parallel Gateway"></parallelGateway>
     <sequenceFlow id="flow26" sourceRef="sid-1A0ED49F-FDFC-41F3-B131-217B1F8EA36E" targetRef="parallelgateway3"></sequenceFlow>
-    <userTask id="usertask13" name="通用任务管理" activiti:formKey="CommonTaskManagement"></userTask>
+    <userTask id="usertask13" name="通用任务管理" activiti:formKey="commonTaskManagement"></userTask>
     <sequenceFlow id="flow30" sourceRef="parallelgateway3" targetRef="sid-438AB38E-A235-4541-B036-538FB8EFA3D4"></sequenceFlow>
     <sequenceFlow id="flow31" sourceRef="parallelgateway3" targetRef="parallelgateway2"></sequenceFlow>
     <sequenceFlow id="flow32" sourceRef="parallelgateway2" targetRef="usertask13"></sequenceFlow>
