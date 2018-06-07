@@ -64,6 +64,12 @@
             </activation>
         </profile>
         <profile>
+            <id>dev2</id>
+            <properties>
+                <env>dev2</env>
+            </properties>
+        </profile>
+        <profile>
             <id>test</id>
             <properties>
                 <env>test</env>

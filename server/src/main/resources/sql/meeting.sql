@@ -130,7 +130,7 @@ CREATE TABLE `MEETING_Topic` (
 DROP TABLE IF EXISTS `MEETING_Task_Candidate`;
 CREATE TABLE `MEETING_Task_Candidate` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `meetingId` int(11) NOT NULL COMMENT '与该界会议关联',
+  `meetingId` int(11) NULL COMMENT '与该界会议关联',
   `taskId` varchar(64) NOT NULL COMMENT '流程任务ID',
   `userId` int(11) NOT NULL COMMENT '用户ID',
   PRIMARY KEY (`id`)
