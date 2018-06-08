@@ -288,7 +288,7 @@ function imageAction() {
 	imageDialog = $.dialog({
 		animationSpeed: 300,
 		title: '流程图',
-		content: 'url:${basePath}/manage/workflow/display?processName=MeetingMeeting&businessId=1',
+		content: 'url:${basePath}/chqs/workflow/display?processName=MeetingMeeting&businessId=1',
 		onContentReady: function () {
 			initMaterialInput();
 		}

@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,8 +104,9 @@ public class BaseWorkFlowService {
 		return null;
 	}
 	
-	public void findDeployment(String processName,String businessKey) {
-		ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processName).singleResult();
+	public InputStream getProcessImage(String processName) {
+		ProcessDefinition pd = findProcessDefinition(processName);
 		Deployment d = repositoryService.createDeploymentQuery().deploymentId(pd.getDeploymentId()).singleResult();
+		return repositoryService.getResourceAsStream(d.getId(), pd.getDiagramResourceName());
 	}
 }

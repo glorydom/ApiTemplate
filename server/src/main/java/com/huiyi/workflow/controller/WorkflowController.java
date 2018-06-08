@@ -1,16 +1,24 @@
 package com.huiyi.workflow.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.activiti.engine.repository.Deployment;
+import org.activiti.engine.repository.ProcessDefinition;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -96,8 +104,36 @@ public class WorkflowController extends BaseController{
 	
 	@ApiOperation(value="显示流程图")
 	@RequestMapping(value="/display", method = RequestMethod.GET)
-	public String displayProcessImage(@RequestParam("processName") String processName,@RequestParam("businessId") String businessId) {
-		System.out.println("process->"+processName);
+	public String displayProcessImage(@RequestParam("processName") String processName,@RequestParam("businessId") String businessId, HttpServletResponse response) {
+		ProcessDefinition pd = baseWorkFlowService.findProcessDefinition(processName);
+		InputStream is = baseWorkFlowService.getProcessImage(processName);
+		try {
+			OutputStream os  = response.getOutputStream();
+			for(int b =-1; (b=is.read())!=-1;)
+				os.write(b);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		String resourceName = pd.getDiagramResourceName();
+		System.out.println("process->"+resourceName);
 		return "/workflow/display.jsp";
+	}
+	
+	@ApiOperation(value="显示流程图")
+	@RequestMapping(value="/image", method = RequestMethod.GET,  produces = MediaType.IMAGE_PNG_VALUE)
+	@ResponseBody
+	public Object Image(@RequestParam("processName") String processName,@RequestParam("businessId") String businessId)throws IOException {
+		ProcessDefinition pd = baseWorkFlowService.findProcessDefinition(processName);
+		InputStream is = baseWorkFlowService.getProcessImage(processName);
+//		try {
+//			OutputStream os  = response.getOutputStream();
+//			for(int b =-1; (b=is.read())!=-1;)
+//				os.write(b);
+//		}catch (Exception e) {
+//			e.printStackTrace();
+//		}
+		String resourceName = pd.getDiagramResourceName();
+		System.out.println("process->"+resourceName);
+		return IOUtils.toByteArray(is);
 	}
 }
