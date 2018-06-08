@@ -80,7 +80,7 @@ public class MeetingParticipantController extends BaseController {
     public BaseResult regist(@RequestBody MeetingParticipant meetingParticipant){
     	ComplexResult result = FluentValidator.checkAll()
 				.on(meetingParticipant.getName(), new LengthValidator(1, 20, "名字"))
-				.on(meetingParticipant.getPhone(), new LengthValidator(1, 20, "电话"))
+				.on(meetingParticipant.getTelephone(), new LengthValidator(1, 20, "电话"))
 				.doValidate()
 				.result(ResultCollectors.toComplex());
 		if (!result.isSuccess()) {
@@ -136,7 +136,7 @@ public class MeetingParticipantController extends BaseController {
     	}
     	ComplexResult result = FluentValidator.checkAll()
 				.on(meetingParticipant.getName(), new LengthValidator(1, 20, "名字"))
-				.on(meetingParticipant.getPhone(), new LengthValidator(1, 20, "电话"))
+				.on(meetingParticipant.getTelephone(), new LengthValidator(1, 20, "电话"))
 				.doValidate()
 				.result(ResultCollectors.toComplex());
 		if (!result.isSuccess()) {

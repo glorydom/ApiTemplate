@@ -142,6 +142,7 @@ DROP TABLE IF EXISTS `MEETING_Common_Task`;
 CREATE TABLE `MEETING_Common_Task` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `taskType` varchar(40) NOT NULL COMMENT '任务类型，应该包含固定个数的类型，比如准备材料， 上传问题到平台',
+  `activitiTaskId` varchar(20) NOT NULL COMMENT 'Activiti流程使用的id',
   `taskStatus` varchar(10) DEFAULT NULL COMMENT '新建 | 进行中 | 结束',
   `taskViewers` varchar(500) DEFAULT NULL COMMENT 'userId 使用逗号分割',
   `taskOwner` varchar(100) NOT NULL COMMENT '任务所有者',
@@ -151,6 +152,9 @@ CREATE TABLE `MEETING_Common_Task` (
   `taskAttachment` varchar(1000) DEFAULT NULL COMMENT '任务附件，可以上传多个附件，他们被拼接为一个字符串',
   `startTime` date DEFAULT NULL COMMENT '开始时间',
   `endTime` date DEFAULT NULL COMMENT '结束时间',
+  `meeting_id` varchar(20) NOT NULL COMMENT '会议的bussiness key, 比如： meetingMeeting_2',
+  `taskApprover` varchar(20) NOT NULL COMMENT '任务需要审批者是',
+  `needApproval` varchar(10) NOT NULL COMMENT '任务需要审批否？  TRUE | FALSE',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通用任务的模型';
