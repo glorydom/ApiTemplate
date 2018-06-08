@@ -15,14 +15,17 @@ import com.zheng.common.util.StringUtil;
 import com.zheng.common.validator.NotNullValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -41,6 +44,9 @@ public class MeetingCommonTaskController extends BaseController {
     private TaskService taskService;
 
     @Autowired
+    private HistoryService historyService;
+
+    @Autowired
     private MeetingCommonTaskService meetingCommonTaskService;
 
     @Autowired
@@ -49,24 +55,11 @@ public class MeetingCommonTaskController extends BaseController {
     @ApiOperation(value = "开启任务")
     @RequestMapping(value = "start", method = RequestMethod.POST)
     @ResponseBody
+    @Transactional
     /**
      * 启动通用任务，任务拥有者默认为本人，执行者如果没有值，就默认为自己。
      */
     public BaseResult startTask(@RequestBody MeetingCommonTask meetingCommonTask){
-
-        if(meetingCommonTask == null && meetingCommonTask.getMeetingId() == null){
-            return new BaseResult(Constants.ERROR_CODE, "必须有meeting_id", null);
-        }
-
-        ComplexResult result = FluentValidator.checkAll()
-                .on(meetingCommonTask.getMeetingId(), new NotNullValidator("meetingId"))
-                .doValidate()
-                .result(ResultCollectors.toComplex());
-
-        if (!result.isSuccess()) {
-            return new BaseResult(ERROR_CODE, "meetingId is null", null);
-        }
-
 
         int id = -1;
         //save one meeting
@@ -77,13 +70,15 @@ public class MeetingCommonTaskController extends BaseController {
             meetingCommonTask.setCreationtimestamp(timestamp);
             int affectCount = meetingCommonTaskService.insert(meetingCommonTask);
 
-            if(affectCount == 1){
-                MeetingCommonTaskExample example = new MeetingCommonTaskExample();
-                example.createCriteria().andCreationtimestampEqualTo(timestamp);
-                List<MeetingCommonTask> ms = meetingCommonTaskMapper.selectByExample(example);
-                meetingCommonTask = ms.get(0);
+            if(affectCount == 0){
+               return new BaseResult(Constants.ERROR_CODE, "failed to start common job", meetingCommonTask);
             }
-            id = meetingCommonTask.getId();
+
+            MeetingCommonTaskExample example = new MeetingCommonTaskExample();
+            example.createCriteria().andCreationtimestampEqualTo(timestamp);
+            List<MeetingCommonTask> meetingCommonTasks =  meetingCommonTaskService.selectByExample(example);
+            MeetingCommonTask meetingCommonTask1 = meetingCommonTasks.get(0);
+            id = meetingCommonTask1.getId();
         }
 
         // prepare the parameters
@@ -100,6 +95,8 @@ public class MeetingCommonTaskController extends BaseController {
             parameters.put(Constants.COMMON_TASK_APPROVER, meetingCommonTask.getTaskapprover());
         }
 
+        parameters.put(Constants.COMMON_TASK_NEED_APPROVAL, Constants.COMMON_TASK_NEED_APPROVAL_NEGATIVE); //默认不需要审批
+
         return ControllerUtil.startNewBussinessProcess(runtimeService, meetingCommonTask, id, parameters);
     }
 
@@ -111,7 +108,7 @@ public class MeetingCommonTaskController extends BaseController {
      */
     public BaseResult partialCompleteTask(@RequestBody CommonTaskCompleteParameter commonTaskCompleteParameter){
         ComplexResult result = FluentValidator.checkAll()
-                .on(commonTaskCompleteParameter.getTaskCompleteDto().getTaskId(), new NotNullValidator("taskId"))
+                .on(commonTaskCompleteParameter.getTaskId(), new NotNullValidator("taskId"))
                 .doValidate()
                 .result(ResultCollectors.toComplex());
 
@@ -126,14 +123,69 @@ public class MeetingCommonTaskController extends BaseController {
         }
 
         String userId = (String) SecurityUtils.getSubject().getPrincipal();
-        String taskId = commonTaskCompleteParameter.getTaskCompleteDto().getTaskId();
+        String taskId = commonTaskCompleteParameter.getTaskId();
 
         Map<String, Object> p = new HashMap<>();
 
         Authentication.setAuthenticatedUserId(userId);//批注人的名称  一定要写，不然查看的时候不知道人物信息
         // 添加批注信息
-        taskService.addComment(taskId, null, commonTaskCompleteParameter.getTaskCompleteDto().getComment());//comment为批注内容
+        taskService.addComment(taskId, null, commonTaskCompleteParameter.getComment());//comment为批注内容
+
+        //设置execution parameters
+        Task task = taskService.createTaskQuery().taskId(commonTaskCompleteParameter.getTaskId()).singleResult();
+        taskService.setVariable(taskId, Constants.COMMON_TASK_OWNER, commonTaskCompleteParameter.getMeetingCommonTask().getTaskowner());
+        taskService.setVariable(taskId, Constants.COMMON_TASK_ASSIGNEE, commonTaskCompleteParameter.getMeetingCommonTask().getTaskexecutors());
+        if(commonTaskCompleteParameter.getMeetingCommonTask().getNeedapproval().equalsIgnoreCase("YES")){
+            taskService.setVariable(taskId, Constants.COMMON_TASK_APPROVER, commonTaskCompleteParameter.getMeetingCommonTask().getTaskapprover());
+            taskService.setVariable(taskId, Constants.COMMON_TASK_NEED_APPROVAL, Constants.COMMON_TASK_NEED_APPROVAL_POSITIVE);
+        }else{
+            taskService.setVariable(taskId, Constants.COMMON_TASK_NEED_APPROVAL, Constants.COMMON_TASK_NEED_APPROVAL_NEGATIVE); //不需要审核
+        }
+        taskService.setVariable(taskId, Constants.COMMON_TASK_VIEWER, commonTaskCompleteParameter.getMeetingCommonTask().getTaskviewers());
         // 完成任务
+        taskService.complete(taskId,p);//vars是一些变量
+
+        meetingCommonTaskService.updateByPrimaryKey(meetingCommonTask);
+        return new BaseResult(Constants.SUCCESS_CODE, "success", null);
+    }
+
+    @ApiOperation(value = "通用任务审核")
+    @RequestMapping(value = "audit", method = RequestMethod.POST)
+    @ResponseBody
+    @Transactional
+    public BaseResult audit(@RequestBody CommonTaskCompleteParameter commonTaskCompleteParameter){
+        ComplexResult result = FluentValidator.checkAll()
+                .on(commonTaskCompleteParameter.getTaskId(), new NotNullValidator("taskId"))
+                .doValidate()
+                .result(ResultCollectors.toComplex());
+
+        if (!result.isSuccess()) {
+            return new BaseResult(ERROR_CODE, "taskId is null", null);
+        }
+
+        MeetingCommonTask meetingCommonTask = commonTaskCompleteParameter.getMeetingCommonTask();
+
+        if(meetingCommonTask == null || meetingCommonTask.getId() == null){
+            return new BaseResult(ERROR_CODE, "nothing is done, you should not close this task", null);
+        }
+
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
+        String taskId = commonTaskCompleteParameter.getTaskId();
+
+        Map<String, Object> p = new HashMap<>();
+
+        Authentication.setAuthenticatedUserId(userId);//批注人的名称  一定要写，不然查看的时候不知道人物信息
+        // 添加批注信息
+        taskService.addComment(taskId, null, commonTaskCompleteParameter.getComment());//comment为批注内容
+
+        //设置execution parameters
+//        Task task = taskService.createTaskQuery().taskId(commonTaskCompleteParameter.getTaskId()).singleResult();
+        if(commonTaskCompleteParameter.isAuditResult()){
+            taskService.setVariable(taskId, Constants.COMMON_TASK_AUDIT_RESULT, Constants.COMMON_TASK_AUDIT_RESULT_PASS);
+        } else {
+            taskService.setVariable(taskId, Constants.COMMON_TASK_AUDIT_RESULT, Constants.COMMON_TASK_AUDIT_RESULT_FAIL);
+        }
+
         taskService.complete(taskId,p);//vars是一些变量
 
         meetingCommonTaskService.updateByPrimaryKey(meetingCommonTask);
@@ -143,27 +195,14 @@ public class MeetingCommonTaskController extends BaseController {
     @ApiOperation(value = "获取给我的通用任务")
     @RequestMapping(value = "list/assigntome", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResult getMyTasks(@RequestParam final String meetingkey, @RequestParam String historyIndicator){
+    public BaseResult getMyTasks(@RequestParam final String meetingId){
         String userId = (String) SecurityUtils.getSubject().getPrincipal();
-        if(historyIndicator.equalsIgnoreCase("YES")){
 
-            return  new BaseResult(Constants.SUCCESS_CODE, "", null);
-        }else{
-            List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-                    .processInstanceNameLikeIgnoreCase(MeetingCommonTask.class.getSimpleName())
-                    .list();
-            List<MeetingCommonTask> commonTaskBussinessKeys = new ArrayList<>();
-            for(ProcessInstance processInstance : processInstances){
-                String bussinessKey = processInstance.getBusinessKey();
-                int id = Integer.parseInt(bussinessKey.split("_")[1]);
-                MeetingCommonTask meetingCommonTask = meetingCommonTaskService.selectByPrimaryKey(id);
-                if(meetingCommonTask.getMeetingId().equalsIgnoreCase(meetingkey)){
-                    commonTaskBussinessKeys.add(meetingCommonTask);
-                }
-            }
+        MeetingCommonTaskExample example = new MeetingCommonTaskExample();
+        example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId)).andTaskexecutorsEqualTo(userId);
+        List<MeetingCommonTask> meetingCommonTasks = meetingCommonTaskService.selectByExample(example);
 
-            return  new BaseResult(Constants.SUCCESS_CODE, "", commonTaskBussinessKeys);
-        }
+        return  new BaseResult(Constants.SUCCESS_CODE, "success", meetingCommonTasks);
     }
 
     @ApiOperation(value = "获取给其他人的任务")

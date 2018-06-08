@@ -15,8 +15,11 @@ public class Constants {
     public static final String COMMON_TASK_OWNER = "COMMON_TASK_OWNER";
     public static final String COMMON_TASK_ASSIGNEE = "COMMON_TASK_ASSIGNEE";
     public static final String COMMON_TASK_VIEWER = "COMMON_TASK_VIEWER";
-    public static final String COMMON_TASK_NEED_APPROVE = "COMMON_TASK_NEED_APPROVAL";
-    public static final String COMMON_TASK_APPROVER = "COMMON_TASK_APPROVER";
     public static final String COMMON_TASK_NEED_APPROVAL = "COMMON_TASK_NEED_APPROVAL";
+    public static final String COMMON_TASK_NEED_APPROVAL_POSITIVE = "YES";
+    public static final String COMMON_TASK_NEED_APPROVAL_NEGATIVE = "NO";
+    public static final String COMMON_TASK_APPROVER = "COMMON_TASK_APPROVER";
     public static final String COMMON_TASK_AUDIT_RESULT = "COMMON_TASK_AUDIT_RESULT";
+    public static final String COMMON_TASK_AUDIT_RESULT_PASS = "YES";
+    public static final String COMMON_TASK_AUDIT_RESULT_FAIL = "NO";
 }

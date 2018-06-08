@@ -17,14 +17,32 @@ public class TaskDto implements Serializable {
     private String assigne;
     private Date dueDate;
     private String formKey;
-    private String bussinessKey;
+    private String businessKey;
+    private String meetingsubject;
+    private int meetingId;
 
-    public String getBussinessKey() {
-        return bussinessKey;
+    public String getMeetingsubject() {
+        return meetingsubject;
     }
 
-    public void setBussinessKey(String bussinessKey) {
-        this.bussinessKey = bussinessKey;
+    public void setMeetingsubject(String meetingsubject) {
+        this.meetingsubject = meetingsubject;
+    }
+
+    public int getMeetingId() {
+        return meetingId;
+    }
+
+    public void setMeetingId(int meetingId) {
+        this.meetingId = meetingId;
+    }
+
+    public String getBusinessKey() {
+        return businessKey;
+    }
+
+    public void setBusinessKey(String businessKey) {
+        this.businessKey = businessKey;
     }
 
     public String getName() {
@@ -96,7 +114,7 @@ public class TaskDto implements Serializable {
                 ", assigne='" + assigne + '\'' +
                 ", dueDate=" + dueDate +
                 ", formKey='" + formKey + '\'' +
-                ", bussinessKey='" + bussinessKey + '\'' +
+                ", bussinessKey='" + businessKey + '\'' +
                 '}';
     }
 }

@@ -7,7 +7,9 @@ import com.dto.huiyi.meeting.entity.chqs.TaskHistoryDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huicong.upms.dao.model.UpmsUserExample;
 import com.huicong.upms.rpc.api.UpmsUserService;
+import com.huiyi.meeting.dao.model.MeetingMeeting;
 import com.huiyi.meeting.dao.model.MeetingParticipant;
+import com.huiyi.meeting.rpc.api.MeetingMeetingService;
 import com.huiyi.service.HttpClientService;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
@@ -59,6 +61,26 @@ public class TaskController {
     @Autowired
     private RuntimeService runtimeService;
 
+    @Autowired
+    private MeetingMeetingService meetingMeetingService;
+
+
+    @ApiOperation(value = "根据ID获取任务")
+    @RequestMapping(value = "get/{taskId}", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult searchMyTaskByID(@PathVariable String taskId) {
+        String myID = (String) SecurityUtils.getSubject().getPrincipal();
+
+        Task task = taskService.createTaskQuery()
+                .taskId(taskId).singleResult();
+        if(null != task){
+            return new BaseResult(SUCCESS_CODE, "success", convertToTaskDto(task));
+        }else{
+
+            return new BaseResult(ERROR_CODE, "not found", null);
+        }
+    }
+
 
     @ApiOperation(value = "查询本组的任务")
     @RequestMapping(value = "search/group", method = RequestMethod.GET)
@@ -106,7 +128,6 @@ public class TaskController {
     @ResponseBody
     public BaseResult searchMyTask() {
         String myID = (String) SecurityUtils.getSubject().getPrincipal();
-
 
         List<Task> candidateOrAssignedTasks = taskService.createTaskQuery().taskCandidateOrAssigned(myID).list();
         // 分给我我组的任务
@@ -185,8 +206,16 @@ public class TaskController {
         taskDto.setFormKey(task.getFormKey());
         taskDto.setOwner(task.getOwner());
         taskDto.setTaskId(task.getId());
-        taskDto.setBussinessKey(getBusinessObjId(task.getId()));
+        taskDto.setBusinessKey(getBusinessObjId(task.getId()));
 
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        String businessKey = processInstance.getBusinessKey();
+        if(businessKey.split("_")[0].equalsIgnoreCase(MeetingMeeting.class.getSimpleName())){
+            int meetingId = Integer.parseInt(businessKey.split("_")[1]);
+            MeetingMeeting meetingMeeting = meetingMeetingService.selectByPrimaryKey(meetingId);
+            taskDto.setMeetingId(meetingId);
+            taskDto.setMeetingsubject(meetingMeeting.getMeetingsubject());
+        }
         return taskDto;
     }
 }
