@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +39,8 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/chqs/participant")
 @Api(value = "会议管理", description = "对会议进行创建，查询，挂起，取消操作")
 public class MeetingParticipantController extends BaseController {
+	private static Logger LOGGER = LoggerFactory.getLogger(MeetingParticipantController.class);
+	
 	@Autowired
 	private MeetingParticipantService meetingParticipantService;
 	
@@ -47,10 +51,18 @@ public class MeetingParticipantController extends BaseController {
     		@RequestParam(required = false, defaultValue = "0", value = "offset") int offset,
             @RequestParam(required = false, defaultValue = "10", value = "limit") int limit,
             @RequestParam(required = false, defaultValue = "", value = "search") String search,
+            @RequestParam(required = false, value = "businessKey") String businessKey,
             @RequestParam(required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "order") String order
     		){
     	MeetingParticipantExample example = new MeetingParticipantExample();
+    	if(!StringUtils.isBlank(businessKey) && businessKey.startsWith(MeetingParticipant.class.getSimpleName()+"_")) {
+    		String meetingIdStr = businessKey.substring((MeetingParticipant.class.getSimpleName()+"_").length());
+    		if(StringUtils.isNumeric(meetingIdStr))
+    			example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingIdStr));
+    		else
+    			LOGGER.info("传入参数businessKey不能解析出会议ID");
+    	}
     	if (!StringUtils.isBlank(sort) && !StringUtils.isBlank(order)) {
     		example.setOrderByClause(StringUtil.humpToLine(sort) + " " + order);
     	}
@@ -89,7 +101,7 @@ public class MeetingParticipantController extends BaseController {
     	meetingParticipant.setCreationtimestamp(new Date().getTime());
     	int ret = meetingParticipantService.insert(meetingParticipant);
     	if(ret ==0) {
-    		return new BaseResult(Constants.ERROR_CODE, "查询失败", meetingParticipant);
+    		return new BaseResult(Constants.ERROR_CODE, "人员注册失败", meetingParticipant);
     	}
         return new BaseResult(Constants.SUCCESS_CODE, "", meetingParticipant);
     }
@@ -103,7 +115,7 @@ public class MeetingParticipantController extends BaseController {
      */
     public BaseResult deregist(@PathVariable int id){
     	int ret = meetingParticipantService.deleteByPrimaryKey(id);
-    	if(ret ==0) {
+    	if(ret == 0) {
     		return new BaseResult(Constants.ERROR_CODE, "未查到相关人员信息", id);
     	}
         return new BaseResult(Constants.SUCCESS_CODE, "", ret);
@@ -117,7 +129,7 @@ public class MeetingParticipantController extends BaseController {
      */
     public BaseResult get(@PathVariable int id){
     	MeetingParticipant mp = meetingParticipantService.selectByPrimaryKey(id);
-    	if(mp != null) {
+    	if(mp == null) {
     		return new BaseResult(Constants.ERROR_CODE, "未查到相关人员信息", mp);
     	}
         return new BaseResult(Constants.SUCCESS_CODE, "", mp);

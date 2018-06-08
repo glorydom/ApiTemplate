@@ -3,10 +3,8 @@ package com.huiyi.workflow.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.activiti.bpmn.model.UserTask;
 import org.apache.commons.lang3.StringUtils;
@@ -30,10 +28,7 @@ import com.baidu.unbiz.fluentvalidator.ResultCollectors;
 import com.dto.huiyi.meeting.entity.config.TaskAssigneeDto;
 import com.dto.huiyi.meeting.entity.config.TaskAssigneeSingleDto;
 import com.dto.huiyi.meeting.util.Constants;
-import com.huicong.upms.dao.model.UpmsUser;
-import com.huicong.upms.dao.model.UpmsUserExample;
 import com.huicong.upms.rpc.api.UpmsUserService;
-import com.huiyi.meeting.dao.model.CustomMeetingTask;
 import com.huiyi.meeting.dao.model.MeetingMeeting;
 import com.huiyi.meeting.dao.model.MeetingMeetingExample;
 import com.huiyi.meeting.dao.model.MeetingTaskCandidate;
@@ -149,7 +144,7 @@ public class MeetingV2Controller extends BaseController {
 		if (taskAssigneeDto == null || taskAssigneeDto.getTaskSettings() ==null ) {
 			return new BaseResult(Constants.ERROR_CODE, "failed", "没有需要保存的数据！");
 		}
-		int meetingId = taskAssigneeDto.getMeetingId();
+//		int meetingId = taskAssigneeDto.getMeetingId();
 		List<MeetingTaskCandidate> list = new ArrayList<>();
 		for(TaskAssigneeSingleDto tasd: taskAssigneeDto.getTaskSettings()) {
 			// 前端如果传来的人是空的 怎么处理？
@@ -158,14 +153,14 @@ public class MeetingV2Controller extends BaseController {
 			String taskId = tasd.getTaskId();
 			for(Integer uid : tasd.getUserList()) {
 				MeetingTaskCandidate meetingTaskCandidate = new MeetingTaskCandidate();
-				meetingTaskCandidate.setMeetingid(meetingId);
+//				meetingTaskCandidate.setMeetingid(meetingId);
 				meetingTaskCandidate.setTaskid(taskId);
 				meetingTaskCandidate.setUserid(uid);
 				list.add(meetingTaskCandidate);
 			}
 		}
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
-		example.createCriteria().andMeetingidEqualTo(taskAssigneeDto.getMeetingId());
+//		example.createCriteria().andMeetingidEqualTo(taskAssigneeDto.getMeetingId());
 		if(list.size()==0) {
 			meetingTaskCandidateService.deleteByExample(example);
 			return new BaseResult(Constants.SUCCESS_CODE, "success", 0);
@@ -196,50 +191,42 @@ public class MeetingV2Controller extends BaseController {
 		return new BaseResult(Constants.SUCCESS_CODE, "success", total);
 	}
 	
-	@RequestMapping(value="/findWholeMeetingTaskCandidates/{meetingId}", method = RequestMethod.GET)
+	@RequestMapping(value="/findWholeMeetingTaskCandidates", method = RequestMethod.GET)
 	@ApiOperation(value="查询整个会议任务执行人候选人")
 	@ResponseBody
-	public Object findWholeMeetingTaskCandidates(@PathVariable("meetingId") String meetingId) {
-		
-		List<UpmsUser> allUsers = upmsUserService.selectByExample(new UpmsUserExample());
-		Map<Integer,UpmsUser> userMap = new HashMap<Integer,UpmsUser>();
-		for(UpmsUser u : allUsers) {
-			userMap.put(u.getUserId(), u);
-		}
-		
-		List<UserTask> allTasks = baseWorkFlowService.listAllUserTasks(MeetingMeeting.class.getSimpleName());
-		Map<String,String> taskMap = new HashMap<String,String>();
-		Map<String,CustomMeetingTask> map = new HashMap<>();
-		for(UserTask t : allTasks) {
-			taskMap.put(t.getId(), t.getName());
-			CustomMeetingTask cmt = new CustomMeetingTask();
-			cmt.setTaskId(t.getId());
-			cmt.setTaskName(t.getName());
-			map.put(t.getId(), cmt);
-		}
+	public Object findWholeMeetingTaskCandidates() {
+//		int meetingId = 2;
+//		MeetingMeeting meeting = meetingMeetingService.selectByPrimaryKey(meetingId);
+
+		TaskAssigneeDto taskAssigneeDto = new TaskAssigneeDto();
+//		taskAssigneeDto.setMeetingId(meetingId);
+//		taskAssigneeDto.setMeetingsubject(meeting.getMeetingsubject());
+		List<TaskAssigneeSingleDto> taskSettings = new ArrayList<>();
+		taskAssigneeDto.setTaskSettings(taskSettings);
 		
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
-		example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId));
+//		example.createCriteria().andMeetingidEqualTo(meetingId);
 		List<MeetingTaskCandidate> list = meetingTaskCandidateService.selectByExample(example);
+		Map<String,List<Integer>> existingTaskAssignee = new HashMap<>();
 		for(MeetingTaskCandidate mtc: list) {
 			String taskId = mtc.getTaskid();
-			CustomMeetingTask customMeetingTask =  map.get(taskId);
-			if(customMeetingTask == null) {
-				customMeetingTask = new CustomMeetingTask();
-				customMeetingTask.setTaskId(mtc.getTaskid());
-				customMeetingTask.setTaskName(taskMap.get(taskId));
-				
-				map.put(mtc.getTaskid(), customMeetingTask);
+			List<Integer> userIds = existingTaskAssignee.get(taskId);
+			if(userIds == null) {
+				userIds = new ArrayList<>();
+				existingTaskAssignee.put(taskId, userIds);
 			}
-			Set<UpmsUser> userList = customMeetingTask.getUserList();
-			if(userList == null) {
-				userList = new HashSet<>();
-				customMeetingTask.setUserList(userList);
-			}
-			userList.add(userMap.get(mtc.getUserid()));
+			if(!userIds.contains(mtc.getUserid()))
+				userIds.add(mtc.getUserid());
 		}
-		List<CustomMeetingTask> taskList = new ArrayList<CustomMeetingTask>(map.values());
-		return new BaseResult(Constants.SUCCESS_CODE, "success", taskList);
+		List<UserTask> allTasks = baseWorkFlowService.listAllUserTasks(MeetingMeeting.class.getSimpleName());
+		for(UserTask t : allTasks) {
+			TaskAssigneeSingleDto tasd = new TaskAssigneeSingleDto();
+			tasd.setTaskId(t.getId());
+			tasd.setTaskName(t.getName());
+			tasd.setUserList(existingTaskAssignee.get(t.getId()));
+			taskSettings.add(tasd);
+		}
+		return new BaseResult(Constants.SUCCESS_CODE, "success", taskAssigneeDto);
 	}
 	
 }
