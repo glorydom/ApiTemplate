@@ -37,7 +37,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping("/chqs/participant")
-@Api(value = "会议管理", description = "对会议进行创建，查询，挂起，取消操作")
+@Api(value = "与会人员管理", description = "对与会嘉宾的注册，撤销")
 public class MeetingParticipantController extends BaseController {
 	private static Logger LOGGER = LoggerFactory.getLogger(MeetingParticipantController.class);
 	
@@ -45,24 +45,29 @@ public class MeetingParticipantController extends BaseController {
 	private MeetingParticipantService meetingParticipantService;
 	
     @ApiOperation(value = "查询所有与会人员, 要分页")
-    @RequestMapping(value = "list/{pageIndex}/{count}", method = RequestMethod.GET)
+    @RequestMapping(value = "list", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult list(
-    		@RequestParam(required = false, defaultValue = "0", value = "offset") int offset,
-            @RequestParam(required = false, defaultValue = "10", value = "limit") int limit,
+    		@RequestParam(required = false, defaultValue = "0", value = "pageIndex") int pageIndex,
+            @RequestParam(required = false, defaultValue = "10", value = "pageSize") int pageSize,
             @RequestParam(required = false, defaultValue = "", value = "search") String search,
-            @RequestParam(required = false, value = "businessKey") String businessKey,
+            @RequestParam(required = true, value = "businessKey") String businessKey,
             @RequestParam(required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "order") String order
     		){
+    	int offset = pageIndex * pageSize;
+    	int limit = pageSize;
     	MeetingParticipantExample example = new MeetingParticipantExample();
-    	if(!StringUtils.isBlank(businessKey) && businessKey.startsWith(MeetingParticipant.class.getSimpleName()+"_")) {
-    		String meetingIdStr = businessKey.substring((MeetingParticipant.class.getSimpleName()+"_").length());
-    		if(StringUtils.isNumeric(meetingIdStr))
-    			example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingIdStr));
-    		else
-    			LOGGER.info("传入参数businessKey不能解析出会议ID");
-    	}
+//    	if(!StringUtils.isBlank(businessKey) && businessKey.startsWith(MeetingParticipant.class.getSimpleName()+"_")) {
+//    		String meetingIdStr = businessKey.substring((MeetingParticipant.class.getSimpleName()+"_").length());
+//    		if(StringUtils.isNumeric(meetingIdStr))
+//    			example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingIdStr));
+//    		else
+//    			LOGGER.info("传入参数businessKey不能解析出会议ID");
+//    	}
+        //businessKey 是meeting的bussinesskey
+        int meetingId = Integer.parseInt(businessKey.split("_")[1]);
+        example.createCriteria().andMeetingidEqualTo(meetingId);
     	if (!StringUtils.isBlank(sort) && !StringUtils.isBlank(order)) {
     		example.setOrderByClause(StringUtil.humpToLine(sort) + " " + order);
     	}
