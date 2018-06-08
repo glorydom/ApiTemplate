@@ -18,8 +18,6 @@
         <property name="filters">
             <util:map>
                 <entry key="authc" value-ref="upmsAuthenticationFilter"/>
-                <entry key="jwtv" value-ref="jwtv"/>
-                <entry key="jwtg" value-ref="jwtg"/>
             </util:map>
         </property>
         <property name="filterChainDefinitions">
@@ -31,17 +29,13 @@
                 /resources/** = anon
                 /api/** = anon
                 /chqs/** = user
-                <!--/token/** = jwtg-->
                 /** = anon
             </value>
         </property>
         </bean>
 
-<!-- 重写authc过滤器 -->
+    <!-- 重写authc过滤器 -->
     <bean id="upmsAuthenticationFilter" class="com.zheng.upms.client.shiro.filter.UpmsAuthenticationFilter"/>
-
-    <bean id="jwtv" class="com.zheng.upms.client.shiro.filter.JWTVerifyingFilter"/>
-    <bean id="jwtg" class="com.zheng.upms.client.shiro.filter.RestAuthenticationFilter"/>
 
     <!-- 强制退出会话过滤器 -->
     <bean id="upmsSessionForceLogout" class="com.zheng.upms.client.shiro.filter.UpmsSessionForceLogoutFilter"/>

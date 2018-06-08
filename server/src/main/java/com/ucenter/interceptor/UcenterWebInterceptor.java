@@ -17,9 +17,6 @@ public class UcenterWebInterceptor extends HandlerInterceptorAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UcenterWebInterceptor.class);
 
-//    @Autowired
-//    private CmsMenuService cmsMenuService;
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 过滤ajax
@@ -31,11 +28,7 @@ public class UcenterWebInterceptor extends HandlerInterceptorAdapter {
         String uiPath = PropertiesFileUtil.getInstance().get("zheng.ui.path");
         request.setAttribute("appName", appName);
         request.setAttribute("uiPath", uiPath);
-//        // 菜单
-//        CmsMenuExample cmsMenuExample = new CmsMenuExample();
-//        cmsMenuExample.setOrderByClause("orders asc");
-//        List<CmsMenu> menus = cmsMenuService.selectByExample(cmsMenuExample);
-//        request.setAttribute("menus", menus);
+
         return true;
     }
 
