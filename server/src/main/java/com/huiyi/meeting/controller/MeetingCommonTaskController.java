@@ -4,14 +4,11 @@ import com.baidu.unbiz.fluentvalidator.ComplexResult;
 import com.baidu.unbiz.fluentvalidator.FluentValidator;
 import com.baidu.unbiz.fluentvalidator.ResultCollectors;
 import com.dto.huiyi.meeting.entity.commonTaskDto.CommonTaskCompleteParameter;
-import com.dto.huiyi.meeting.entity.commonTaskDto.CommonTaskStartParameter;
 import com.dto.huiyi.meeting.util.Constants;
-import com.dto.huiyi.meeting.util.TimeDateFormat;
 import com.huiyi.meeting.dao.mapper.MeetingCommonTaskMapper;
 import com.huiyi.meeting.dao.model.*;
 import com.huiyi.meeting.rpc.api.MeetingCommonTaskService;
 import com.zheng.common.base.BaseResult;
-import com.zheng.common.util.StringUtil;
 import com.zheng.common.validator.NotNullValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,7 +16,6 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.identity.Authentication;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -86,10 +82,13 @@ public class MeetingCommonTaskController extends BaseController {
         String myID = (String) SecurityUtils.getSubject().getPrincipal();
         Map<String, Object> parameters = new HashMap<>();
         parameters.put(Constants.COMMON_TASK_OWNER, myID);
-        if(StringUtils.isBlank(meetingCommonTask.getTaskexecutors())) // taskExecutors就是 assignee, 只能是一个人
+        if(StringUtils.isBlank(meetingCommonTask.getTaskexecutors())){// taskExecutors就是 assignee, 只能是一个人
             parameters.put(Constants.COMMON_TASK_ASSIGNEE, myID);
-        else
+        }
+        else {
+
             parameters.put(Constants.COMMON_TASK_ASSIGNEE, meetingCommonTask.getTaskexecutors());
+        }
 
         if(meetingCommonTask.getNeedapproval().equalsIgnoreCase("YES")){
             parameters.put(Constants.COMMON_TASK_APPROVER, meetingCommonTask.getTaskapprover());
@@ -196,29 +195,67 @@ public class MeetingCommonTaskController extends BaseController {
     @RequestMapping(value = "list/assigntome", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult getMyTasks(@RequestParam final String meetingId){
+
         String userId = (String) SecurityUtils.getSubject().getPrincipal();
 
         MeetingCommonTaskExample example = new MeetingCommonTaskExample();
-        example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId)).andTaskexecutorsEqualTo(userId);
+        example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId));
         List<MeetingCommonTask> meetingCommonTasks = meetingCommonTaskService.selectByExample(example);
-
-        return  new BaseResult(Constants.SUCCESS_CODE, "success", meetingCommonTasks);
+        List<MeetingCommonTask> result = new ArrayList<MeetingCommonTask>();
+        // get the task list whose assignee or candidate is me
+        for(MeetingCommonTask task : meetingCommonTasks){
+            String candidates = task.getTaskexecutors();
+            List<String> candidateList = Arrays.asList(candidates.split(","));
+            if(candidateList.contains(userId)){
+                result.add(task);
+            }
+        }
+        return  new BaseResult(Constants.SUCCESS_CODE, "success", result);
     }
 
     @ApiOperation(value = "获取给其他人的任务")
     @RequestMapping(value = "list/assign2others", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResult getOtherTasks(){
+    public BaseResult getOtherTasks(@RequestParam final String meetingId){
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
 
-        return  new BaseResult(Constants.SUCCESS_CODE, "", null);
+        MeetingCommonTaskExample example = new MeetingCommonTaskExample();
+        example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId)).andTaskownerEqualTo(userId);
+        List<MeetingCommonTask> meetingCommonTasks = meetingCommonTaskService.selectByExample(example);
+        return  new BaseResult(Constants.SUCCESS_CODE, "", meetingCommonTasks);
     }
 
     @ApiOperation(value = "获取我能看到的任务")
     @RequestMapping(value = "list/icanview", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResult getViewTasks(){
+    public BaseResult getViewTasks(@RequestParam final String meetingId){
 
-        return  new BaseResult(Constants.SUCCESS_CODE, "", null);
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
+
+        MeetingCommonTaskExample example = new MeetingCommonTaskExample();
+        example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId));
+        List<MeetingCommonTask> meetingCommonTasks = meetingCommonTaskService.selectByExample(example);
+        List<MeetingCommonTask> result = new ArrayList<MeetingCommonTask>();
+        // I can view
+        for(MeetingCommonTask task : meetingCommonTasks){
+            String viewers = task.getTaskviewers();
+            List<String> viewList = Arrays.asList(viewers.split(","));
+            if(viewList.contains(userId)){
+                result.add(task);
+            }
+        }
+        return  new BaseResult(Constants.SUCCESS_CODE, "", result);
+    }
+
+
+    @ApiOperation(value = "获取任务详情")
+    @RequestMapping(value = "detail/{commonTaskId}", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult getDetails(@RequestParam final String commonTaskId){
+
+        MeetingCommonTask task = meetingCommonTaskService.selectByPrimaryKey(Integer.parseInt(commonTaskId));
+
+        return  new BaseResult(Constants.SUCCESS_CODE, "got one commont task", task);
     }
 
 

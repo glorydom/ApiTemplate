@@ -22,13 +22,17 @@ public class CommonTaskListener implements TaskListener, Serializable {
                 .getBean("CommonTaskService");
         String assigne = "";
         if(delegateTask.getFormKey().equalsIgnoreCase("meetingCommontaskCompletion")){
-
-            assigne = commonTaskService.getAssignee(delegateTask.getExecutionId());
+            //
+            String assigneeCandidates = commonTaskService.getAssignee(delegateTask.getExecutionId());
+            for(String candidate : assigneeCandidates.split(",")){
+                delegateTask.addCandidateUser(candidate);
+            }
         } else {
-            assigne = commonTaskService.getApprover(delegateTask.getExecutionId());
+            String approverCandidates = commonTaskService.getApprover(delegateTask.getExecutionId());
+            for(String candidate : approverCandidates.split(",")){
+                delegateTask.addCandidateUser(candidate);
+            }
         }
-        delegateTask.setAssignee(assigne);
     }
-
 
 }

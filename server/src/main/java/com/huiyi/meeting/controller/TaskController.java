@@ -1,16 +1,14 @@
 package com.huiyi.meeting.controller;
 
-import com.alibaba.fastjson.TypeReference;
 import com.dto.huiyi.meeting.entity.CHQSResult;
 import com.dto.huiyi.meeting.entity.chqs.TaskDto;
 import com.dto.huiyi.meeting.entity.chqs.TaskHistoryDto;
 import com.dto.huiyi.meeting.util.Constants;
-import com.huicong.upms.dao.model.UpmsUserExample;
 import com.huicong.upms.rpc.api.UpmsUserService;
+import com.huiyi.meeting.dao.model.MeetingCommonTask;
 import com.huiyi.meeting.dao.model.MeetingMeeting;
-import com.huiyi.meeting.dao.model.MeetingParticipant;
+import com.huiyi.meeting.rpc.api.MeetingCommonTaskService;
 import com.huiyi.meeting.rpc.api.MeetingMeetingService;
-import com.huiyi.service.HttpClientService;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +23,6 @@ import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -64,6 +61,8 @@ public class TaskController {
     @Autowired
     private MeetingMeetingService meetingMeetingService;
 
+    @Autowired
+    private MeetingCommonTaskService meetingCommonTaskService;
 
     @ApiOperation(value = "根据ID获取任务")
     @RequestMapping(value = "get/{taskId}", method = RequestMethod.GET)
@@ -123,14 +122,13 @@ public class TaskController {
         return new BaseResult(Constants.SUCCESS_CODE, "success", null);
     }
 
-    @ApiOperation(value = "查询本人的任务")
+    @ApiOperation(value = "查询本人可以执行的任务")
     @RequestMapping(value = "search/mine", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult searchMyTask() {
         String myID = (String) SecurityUtils.getSubject().getPrincipal();
 
-        List<Task> candidateOrAssignedTasks = taskService.createTaskQuery().taskCandidateOrAssigned(myID).list();
-        // 分给我我组的任务
+        List<Task> candidateOrAssignedTasks = taskService.createTaskQuery().taskCandidateOrAssigned(myID).list();// assigne或者candidate
 
         List<TaskDto> tds = new ArrayList<>();
         for (Task task : candidateOrAssignedTasks) {
@@ -210,12 +208,23 @@ public class TaskController {
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         String businessKey = processInstance.getBusinessKey();
-        if(businessKey.split("_")[0].equalsIgnoreCase(MeetingMeeting.class.getSimpleName())){
-            int meetingId = Integer.parseInt(businessKey.split("_")[1]);
-            MeetingMeeting meetingMeeting = meetingMeetingService.selectByPrimaryKey(meetingId);
-            taskDto.setMeetingId(meetingId);
+        String businessEntity= businessKey.split("_")[0];
+        int businessId= Integer.parseInt(businessKey.split("_")[1]);
+        if(businessEntity.equalsIgnoreCase(MeetingMeeting.class.getSimpleName())){
+            MeetingMeeting meetingMeeting = meetingMeetingService.selectByPrimaryKey(businessId);
+            taskDto.setMeetingId(businessId);
             taskDto.setMeetingsubject(meetingMeeting.getMeetingsubject());
+        } else if(businessEntity.equalsIgnoreCase(MeetingCommonTask.class.getSimpleName())){
+            MeetingCommonTask meetingCommonTask = meetingCommonTaskService.selectByPrimaryKey(businessId);
+            addMeetingFieldsToTask(taskDto, meetingCommonTask.getMeetingid());
         }
         return taskDto;
+    }
+
+
+    private void addMeetingFieldsToTask(TaskDto taskDto, int meetingId){
+        MeetingMeeting meetingMeeting = meetingMeetingService.selectByPrimaryKey(meetingId);
+        taskDto.setMeetingId(meetingId);
+        taskDto.setMeetingsubject(meetingMeeting.getMeetingsubject());
     }
 }

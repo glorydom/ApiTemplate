@@ -145,7 +145,7 @@ CREATE TABLE `MEETING_Common_Task` (
   `activitiTaskId` varchar(20) DEFAULT NULL COMMENT 'Activiti流程使用的id',
   `taskStatus` varchar(10) DEFAULT NULL COMMENT '新建 | 进行中 | 结束',
   `taskViewers` varchar(500) DEFAULT NULL COMMENT 'userId 使用逗号分割',
-  `taskOwner` varchar(100) DEFAULT NULL COMMENT '任务所有者',
+  `taskOwner` varchar(100) DEFAULT NULL COMMENT '任务所有者 userId 使用逗号分割',
   `taskExecutors` varchar(100) DEFAULT NULL COMMENT 'userId 使用逗号分割',
   `taskDescription` varchar(1000) DEFAULT NULL COMMENT '任务详细描述',
   `taskTitle` varchar(40) DEFAULT NULL COMMENT '任务简单描述',
@@ -153,7 +153,7 @@ CREATE TABLE `MEETING_Common_Task` (
   `startTime` date DEFAULT NULL COMMENT '开始时间',
   `endTime` date DEFAULT NULL COMMENT '结束时间',
   `meetingId` int(11) DEFAULT NULL COMMENT '会议的id  meetingId',
-  `taskApprover` varchar(20) DEFAULT NULL COMMENT '任务需要审批者是',
+  `taskApprover` varchar(20) DEFAULT NULL COMMENT '任务需要审批者 userId 使用逗号分割',
   `needApproval` varchar(10) DEFAULT NULL COMMENT '任务需要审批否？  TRUE | FALSE',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
