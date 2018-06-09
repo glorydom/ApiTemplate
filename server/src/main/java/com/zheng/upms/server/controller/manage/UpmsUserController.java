@@ -238,12 +238,5 @@ public class UpmsUserController extends BaseController {
         return new UpmsResult(UpmsResultConstant.SUCCESS, count);
     }
 
-    @ApiOperation(value = "读取用户列表")
-    @RequiresPermissions("upms:user:read")
-    @RequestMapping(value = "/listusers", method = RequestMethod.GET)
-    @ResponseBody
-    public Object listusers() {
-        List<UpmsUser> users = upmsUserService.selectByExample(new UpmsUserExample());
-        return new BaseResult(Constants.SUCCESS_CODE, "success", users);
-    }
+
 }
