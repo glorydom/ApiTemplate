@@ -1,6 +1,7 @@
 package com.huiyi.meeting.controller;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.baidu.unbiz.fluentvalidator.ComplexResult;
 import com.baidu.unbiz.fluentvalidator.FluentValidator;
 import com.baidu.unbiz.fluentvalidator.ResultCollectors;
 import com.dto.huiyi.meeting.entity.ParticipantSearchParameter;
+import com.dto.huiyi.meeting.entity.participantDto.ParticipantStatisticsDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huiyi.meeting.dao.model.MeetingParticipant;
 import com.huiyi.meeting.dao.model.MeetingParticipantExample;
@@ -90,6 +92,47 @@ public class MeetingParticipantController extends BaseController {
         return new BaseResult(Constants.SUCCESS_CODE, "", null);
     }
 
+    @ApiOperation(value = "统计所有与会人员")
+    @RequestMapping(value = "statistics", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult statistics(@RequestParam(value="businessKey") String businessKey){
+    	int meetingId = Integer.parseInt(businessKey.split("_")[1]);
+    	MeetingParticipantExample example = new MeetingParticipantExample();
+        example.createCriteria().andMeetingidEqualTo(meetingId);
+        List<MeetingParticipant> all = meetingParticipantService.selectByExample(example);
+        Map<String,List<MeetingParticipant>> interestMap = new HashMap<>();
+        for(MeetingParticipant mp : all) {
+//        	String[] arrays = StringUtils.defaultIfBlank(mp.getProductofinterest(),"").split(",");
+        	String poi = StringUtils.defaultIfBlank(mp.getProductofinterest(),"未关注任何产品");
+        	List<MeetingParticipant> list = interestMap.get(poi);
+        	if (list == null) {
+        		list = new ArrayList<>();
+        		interestMap.put(poi, list);
+        	}
+        	list.add(mp);
+        }
+        List<ParticipantStatisticsDto> result = new ArrayList<>();
+        for(String poi : interestMap.keySet()) {
+        	List<MeetingParticipant> list = interestMap.get(poi);
+        	ParticipantStatisticsDto psd = new ParticipantStatisticsDto();
+        	result.add(psd);
+        	psd.setInterestedProduct(poi);
+        	for(MeetingParticipant mp : list) {
+        		psd.setTotal(psd.getTotal()+1);
+        		if("Y".equals(mp.getCharged())) {
+        			psd.setCharged(psd.getCharged()+1);
+        		}
+        		if("Y".equals(mp.getInvoiced())) {
+        			psd.setInvoiced(psd.getInvoiced()+1);
+        		}
+        		if(StringUtils.defaultIfBlank(mp.getHoteladdress(), "").length()>5) {
+        			psd.setHoteled(psd.getHoteled()+1);
+        		}
+        	}
+        }
+        
+        return new BaseResult(Constants.SUCCESS_CODE, "", result);
+    }
 
     @ApiOperation(value = "人员注册")
     @RequestMapping(value = "create", method = RequestMethod.POST)

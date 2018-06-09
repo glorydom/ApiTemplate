@@ -2,13 +2,10 @@ package com.huiyi.workflow.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -104,18 +101,11 @@ public class WorkflowController extends BaseController{
 	
 	@ApiOperation(value="显示流程图")
 	@RequestMapping(value="/display", method = RequestMethod.GET)
-	public String displayProcessImage(@RequestParam("processName") String processName,@RequestParam("businessId") String businessId, HttpServletResponse response) {
+	public String displayProcessImage(@RequestParam("processName") String processName,@RequestParam("businessId") String businessId, ModelMap modelMap)throws IOException {
 		ProcessDefinition pd = baseWorkFlowService.findProcessDefinition(processName);
-		InputStream is = baseWorkFlowService.getProcessImage(processName);
-		try {
-			OutputStream os  = response.getOutputStream();
-			for(int b =-1; (b=is.read())!=-1;)
-				os.write(b);
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-		String resourceName = pd.getDiagramResourceName();
-		System.out.println("process->"+resourceName);
+		modelMap.put("processName", pd.getName());
+		modelMap.put("businessId", businessId);
+		
 		return "/workflow/display.jsp";
 	}
 	
@@ -125,13 +115,6 @@ public class WorkflowController extends BaseController{
 	public Object Image(@RequestParam("processName") String processName,@RequestParam("businessId") String businessId)throws IOException {
 		ProcessDefinition pd = baseWorkFlowService.findProcessDefinition(processName);
 		InputStream is = baseWorkFlowService.getProcessImage(processName);
-//		try {
-//			OutputStream os  = response.getOutputStream();
-//			for(int b =-1; (b=is.read())!=-1;)
-//				os.write(b);
-//		}catch (Exception e) {
-//			e.printStackTrace();
-//		}
 		String resourceName = pd.getDiagramResourceName();
 		System.out.println("process->"+resourceName);
 		return IOUtils.toByteArray(is);
