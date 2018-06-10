@@ -216,7 +216,8 @@ public class TaskController {
             taskDto.setMeetingsubject(meetingMeeting.getMeetingsubject());
         } else if(businessEntity.equalsIgnoreCase(MeetingCommonTask.class.getSimpleName())){
             MeetingCommonTask meetingCommonTask = meetingCommonTaskService.selectByPrimaryKey(businessId);
-            addMeetingFieldsToTask(taskDto, meetingCommonTask.getMeetingid());
+            if(null != meetingCommonTask)
+                addMeetingFieldsToTask(taskDto, meetingCommonTask.getMeetingid());
         }
         return taskDto;
     }
@@ -224,7 +225,10 @@ public class TaskController {
 
     private void addMeetingFieldsToTask(TaskDto taskDto, int meetingId){
         MeetingMeeting meetingMeeting = meetingMeetingService.selectByPrimaryKey(meetingId);
-        taskDto.setMeetingId(meetingId);
-        taskDto.setMeetingsubject(meetingMeeting.getMeetingsubject());
+        if(null != meetingMeeting){
+            taskDto.setMeetingId(meetingId);
+            taskDto.setMeetingsubject(meetingMeeting.getMeetingsubject());
+
+        }
     }
 }

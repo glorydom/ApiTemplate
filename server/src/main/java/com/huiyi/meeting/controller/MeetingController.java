@@ -87,7 +87,11 @@ public class MeetingController extends BaseController {
         String activitiTime = TimeDateFormat.formatTime(beginAt);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("beginAt", activitiTime);  //
-
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, 5);
+        calendar.get(Calendar.DAY_OF_YEAR);
+        String secondWeek = TimeDateFormat.formatCalendar(calendar.getTime());
+        parameters.put("secondWeek", secondWeek);
         return ControllerUtil.startNewBussinessProcess(runtimeService, meeting, id, parameters);
     }
 

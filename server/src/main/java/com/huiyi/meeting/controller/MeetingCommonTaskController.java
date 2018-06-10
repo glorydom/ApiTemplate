@@ -16,6 +16,7 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.identity.Authentication;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -33,6 +34,9 @@ import static com.dto.huiyi.meeting.util.Constants.ERROR_CODE;
 @Api(value = "通用任务管理", description = "对通用任务的处理： 启动，关闭，执行历史查询")
 public class MeetingCommonTaskController extends BaseController {
 
+
+    private String[] taskStatus = {"新建", "进行中", "待批准", "结束"};
+
     @Autowired
     private RuntimeService runtimeService;
 
@@ -47,6 +51,7 @@ public class MeetingCommonTaskController extends BaseController {
 
     @Autowired
     private MeetingCommonTaskMapper meetingCommonTaskMapper;
+
 
     @ApiOperation(value = "开启任务")
     @RequestMapping(value = "start", method = RequestMethod.POST)
@@ -64,6 +69,7 @@ public class MeetingCommonTaskController extends BaseController {
             // set timestamp to retrieve it
             long timestamp = new Date().getTime();
             meetingCommonTask.setCreationtimestamp(timestamp);
+            meetingCommonTask.setTaskstatus(taskStatus[0]); //进行中
             int affectCount = meetingCommonTaskService.insert(meetingCommonTask);
 
             if(affectCount == 0){
@@ -102,9 +108,6 @@ public class MeetingCommonTaskController extends BaseController {
     @ApiOperation(value = "通用任务完成")
     @RequestMapping(value = "complete", method = RequestMethod.POST)
     @ResponseBody
-    /**
-     * 该方法不同于普通的任务完成，该方法要主要检测 完成者是否是任务的拥有者，如果是就结束该task,如果不是就要将任务从新分给任务拥有者
-     */
     public BaseResult partialCompleteTask(@RequestBody CommonTaskCompleteParameter commonTaskCompleteParameter){
         ComplexResult result = FluentValidator.checkAll()
                 .on(commonTaskCompleteParameter.getTaskId(), new NotNullValidator("taskId"))
@@ -131,14 +134,15 @@ public class MeetingCommonTaskController extends BaseController {
         taskService.addComment(taskId, null, commonTaskCompleteParameter.getComment());//comment为批注内容
 
         //设置execution parameters
-        Task task = taskService.createTaskQuery().taskId(commonTaskCompleteParameter.getTaskId()).singleResult();
         taskService.setVariable(taskId, Constants.COMMON_TASK_OWNER, commonTaskCompleteParameter.getMeetingCommonTask().getTaskowner());
         taskService.setVariable(taskId, Constants.COMMON_TASK_ASSIGNEE, commonTaskCompleteParameter.getMeetingCommonTask().getTaskexecutors());
         if(commonTaskCompleteParameter.getMeetingCommonTask().getNeedapproval().equalsIgnoreCase("YES")){
             taskService.setVariable(taskId, Constants.COMMON_TASK_APPROVER, commonTaskCompleteParameter.getMeetingCommonTask().getTaskapprover());
             taskService.setVariable(taskId, Constants.COMMON_TASK_NEED_APPROVAL, Constants.COMMON_TASK_NEED_APPROVAL_POSITIVE);
+            meetingCommonTask.setTaskstatus(taskStatus[2]); //设置为待批准
         }else{
             taskService.setVariable(taskId, Constants.COMMON_TASK_NEED_APPROVAL, Constants.COMMON_TASK_NEED_APPROVAL_NEGATIVE); //不需要审核
+            meetingCommonTask.setTaskstatus(taskStatus[3]);
         }
         taskService.setVariable(taskId, Constants.COMMON_TASK_VIEWER, commonTaskCompleteParameter.getMeetingCommonTask().getTaskviewers());
         // 完成任务
@@ -181,8 +185,10 @@ public class MeetingCommonTaskController extends BaseController {
 //        Task task = taskService.createTaskQuery().taskId(commonTaskCompleteParameter.getTaskId()).singleResult();
         if(commonTaskCompleteParameter.isAuditResult()){
             taskService.setVariable(taskId, Constants.COMMON_TASK_AUDIT_RESULT, Constants.COMMON_TASK_AUDIT_RESULT_PASS);
+            meetingCommonTask.setTaskstatus(taskStatus[3]);  //批准则任务结束
         } else {
             taskService.setVariable(taskId, Constants.COMMON_TASK_AUDIT_RESULT, Constants.COMMON_TASK_AUDIT_RESULT_FAIL);
+            meetingCommonTask.setTaskstatus(taskStatus[1]);  //不批准，则任务继续为进行中
         }
 
         taskService.complete(taskId,p);//vars是一些变量
@@ -195,21 +201,37 @@ public class MeetingCommonTaskController extends BaseController {
     @RequestMapping(value = "list/assigntome", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult getMyTasks(@RequestParam final String meetingId){
-
         String userId = (String) SecurityUtils.getSubject().getPrincipal();
-
         MeetingCommonTaskExample example = new MeetingCommonTaskExample();
         example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId));
         List<MeetingCommonTask> meetingCommonTasks = meetingCommonTaskService.selectByExample(example);
         List<MeetingCommonTask> result = new ArrayList<MeetingCommonTask>();
-        // get the task list whose assignee or candidate is me
+        // get the task list whose assignee or candidate is metask
         for(MeetingCommonTask task : meetingCommonTasks){
             String candidates = task.getTaskexecutors();
+            String approvers = task.getTaskapprover();
+            int meetingCommonTask = task.getId();
+            String commonTaskBusinessKey = MeetingCommonTask.class.getSimpleName() + "_" + meetingCommonTask;
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(commonTaskBusinessKey).singleResult();
+            if(null == processInstance) //说明没有找到
+                continue;
+            Task activitiTask = taskService.createTaskQuery().executionId(processInstance.getId()).singleResult();
+            if(null == activitiTask) //说明该列表下没有这个
+                continue;
+            task.setActivititaskid(activitiTask.getId());
             List<String> candidateList = Arrays.asList(candidates.split(","));
-            if(candidateList.contains(userId)){
+            List<String> candidateApprovers = Arrays.asList(approvers.split(","));
+            //如果是用户为执行者，那么获取正在进行的任务或者新建的任务，如果用户为审批者，那么获取待审批的任务
+            if( (candidateList.contains(userId) && (task.getTaskstatus().equalsIgnoreCase(taskStatus[0] ) || task.getTaskstatus().equalsIgnoreCase(taskStatus[1] )))
+                    || (candidateApprovers.contains(userId) && task.getTaskstatus().equalsIgnoreCase(taskStatus[2]))
+                    ){
+                task.setActivititaskid(activitiTask.getId()); // 将taskid更新到这个bean里面
+                task.setFormkey(activitiTask.getFormKey());
+                meetingCommonTaskService.updateByPrimaryKeySelective(task);
                 result.add(task);
             }
         }
+
         return  new BaseResult(Constants.SUCCESS_CODE, "success", result);
     }
 
@@ -251,7 +273,7 @@ public class MeetingCommonTaskController extends BaseController {
     @ApiOperation(value = "获取任务详情")
     @RequestMapping(value = "detail/{commonTaskId}", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResult getDetails(@RequestParam final String commonTaskId){
+    public BaseResult getDetails(@PathVariable final String commonTaskId){
 
         MeetingCommonTask task = meetingCommonTaskService.selectByPrimaryKey(Integer.parseInt(commonTaskId));
 

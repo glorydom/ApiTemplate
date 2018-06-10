@@ -112,7 +112,7 @@ public class WorkflowController extends BaseController{
 	@ApiOperation(value="显示流程图")
 	@RequestMapping(value="/image", method = RequestMethod.GET,  produces = MediaType.IMAGE_PNG_VALUE)
 	@ResponseBody
-	public Object Image(@RequestParam("processName") String processName,@RequestParam("businessId") String businessId)throws IOException {
+	public Object Image(@RequestParam("processName") String processName)throws IOException {
 		ProcessDefinition pd = baseWorkFlowService.findProcessDefinition(processName);
 		InputStream is = baseWorkFlowService.getProcessImage(processName);
 		String resourceName = pd.getDiagramResourceName();
