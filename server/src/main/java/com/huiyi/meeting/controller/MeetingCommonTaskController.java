@@ -247,33 +247,81 @@ public class MeetingCommonTaskController extends BaseController {
     @ResponseBody
     public BaseResult getOtherTasks(@RequestParam final String meetingId){
         String userId = (String) SecurityUtils.getSubject().getPrincipal();
-
         MeetingCommonTaskExample example = new MeetingCommonTaskExample();
-        example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId)).andTaskownerEqualTo(userId);
+        example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId));
         List<MeetingCommonTask> meetingCommonTasks = meetingCommonTaskService.selectByExample(example);
-        return  new BaseResult(Constants.SUCCESS_CODE, "", meetingCommonTasks);
+        List<MeetingCommonTask> result = new ArrayList<MeetingCommonTask>();
+        // get the task list whose assignee or candidate is metask
+        for(MeetingCommonTask task : meetingCommonTasks){
+            String taskOwners = task.getTaskowner();
+            int meetingCommonTask = task.getId();
+            String commonTaskBusinessKey = MeetingCommonTask.class.getSimpleName() + "_" + meetingCommonTask;
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(commonTaskBusinessKey).singleResult();
+            if(null == processInstance) //说明没有找到
+                continue;
+            Task activitiTask = taskService.createTaskQuery().executionId(processInstance.getId()).singleResult();
+            if(null == activitiTask) //说明该列表下没有这个
+                continue;
+            task.setActivititaskid(activitiTask.getId());
+
+            List<String> owners = null;
+            if(taskOwners != null){
+                owners = Arrays.asList(taskOwners.split(","));
+            } else {
+                owners = new ArrayList<>();
+            }
+            //判断用户是否为任务所有者
+            if( (owners.contains(userId) && (!task.getTaskstatus().equalsIgnoreCase(taskStatus[3])))) //排除那些已经完成的
+            {
+                task.setActivititaskid(activitiTask.getId()); // 将taskid更新到这个bean里面
+                task.setFormkey(activitiTask.getFormKey());
+                meetingCommonTaskService.updateByPrimaryKeySelective(task);
+                result.add(task);
+            }
+        }
+
+        return  new BaseResult(Constants.SUCCESS_CODE, "success", result);
     }
 
     @ApiOperation(value = "获取我能看到的任务")
     @RequestMapping(value = "list/icanview", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult getViewTasks(@RequestParam final String meetingId){
-
         String userId = (String) SecurityUtils.getSubject().getPrincipal();
-
         MeetingCommonTaskExample example = new MeetingCommonTaskExample();
         example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingId));
         List<MeetingCommonTask> meetingCommonTasks = meetingCommonTaskService.selectByExample(example);
         List<MeetingCommonTask> result = new ArrayList<MeetingCommonTask>();
-        // I can view
+        // get the task list whose assignee or candidate is metask
         for(MeetingCommonTask task : meetingCommonTasks){
-            String viewers = task.getTaskviewers();
-            List<String> viewList = Arrays.asList(viewers.split(","));
-            if(viewList.contains(userId)){
+            String taskViewerss = task.getTaskviewers();
+            int meetingCommonTask = task.getId();
+            String commonTaskBusinessKey = MeetingCommonTask.class.getSimpleName() + "_" + meetingCommonTask;
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(commonTaskBusinessKey).singleResult();
+            if(null == processInstance) //说明没有找到
+                continue;
+            Task activitiTask = taskService.createTaskQuery().executionId(processInstance.getId()).singleResult();
+            if(null == activitiTask) //说明该列表下没有这个
+                continue;
+            task.setActivititaskid(activitiTask.getId());
+
+            List<String> viewers = null;
+            if(taskViewerss != null){
+                viewers = Arrays.asList(taskViewerss.split(","));
+            } else {
+                viewers = new ArrayList<>();
+            }
+            //判断用户是否为任务所有者
+            if( (viewers.contains(userId) && (!task.getTaskstatus().equalsIgnoreCase(taskStatus[3])))) //排除那些已经完成的
+            {
+                task.setActivititaskid(activitiTask.getId()); // 将taskid更新到这个bean里面
+                task.setFormkey(activitiTask.getFormKey());
+                meetingCommonTaskService.updateByPrimaryKeySelective(task);
                 result.add(task);
             }
         }
-        return  new BaseResult(Constants.SUCCESS_CODE, "", result);
+
+        return  new BaseResult(Constants.SUCCESS_CODE, "success", result);
     }
 
 
