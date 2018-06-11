@@ -165,46 +165,51 @@ CREATE TABLE `MEETING_Common_Task` (
 DROP TABLE IF EXISTS `MEETING_Station`;
 CREATE TABLE `MEETING_Station` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(40) DEFAULT NULL COMMENT '目前支持一下几种：  机场 | 火车站 ',
-  `province` varchar(10) DEFAULT NULL COMMENT '',
+  `name` varchar(40) DEFAULT NULL COMMENT '机场车站名',
+  `stationType` varchar(10) DEFAULT NULL COMMENT '目前支持一下几种：  机场 | 火车站 ',
+  `province` varchar(10) DEFAULT NULL COMMENT 'province',
   `city` varchar(20) DEFAULT NULL COMMENT 'city',
   `town` varchar(20) DEFAULT NULL COMMENT 'town',
-  `address` varchar(50) DEFAULT NULL COMMENT 'address',
+  `address` varchar(200) DEFAULT NULL COMMENT 'address',
   `personInCharge` varchar(20) DEFAULT NULL COMMENT '负责人ID',
   `taskAttachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场，火车站的配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场车站的配置';
 
 
 #会议室
 DROP TABLE IF EXISTS `MEETING_Room`;
 CREATE TABLE `MEETING_Room` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `province` varchar(10) DEFAULT NULL COMMENT '',
+  `name` varchar(40) DEFAULT NULL COMMENT '会议室名',
+  `province` varchar(10) DEFAULT NULL COMMENT 'province',
   `city` varchar(20) DEFAULT NULL COMMENT 'city',
   `town` varchar(20) DEFAULT NULL COMMENT 'town',
-  `address` varchar(50) DEFAULT NULL COMMENT 'address',
+  `address` varchar(200) DEFAULT NULL COMMENT 'address',
   `validFlag` varchar(5) DEFAULT NULL COMMENT '是否有效 Y | N',
   `startValid` date DEFAULT NULL COMMENT '有效开始期',
   `endValid` date DEFAULT NULL COMMENT '有效截止期',
   `personInCharge` varchar(20) DEFAULT NULL COMMENT '负责人ID',
   `taskAttachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
   `capacity` int(11)  DEFAULT NULL COMMENT '支持多少人',
-  `price` float(11)  DEFAULT NULL COMMENT '支持多少人',
+  `price` float(11)  DEFAULT NULL COMMENT '价格',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='机场火车站的配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会议室的配置';
 
 
 #酒店
-DROP TABLE IF EXISTS `MEETING_Room`;
-CREATE TABLE `MEETING_Room` (
+DROP TABLE IF EXISTS `MEETING_Hotel`;
+CREATE TABLE `MEETING_Hotel` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL COMMENT '酒店名',
   `province` varchar(10) DEFAULT NULL COMMENT '',
   `city` varchar(20) DEFAULT NULL COMMENT 'city',
   `town` varchar(20) DEFAULT NULL COMMENT 'town',
-  `address` varchar(50) DEFAULT NULL COMMENT 'address',
+  `address` varchar(200) DEFAULT NULL COMMENT 'address',
+  `telephone` varchar(20)  COMMENT 'telphone',
+  `price` float(11)  DEFAULT NULL COMMENT '价格',
   `validFlag` varchar(5) DEFAULT NULL COMMENT '是否有效 Y | N',
   `startValid` date DEFAULT NULL COMMENT '有效开始期',
   `endValid` date DEFAULT NULL COMMENT '有效截止期',

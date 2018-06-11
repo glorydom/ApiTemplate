@@ -86,6 +86,7 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 		}
 		Map<String,Object> param = new HashMap<String,Object>(1);
 		param.put("beginAt", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(new Date()));
+		param.put("secondWeek", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(new Date()));
 		runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey, param);
 		return true;
 	}
