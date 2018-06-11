@@ -191,6 +191,7 @@ public class MeetingCommonTaskController extends BaseController {
             meetingCommonTask.setTaskstatus(taskStatus[1]);  //不批准，则任务继续为进行中
         }
 
+        taskService.setVariable(taskId, Constants.COMMON_TASK_ASSIGNEE, meetingCommonTask.getTaskexecutors());  // 任务的分配者再次设置
         taskService.complete(taskId,p);//vars是一些变量
 
         meetingCommonTaskService.updateByPrimaryKey(meetingCommonTask);
@@ -220,7 +221,13 @@ public class MeetingCommonTaskController extends BaseController {
                 continue;
             task.setActivititaskid(activitiTask.getId());
             List<String> candidateList = Arrays.asList(candidates.split(","));
-            List<String> candidateApprovers = Arrays.asList(approvers.split(","));
+            List<String> candidateApprovers = null;
+            if(approvers != null){
+                candidateApprovers = Arrays.asList(approvers.split(","));
+            } else {
+                candidateApprovers = new ArrayList<>();
+            }
+
             //如果是用户为执行者，那么获取正在进行的任务或者新建的任务，如果用户为审批者，那么获取待审批的任务
             if( (candidateList.contains(userId) && (task.getTaskstatus().equalsIgnoreCase(taskStatus[0] ) || task.getTaskstatus().equalsIgnoreCase(taskStatus[1] )))
                     || (candidateApprovers.contains(userId) && task.getTaskstatus().equalsIgnoreCase(taskStatus[2]))

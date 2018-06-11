@@ -95,8 +95,7 @@ public class MeetingParticipantController extends BaseController {
     @ApiOperation(value = "统计所有与会人员")
     @RequestMapping(value = "statistics", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResult statistics(@RequestParam(value="businessKey") String businessKey){
-    	int meetingId = Integer.parseInt(businessKey.split("_")[1]);
+    public BaseResult statistics(@RequestParam(value="meetingId") int meetingId){
     	MeetingParticipantExample example = new MeetingParticipantExample();
         example.createCriteria().andMeetingidEqualTo(meetingId);
         List<MeetingParticipant> all = meetingParticipantService.selectByExample(example);
