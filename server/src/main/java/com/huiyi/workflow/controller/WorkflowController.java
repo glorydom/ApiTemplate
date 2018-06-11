@@ -9,9 +9,12 @@ import java.util.Map;
 
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.task.Task;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dto.huiyi.meeting.entity.chqs.TaskDto;
 import com.huiyi.workflow.service.BaseWorkFlowService;
 import com.zheng.common.base.BaseController;
 import com.zheng.common.base.BaseResult;
@@ -42,6 +46,37 @@ public class WorkflowController extends BaseController{
 			
 	@Autowired
 	BaseWorkFlowService baseWorkFlowService;
+	
+	
+	@RequestMapping(value="/mytasks", method = RequestMethod.GET)
+	@ApiOperation(value="工作流列表")
+	@ResponseBody
+	public Object mytasks(ModelMap modelMap) {
+		Subject subject = SecurityUtils.getSubject();
+		String userName = (String)SecurityUtils.getSubject().getPrincipal();
+		List<Task> taskList = baseWorkFlowService.findTasksByUserName(userName);
+		List<Map<String,Object>> list = new ArrayList<>(taskList.size());
+		for(Task task : taskList) {
+			Map<String,Object> taskMap = new HashMap<>();
+			taskMap.put("id", task.getId());
+			taskMap.put("key", task.getTaskDefinitionKey());
+			taskMap.put("name", task.getName());
+			taskMap.put("dueDate", task.getDueDate());
+			list.add(taskMap);
+		}
+			
+		LOGGER.debug("list size:"+list.size());
+		Map<String, Object> result = new HashMap<>();
+        result.put("rows", list);
+        result.put("total", list.size());
+        return result;
+	}
+	
+	@RequestMapping(value="/tasks", method = RequestMethod.GET)
+	@ApiOperation(value="任务列表")
+	public String taskList(ModelMap modelMap) {
+		return "/workflow/tasklist.jsp";
+	}
 	
 	
 	@RequestMapping(value="/deployment", method = RequestMethod.POST)
