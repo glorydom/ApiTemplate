@@ -99,7 +99,7 @@ public class WorkflowController extends BaseController{
 			Map<String,Object> deploymentMap = new HashMap<String,Object>(3);
 			deploymentMap.put("id", d.getId());
 			deploymentMap.put("name", d.getName());
-			deploymentMap.put("deploymentTime", DateFormatUtils.format(d.getDeploymentTime(), "yyyy-MM-dd HH24:mm:ss"));
+			deploymentMap.put("deploymentTime", DateFormatUtils.format(d.getDeploymentTime(), "yyyy-MM-dd HH:mm:ss"));
 			rows.add(deploymentMap);
 		}
 		LOGGER.debug("deployment size:"+wfList.size());
