@@ -1,24 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
   <process id="MeetingMeeting" name="MeetingMeeting" isExecutable="true">
-    <userTask id="sid-CF0261CE-C292-40CE-87D8-ED9714E331E1" name="印刷资料收集" activiti:candidateGroups="负责人协助" activiti:formKey="printingMaterialCollection"></userTask>
+    <userTask id="sid-CF0261CE-C292-40CE-87D8-ED9714E331E1" name="印刷资料收集" activiti:candidateGroups="负责人协助" activiti:formKey="printingMaterialCollection">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <parallelGateway id="sid-30FF48E0-3CB1-4FEE-9566-B1381BEBB655"></parallelGateway>
-    <userTask id="sid-36706E96-8429-4ED7-9F17-8B5DED14D81E" name="其他资料"></userTask>
-    <userTask id="sid-A6F2EACB-6A26-4FA9-9472-604423F913F6" name="赞助商广告"></userTask>
-    <userTask id="sid-8551FF9B-CE52-4DDD-9B0D-029814F68EAE" name="审核"></userTask>
+    <userTask id="sid-36706E96-8429-4ED7-9F17-8B5DED14D81E" name="其他资料">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="sid-A6F2EACB-6A26-4FA9-9472-604423F913F6" name="赞助商广告">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="sid-8551FF9B-CE52-4DDD-9B0D-029814F68EAE" name="赞助商广告审核">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="sid-7873C4E4-4527-4DE4-A7A9-606B4D83AB43" sourceRef="sid-A6F2EACB-6A26-4FA9-9472-604423F913F6" targetRef="sid-8551FF9B-CE52-4DDD-9B0D-029814F68EAE"></sequenceFlow>
-    <userTask id="sid-D7EFDC40-A010-4D92-84A6-F896A8FD6247" name="印刷"></userTask>
+    <userTask id="sid-D7EFDC40-A010-4D92-84A6-F896A8FD6247" name="赞助商广告印刷">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="sid-518689D7-4CD9-4407-840E-8F0F9A4B6DAF" sourceRef="sid-8551FF9B-CE52-4DDD-9B0D-029814F68EAE" targetRef="sid-D7EFDC40-A010-4D92-84A6-F896A8FD6247"></sequenceFlow>
     <endEvent id="sid-C1EB1086-F931-4526-ABBE-4AB65D2CCD2F"></endEvent>
     <sequenceFlow id="sid-F7AB6818-E9A5-45A0-9917-0EBBF1DCB9B5" sourceRef="sid-D7EFDC40-A010-4D92-84A6-F896A8FD6247" targetRef="sid-C1EB1086-F931-4526-ABBE-4AB65D2CCD2F"></sequenceFlow>
-    <userTask id="sid-FBDF329B-02A6-4050-AA95-FB55BD763782" name="检查"></userTask>
+    <userTask id="sid-FBDF329B-02A6-4050-AA95-FB55BD763782" name="印刷资料检查">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="sid-0BC03E24-1330-48FE-B1A1-6B03AE919C01" sourceRef="sid-36706E96-8429-4ED7-9F17-8B5DED14D81E" targetRef="sid-FBDF329B-02A6-4050-AA95-FB55BD763782"></sequenceFlow>
     <endEvent id="sid-E89E3013-DA98-40E4-8C04-B8979C844DFE"></endEvent>
     <sequenceFlow id="sid-92AC3AB6-EA27-4C99-BE01-608EDB771D31" sourceRef="sid-FBDF329B-02A6-4050-AA95-FB55BD763782" targetRef="sid-E89E3013-DA98-40E4-8C04-B8979C844DFE"></sequenceFlow>
     <sequenceFlow id="sid-14082392-4DDE-4C9E-BF09-2FEDE06F4D22" sourceRef="sid-30FF48E0-3CB1-4FEE-9566-B1381BEBB655" targetRef="sid-A6F2EACB-6A26-4FA9-9472-604423F913F6"></sequenceFlow>
     <sequenceFlow id="sid-46D7A3A7-5AB8-41ED-823F-9D06D5F45722" sourceRef="sid-CF0261CE-C292-40CE-87D8-ED9714E331E1" targetRef="sid-30FF48E0-3CB1-4FEE-9566-B1381BEBB655"></sequenceFlow>
     <sequenceFlow id="sid-8D28108E-79E1-4250-ABA7-E05627355C4C" sourceRef="sid-30FF48E0-3CB1-4FEE-9566-B1381BEBB655" targetRef="sid-36706E96-8429-4ED7-9F17-8B5DED14D81E"></sequenceFlow>
-    <userTask id="sid-640D467B-3743-4731-8F44-D0D8D3AB3CDA" name="会前准备清单" activiti:candidateGroups="负责人协助" activiti:formKey="PreparationListBeforeMeeting"></userTask>
+    <userTask id="sid-640D467B-3743-4731-8F44-D0D8D3AB3CDA" name="会前准备清单" activiti:candidateGroups="负责人协助" activiti:formKey="PreparationListBeforeMeeting">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <parallelGateway id="sid-438AB38E-A235-4541-B036-538FB8EFA3D4"></parallelGateway>
     <sequenceFlow id="sid-8A52620B-749C-4782-981F-C62774ABFBA2" sourceRef="sid-438AB38E-A235-4541-B036-538FB8EFA3D4" targetRef="sid-CF0261CE-C292-40CE-87D8-ED9714E331E1"></sequenceFlow>
     <sequenceFlow id="sid-26234A71-3735-4B99-864C-F5A2F0F04BAE" sourceRef="sid-438AB38E-A235-4541-B036-538FB8EFA3D4" targetRef="sid-640D467B-3743-4731-8F44-D0D8D3AB3CDA"></sequenceFlow>
@@ -40,13 +68,29 @@
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
     <sequenceFlow id="flow8" sourceRef="sid-438AB38E-A235-4541-B036-538FB8EFA3D4" targetRef="usertask1"></sequenceFlow>
-    <userTask id="usertask5" name="嘉宾牌整理" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="participantCardCollection"></userTask>
+    <userTask id="usertask5" name="嘉宾牌整理" activiti:candidateGroups="会议嘉宾协助" activiti:formKey="participantCardCollection">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow9" sourceRef="sid-438AB38E-A235-4541-B036-538FB8EFA3D4" targetRef="usertask5"></sequenceFlow>
-    <userTask id="usertask6" name="核对"></userTask>
+    <userTask id="usertask6" name="嘉宾牌核对">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow10" sourceRef="usertask5" targetRef="usertask6"></sequenceFlow>
-    <userTask id="usertask7" name="审核"></userTask>
+    <userTask id="usertask7" name="嘉宾牌审核">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow11" sourceRef="usertask6" targetRef="usertask7"></sequenceFlow>
-    <userTask id="usertask8" name="排座位"></userTask>
+    <userTask id="usertask8" name="排座位">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow12" sourceRef="usertask7" targetRef="usertask8"></sequenceFlow>
     <endEvent id="endevent3" name="End"></endEvent>
     <sequenceFlow id="flow13" sourceRef="usertask8" targetRef="endevent3"></sequenceFlow>
@@ -117,7 +161,7 @@
         <omgdc:Bounds height="35.0" width="35.0" x="1231.0" y="765.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-FBDF329B-02A6-4050-AA95-FB55BD763782" id="BPMNShape_sid-FBDF329B-02A6-4050-AA95-FB55BD763782">
-        <omgdc:Bounds height="55.0" width="105.0" x="752.0" y="671.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="801.0" y="671.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-E89E3013-DA98-40E4-8C04-B8979C844DFE" id="BPMNShape_sid-E89E3013-DA98-40E4-8C04-B8979C844DFE">
         <omgdc:Bounds height="35.0" width="35.0" x="1231.0" y="681.0"></omgdc:Bounds>
@@ -156,7 +200,7 @@
         <omgdc:Bounds height="35.0" width="35.0" x="905.0" y="490.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent5" id="BPMNShape_endevent5">
-        <omgdc:Bounds height="35.0" width="35.0" x="1242.0" y="920.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="1231.0" y="921.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="parallelgateway2" id="BPMNShape_parallelgateway2">
         <omgdc:Bounds height="40.0" width="40.0" x="252.0" y="87.0"></omgdc:Bounds>
@@ -202,10 +246,10 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-0BC03E24-1330-48FE-B1A1-6B03AE919C01" id="BPMNEdge_sid-0BC03E24-1330-48FE-B1A1-6B03AE919C01">
         <omgdi:waypoint x="685.0" y="699.0"></omgdi:waypoint>
-        <omgdi:waypoint x="752.0" y="698.0"></omgdi:waypoint>
+        <omgdi:waypoint x="801.0" y="698.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-92AC3AB6-EA27-4C99-BE01-608EDB771D31" id="BPMNEdge_sid-92AC3AB6-EA27-4C99-BE01-608EDB771D31">
-        <omgdi:waypoint x="857.0" y="698.0"></omgdi:waypoint>
+        <omgdi:waypoint x="906.0" y="698.0"></omgdi:waypoint>
         <omgdi:waypoint x="1231.0" y="698.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-14082392-4DDE-4C9E-BF09-2FEDE06F4D22" id="BPMNEdge_sid-14082392-4DDE-4C9E-BF09-2FEDE06F4D22">
@@ -272,7 +316,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
         <omgdi:waypoint x="416.0" y="939.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1242.0" y="937.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1231.0" y="938.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
         <omgdi:waypoint x="292.0" y="107.0"></omgdi:waypoint>

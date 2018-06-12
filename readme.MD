@@ -19,3 +19,7 @@ http://XXXX:XX/druid/
 >sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 
 
+# 工作流的流程图需要系统中包含中文字体
+安装中文字体的步骤参考：https://www.jianshu.com/p/8b1e8aed0049
+
+
