@@ -134,7 +134,7 @@ public class RedisUtil {
 	 */
 	public synchronized static void set(String key, String value, int seconds) {
 		try {
-            LOGGER.warn("this cache will be expire in {} seconds", seconds);
+            LOGGER.debug("this cache will be expire in {} seconds", seconds);
             Element element = new Element(key, value, false);
             element.setTimeToIdle(seconds);
 			cache.put(element);

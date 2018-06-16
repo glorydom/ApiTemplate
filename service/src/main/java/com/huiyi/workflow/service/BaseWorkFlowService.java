@@ -2,6 +2,7 @@ package com.huiyi.workflow.service;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.engine.repository.Deployment;
@@ -36,4 +37,7 @@ public interface BaseWorkFlowService {
 	
 	//根据用户名获取正在执行中的任务
 	public List<Task> findTasksByUserName(String userName);
+	
+	//完成指定任务
+	public boolean completeTask(String taskId, Map<String,Object> variables);
 }

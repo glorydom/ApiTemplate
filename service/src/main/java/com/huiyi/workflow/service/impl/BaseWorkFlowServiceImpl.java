@@ -128,4 +128,15 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 		List<Task> taskList = taskService.createTaskQuery().taskCandidateOrAssigned(userName).orderByExecutionId().desc().list();
 		return taskList;
 	}
+
+	@Override
+	public boolean completeTask(String taskId, Map<String, Object> variables) {
+		try {
+			taskService.complete(taskId,variables);
+		}catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return false;
+		}
+		return true;
+	}
 }

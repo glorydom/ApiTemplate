@@ -70,11 +70,11 @@
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-quartz</artifactId>
             <version>${shiro.version}</version>
-        </dependency>
+        </dependency> -->
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-spring</artifactId>
@@ -288,6 +288,12 @@
 	      <artifactId>activiti-spring</artifactId>
 	      <version>5.17.0</version>
 	    </dependency>
+	    
+		 <dependency>
+		    <groupId>org.quartz-scheduler</groupId>
+		    <artifactId>quartz</artifactId>
+		    <version>${quartz.version}</version>
+		</dependency>
 	    
         <!-- servlet -->
         <dependency>
