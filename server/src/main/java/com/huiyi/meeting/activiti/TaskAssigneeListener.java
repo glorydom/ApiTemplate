@@ -24,7 +24,8 @@ public class TaskAssigneeListener implements TaskListener, Serializable {
         try {
             ApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
             taskAssigneeService = (TaskAssigneeService) context.getBean("TaskAssigneeService");
-            List<String> users = taskAssigneeService.getUserIdsByTaskID(task.getTaskDefinitionKey());
+            String processName = task.getExecution().getProcessDefinitionId().split(":")[0];
+            List<String> users = taskAssigneeService.getUserIdsByTaskID(processName,task.getTaskDefinitionKey());
             if(users == null)
             	return;
             LOGGER.info(task.getName() +"--"+ task.getTaskDefinitionKey() +"--->:" + users.toString());
@@ -32,6 +33,7 @@ public class TaskAssigneeListener implements TaskListener, Serializable {
                 task.addCandidateUser(userId);
             }
         } catch (Exception e) {
+        	LOGGER.error(e.getMessage());
             e.printStackTrace();
         }
     }

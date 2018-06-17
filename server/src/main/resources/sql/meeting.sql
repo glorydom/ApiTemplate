@@ -44,9 +44,11 @@ CREATE TABLE `MEETING_ScriptManual` (
 DROP TABLE IF EXISTS `MEETING_Participant`;
 CREATE TABLE `MEETING_Participant` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `meetingId` int(11) DEFAULT NULL COMMENT '参加的是哪一届会议',
   `name` varchar(40) NOT NULL COMMENT '人员名字',
+  `telephone` varchar(20) NOT NULL COMMENT 'telphone',
+  `company` varchar(50) DEFAULT NULL COMMENT '所属的公司',
   `gender` varchar(5)  COMMENT '性别',
-  `telephone` varchar(20)  COMMENT 'telphone',
   `age` int(11)  COMMENT 'age',
   `address` varchar(40)  COMMENT 'address',
   `productOfInterest` varchar(100) NOT NULL COMMENT '感兴趣的产品， 使用逗号分隔',
@@ -56,15 +58,13 @@ CREATE TABLE `MEETING_Participant` (
   `arrivalTime` date COMMENT '到达时间',
   `leaveTime` date COMMENT '离开时间',
   `trafficTool` varchar(10) COMMENT '交通工具',
-  `recipiantStatus` varchar(10)  COMMENT '接人状态：没有 | 进行中 | 结束',
+  `receptionStatus` varchar(10)  COMMENT '接人状态：人员重复需确认 | 未指定 | 进行中 | 结束',
   `seatStatus` varchar(10)  COMMENT '会场座位是否已经安排：没有 | 进行中 | 结束',
   `seat` varchar(20)  COMMENT '会场中的位置  横纵坐标',
   `forumOfInterest` varchar(100) DEFAULT NULL COMMENT '参加那几场专题会, 专场会（forum)的id使用逗号分割，',
   `charged` varchar(10) DEFAULT NULL COMMENT '是否付费: 付费|非付费',
   `invoiced`  varchar(10) DEFAULT NULL COMMENT '是否开票: 已开票|未开票',
   `disguisedGuestCardContent` varchar(30) DEFAULT NULL COMMENT '嘉宾牌内容',
-  `company` varchar(50) DEFAULT NULL COMMENT '所属的公司',
-  `meetingId` int(11) DEFAULT NULL COMMENT '参加的是哪一届会议',
   `ticketId` varchar(100) DEFAULT NULL COMMENT '门票',
   `sponsor` varchar(50) DEFAULT NULL COMMENT '赞助商',
   `creationTimestamp` bigint DEFAULT NULL,
@@ -131,6 +131,7 @@ DROP TABLE IF EXISTS `MEETING_Task_Candidate`;
 CREATE TABLE `MEETING_Task_Candidate` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `meetingId` int(11) NULL COMMENT '与该界会议关联',
+  `processName` varchar(50) NOT NULL COMMENT '流程名',
   `taskId` varchar(64) NOT NULL COMMENT '流程任务ID',
   `userId` int(11) NOT NULL COMMENT '用户ID',
   PRIMARY KEY (`id`)

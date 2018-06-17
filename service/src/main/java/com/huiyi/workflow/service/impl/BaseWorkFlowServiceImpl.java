@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.huiyi.meeting.dao.model.MeetingParticipant;
 import com.huiyi.workflow.service.BaseWorkFlowService;
 
 @Service
@@ -79,18 +80,33 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 	public boolean startMeetingProcess(int meetingId) {
 		String processDefinitionKey = "MeetingMeeting";
 		String businessKey = String.valueOf(meetingId);
-		List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey, processDefinitionKey).list();
-		if(list != null && list.size()> 0) {
-			LOGGER.error("该会议已经流程已经启动");
-			return false;
-		}
 		Map<String,Object> param = new HashMap<String,Object>(1);
 		param.put("beginAt", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(new Date()));
 		param.put("secondWeek", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(new Date()));
+		return startProcess(processDefinitionKey, businessKey, param);
+	}
+	
+	@Override
+	public boolean startRegisterProcess(int participantId) {
+		// TODO Auto-generated method stub
+		String processDefinitionKey = "MeetingRegister";
+		String businessKey = MeetingParticipant.class.getSimpleName()+"_"+ String.valueOf(participantId);
+		Map<String,Object> param = new HashMap<String,Object>(1);
+		return startProcess(processDefinitionKey, businessKey, param);
+	}
+	
+	@Override
+	public boolean startProcess(String processDefinitionKey, String businessKey,Map<String,Object> param) {
+		List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey, processDefinitionKey).list();
+		LOGGER.debug(processDefinitionKey+"-"+businessKey + "流程图数量："+list.size());
+		if(list != null && list.size()> 0) {
+			LOGGER.error("流程已经启动");
+			return false;
+		}
 		runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey, param);
 		return true;
 	}
-	
+
 	@Override
 	public List<UserTask> listAllUserTasks(String processName){
 		ProcessDefinition pd = findProcessDefinition(processName);

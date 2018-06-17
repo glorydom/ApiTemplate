@@ -118,9 +118,8 @@ public class MeetingV2Controller extends BaseController {
 	@RequestMapping(value="/saveMeetingTaskCandidate", method = RequestMethod.GET)
 	@ApiOperation(value="保存会议任务执行人候选人")
 	@ResponseBody
-	public Object saveMeetingTaskCandidate(@RequestParam("meetingId") String meetingId, @RequestParam("taskId") String taskId, @RequestParam("userId") String userId) {
+	public Object saveMeetingTaskCandidate(@RequestParam("taskId") String taskId, @RequestParam("userId") String userId) {
 		ComplexResult result = FluentValidator.checkAll()
-                .on(meetingId, new NumberValidator("会议ID"))
                 .on(taskId, new LengthValidator(1, 64, "工作流任务ID"))
                 .on(userId, new NumberValidator("用户"))
                 .doValidate()
@@ -129,7 +128,6 @@ public class MeetingV2Controller extends BaseController {
             return new BaseResult(Constants.ERROR_CODE, "failed", result.getErrors());
         }
 		MeetingTaskCandidate record = new MeetingTaskCandidate();
-		record.setMeetingid(Integer.parseInt(meetingId));
 		record.setTaskid(taskId);
 		record.setUserid(Integer.parseInt(userId));
 		meetingTaskCandidateService.insert(record);
@@ -145,6 +143,7 @@ public class MeetingV2Controller extends BaseController {
 			return new BaseResult(Constants.ERROR_CODE, "failed", "没有需要保存的数据！");
 		}
 //		int meetingId = taskAssigneeDto.getMeetingId();
+		String processName = StringUtils.defaultIfBlank(taskAssigneeDto.getProcessName(), "MeetingMeeting");
 		List<MeetingTaskCandidate> list = new ArrayList<>();
 		for(TaskAssigneeSingleDto tasd: taskAssigneeDto.getTaskSettings()) {
 			// 前端如果传来的人是空的 怎么处理？
@@ -154,12 +153,14 @@ public class MeetingV2Controller extends BaseController {
 			for(Integer uid : tasd.getUserList()) {
 				MeetingTaskCandidate meetingTaskCandidate = new MeetingTaskCandidate();
 //				meetingTaskCandidate.setMeetingid(meetingId);
+				meetingTaskCandidate.setProcessname(processName);
 				meetingTaskCandidate.setTaskid(taskId);
 				meetingTaskCandidate.setUserid(uid);
 				list.add(meetingTaskCandidate);
 			}
 		}
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
+		example.createCriteria().andProcessnameEqualTo(processName);
 //		example.createCriteria().andMeetingidEqualTo(taskAssigneeDto.getMeetingId());
 		if(list.size()==0) {
 			meetingTaskCandidateService.deleteByExample(example);

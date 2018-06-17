@@ -3,6 +3,7 @@ package com.huiyi.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +25,9 @@ public class TaskAssigneeService {
      * @param taskId
      * @return
      */
-    public List<String> getUserIdsByTaskID (String taskId){
+    public List<String> getUserIdsByTaskID (String processName,String taskId){
     	MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
-    	example.createCriteria().andTaskidEqualTo(taskId);
+    	example.createCriteria().andProcessnameEqualTo(StringUtils.defaultIfBlank(processName, "MeetingMeeting")).andTaskidEqualTo(taskId);
     	List<MeetingTaskCandidate> mtcList = meetingTaskCandidateService.selectByExample(example);
     	List<String> list =  new ArrayList<>();
     	for(MeetingTaskCandidate mtc : mtcList) {

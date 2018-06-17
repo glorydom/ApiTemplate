@@ -19,7 +19,7 @@ public class CompleteWithNotificationListener implements TaskListener,Serializab
 
 	private static final long serialVersionUID = -78805721454981881L;
 	
-	Logger LOGGER = LoggerFactory.getLogger(CompleteWithNotificationListener.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(CompleteWithNotificationListener.class);
 
 	@Override
 	public void notify(DelegateTask task) {

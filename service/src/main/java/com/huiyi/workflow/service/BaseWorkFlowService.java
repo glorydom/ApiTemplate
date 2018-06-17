@@ -23,8 +23,14 @@ public interface BaseWorkFlowService {
 	//删除一个流程图
 	public void deleteDeployment(String deploymentId);
 	
+	//启动流程
+	public boolean startProcess(String processDefinitionKey, String businessKey,Map<String,Object> param);
+	
 	//启动一个会议的流程
 	public boolean startMeetingProcess(int meetingId);
+	
+	//启动参会人员注册流程
+	public boolean startRegisterProcess(int participantId);
 	
 	//获取一个流程所有的用户任务
 	public List<UserTask> listAllUserTasks(String processName);
