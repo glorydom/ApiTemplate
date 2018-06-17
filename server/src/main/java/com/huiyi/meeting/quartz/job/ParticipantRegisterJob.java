@@ -17,7 +17,6 @@ public class ParticipantRegisterJob extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		// TODO Auto-generated method stub
 		LOGGER.debug("quartz jobs triggered....");
-		
 	}
 
 }
