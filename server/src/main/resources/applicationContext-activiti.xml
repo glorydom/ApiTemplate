@@ -14,11 +14,9 @@
         <property name="jobExecutorActivate" value="true" />
         <property name="activityFontName" value="宋体"/>
         <property name="labelFontName" value="宋体"/>
-        <property name="annotationFontName" value="宋体"/>
         <!--使用其他系统的表，需要创建相关视图-->
         <property name="dbIdentityUsed" value="false"/>
-        <property name="deploymentResources"
-        >
+        <property name="deploymentResources">
             <list>
                 <value>classpath*:/workflow/*.bpmn</value>
             </list>

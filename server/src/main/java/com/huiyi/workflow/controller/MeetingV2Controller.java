@@ -202,11 +202,13 @@ public class MeetingV2Controller extends BaseController {
 		TaskAssigneeDto taskAssigneeDto = new TaskAssigneeDto();
 //		taskAssigneeDto.setMeetingId(meetingId);
 //		taskAssigneeDto.setMeetingsubject(meeting.getMeetingsubject());
+		String processName = StringUtils.defaultIfBlank(taskAssigneeDto.getProcessName(), "MeetingMeeting");
 		List<TaskAssigneeSingleDto> taskSettings = new ArrayList<>();
 		taskAssigneeDto.setTaskSettings(taskSettings);
 		
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
 //		example.createCriteria().andMeetingidEqualTo(meetingId);
+		example.createCriteria().andProcessnameEqualTo(processName);
 		List<MeetingTaskCandidate> list = meetingTaskCandidateService.selectByExample(example);
 		Map<String,List<Integer>> existingTaskAssignee = new HashMap<>();
 		for(MeetingTaskCandidate mtc: list) {
