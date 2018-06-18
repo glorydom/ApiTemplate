@@ -17,11 +17,14 @@ import java.util.zip.ZipInputStream;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.UserTask;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +47,8 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 	RuntimeService runtimeService;
 	@Autowired
 	TaskService taskService;
+	@Autowired
+	HistoryService historyService;
 	
 	@Override
 	public List<Deployment> getAllDeployments(){
@@ -154,5 +159,20 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public HistoricProcessInstance findProcessInstance(String executionId) {
+		// TODO Auto-generated method stub
+		Execution e = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
+		HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(e.getProcessInstanceId()).singleResult();;
+		return hpi;
+	}
+
+	@Override
+	public boolean checkProcessInstance(String processName, String businessKey) {
+		// TODO Auto-generated method stub
+		List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(processName).processInstanceBusinessKey(businessKey).list();
+		return list.size()>0;
 	}
 }

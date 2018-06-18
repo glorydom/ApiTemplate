@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.UserTask;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
 public interface BaseWorkFlowService {
 
 	//获取所有发布的流程
@@ -46,4 +45,10 @@ public interface BaseWorkFlowService {
 	
 	//完成指定任务
 	public boolean completeTask(String taskId, Map<String,Object> variables);
+	
+	//根据执行ID获取流程实例对象
+	public HistoricProcessInstance findProcessInstance(String executionId);
+	
+	//根据流程名和业务key查询是否已经启动相应实例
+	public boolean checkProcessInstance(String processName,String businessKey);
 }

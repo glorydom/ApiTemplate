@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.huiyi.meeting.service.CommonMeetingService;
 import com.huiyi.workflow.service.BaseWorkFlowService;
 import com.zheng.common.base.BaseController;
 import com.zheng.common.base.BaseResult;
@@ -45,6 +47,8 @@ public class WorkflowController extends BaseController{
 			
 	@Autowired
 	BaseWorkFlowService baseWorkFlowService;
+	@Autowired
+	CommonMeetingService commonMeetingService;
 	
 	
 	@RequestMapping(value="/mytasks", method = RequestMethod.GET)
@@ -52,14 +56,17 @@ public class WorkflowController extends BaseController{
 	@ResponseBody
 	public Object mytasks(ModelMap modelMap) {
 		Subject subject = SecurityUtils.getSubject();
-		String userName = (String)SecurityUtils.getSubject().getPrincipal();
+		String userName = (String)subject.getPrincipal();
 		List<Task> taskList = baseWorkFlowService.findTasksByUserName(userName);
 		List<Map<String,Object>> list = new ArrayList<>(taskList.size());
 		for(Task task : taskList) {
 			Map<String,Object> taskMap = new HashMap<>();
+			
+			HistoricProcessInstance pi = baseWorkFlowService.findProcessInstance(task.getExecutionId());
+			String objDes = commonMeetingService.getObjectDescription(pi);
 			taskMap.put("id", task.getId());
-			taskMap.put("key", task.getTaskDefinitionKey());
-			taskMap.put("name", task.getName());
+			taskMap.put("key", task.getTaskDefinitionKey()+task.getName());
+			taskMap.put("name", objDes);
 			taskMap.put("dueDate", task.getDueDate());
 			list.add(taskMap);
 		}
