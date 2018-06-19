@@ -51,4 +51,7 @@ public interface BaseWorkFlowService {
 	
 	//根据流程名和业务key查询是否已经启动相应实例
 	public boolean checkProcessInstance(String processName,String businessKey);
+	
+	//列出所有流程图定义
+	public List<ProcessDefinition> listAllProcesses();
 }

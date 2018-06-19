@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.UserTask;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.baidu.unbiz.fluentvalidator.ComplexResult;
 import com.baidu.unbiz.fluentvalidator.FluentValidator;
 import com.baidu.unbiz.fluentvalidator.ResultCollectors;
+import com.dto.huiyi.meeting.entity.config.ProcessDto;
 import com.dto.huiyi.meeting.entity.config.TaskAssigneeDto;
 import com.dto.huiyi.meeting.entity.config.TaskAssigneeSingleDto;
 import com.dto.huiyi.meeting.util.Constants;
@@ -232,4 +234,16 @@ public class MeetingV2Controller extends BaseController {
 		return new BaseResult(Constants.SUCCESS_CODE, "success", taskAssigneeDto);
 	}
 	
+	@RequestMapping(value="/listAllProcesses", method = RequestMethod.GET)
+	@ApiOperation(value="列出所有流程")
+	@ResponseBody
+	public Object listAllProcesses() {
+		List<ProcessDefinition> pdList = baseWorkFlowService.listAllProcesses();
+		List<ProcessDto> list = new ArrayList<>();
+		for(ProcessDefinition definition : pdList) {
+			ProcessDto pd = new ProcessDto(definition);
+			list.add(pd);
+		}
+		return new BaseResult(Constants.SUCCESS_CODE, "success", list);
+	}
 }

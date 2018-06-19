@@ -175,4 +175,15 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 		List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(processName).processInstanceBusinessKey(businessKey).list();
 		return list.size()>0;
 	}
+
+	@Override
+	public List<ProcessDefinition> listAllProcesses() {
+		// TODO Auto-generated method stub
+		List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
+		Map<String,ProcessDefinition> uniq = new HashMap<>();
+		for(ProcessDefinition pd : list) {
+			uniq.put(pd.getKey(), pd);
+		}
+		return new ArrayList<ProcessDefinition>(uniq.values());
+	}
 }
