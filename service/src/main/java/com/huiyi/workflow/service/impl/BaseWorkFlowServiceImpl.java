@@ -186,4 +186,17 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 		}
 		return new ArrayList<ProcessDefinition>(uniq.values());
 	}
+
+	@Override
+	public int completeTasks(String taskIds, String comments) {
+		// TODO Auto-generated method stub
+		int cnt = 0;
+		for(String id: taskIds.split("-")) {
+			Map<String,Object> variables = new HashMap<>();
+			variables.put("comment", comments);
+			if(completeTask(id, variables))
+				cnt ++;
+		}
+		return cnt;
+	}
 }

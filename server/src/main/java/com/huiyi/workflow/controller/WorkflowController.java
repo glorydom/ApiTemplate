@@ -54,7 +54,7 @@ public class WorkflowController extends BaseController{
 	@RequestMapping(value="/mytasks", method = RequestMethod.GET)
 	@ApiOperation(value="工作流列表")
 	@ResponseBody
-	public Object mytasks(ModelMap modelMap) {
+	public Object mytasks() {
 		Subject subject = SecurityUtils.getSubject();
 		String userName = (String)subject.getPrincipal();
 		List<Task> taskList = baseWorkFlowService.findTasksByUserName(userName);
@@ -80,15 +80,30 @@ public class WorkflowController extends BaseController{
 	
 	@RequestMapping(value="/tasks", method = RequestMethod.GET)
 	@ApiOperation(value="任务列表")
-	public String taskList(ModelMap modelMap) {
+	public String taskList() {
 		return "/workflow/tasklist.jsp";
 	}
 	
+	@RequestMapping(value="/completeTask/{taskIds}", method = RequestMethod.GET)
+	@ApiOperation(value="完成当前任务")
+	public String completeTask(@PathVariable("taskIds") String taskIds, ModelMap modelMap) {
+		modelMap.put("taskIds", taskIds);
+		return "/workflow/completeTask.jsp";
+	}
+	
+	@RequestMapping(value="/completeTask", method = RequestMethod.POST)
+	@ApiOperation(value="完成当前任务")
+	@ResponseBody
+	public Object complete(@RequestParam("taskIds") String taskIds,@RequestParam("comments") String comments) {
+		LOGGER.debug(taskIds +"="+ comments);
+		int cnt = baseWorkFlowService.completeTasks(taskIds, comments);
+		return new BaseResult(1, "success", cnt);
+	}
 	
 	@RequestMapping(value="/deployment", method = RequestMethod.POST)
 	@ApiOperation(value="发布工作流")
 	@ResponseBody
-	public Object deployment(@RequestParam("file") MultipartFile file,@RequestParam("name") String name, ModelMap modelMap) {
+	public Object deployment(@RequestParam("file") MultipartFile file,@RequestParam("name") String name) {
 		LOGGER.debug(name);
 		int ret = baseWorkFlowService.createDeployment(file, name);
 		if(ret == 1)

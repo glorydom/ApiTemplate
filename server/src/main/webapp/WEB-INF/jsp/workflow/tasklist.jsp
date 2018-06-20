@@ -68,17 +68,37 @@ function actionFormatter(value, row, index) {
 		'<a class="delete" href="javascript:;" onclick="completeAction()" data-toggle="tooltip" title="Remove"><i class="glyphicon glyphicon-remove"></i></a>'
     ].join('');
 }
-// 新增
+// 完成任务
 var completeDialog;
 function completeAction() {
-	completeDialog = $.dialog({
-		animationSpeed: 300,
-		title: '完成任务',
-		content: 'url:${basePath}/chqs/workflow/completeTask',
-		onContentReady: function () {
-			initMaterialInput();
+	var rows = $table.bootstrapTable('getSelections');
+	if (rows.length != 1) {
+		$.confirm({
+			title: false,
+			content: '请选择一条记录！',
+			autoClose: 'cancel|3000',
+			backgroundDismiss: true,
+			buttons: {
+				cancel: {
+					text: '取消',
+					btnClass: 'waves-effect waves-button'
+				}
+			}
+		});
+	} else {
+		var ids = new Array();
+		for (var i in rows) {
+			ids.push(rows[i].id);
 		}
-	});
+		completeDialog = $.dialog({
+			animationSpeed: 300,
+			title: '完成任务',
+			content: 'url:${basePath}/chqs/workflow/completeTask/'+ids.join("-"),
+			onContentReady: function () {
+				initMaterialInput();
+			}
+		});
+	}
 }
 // 删除
 var deleteDialog;

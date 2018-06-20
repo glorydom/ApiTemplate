@@ -54,4 +54,7 @@ public interface BaseWorkFlowService {
 	
 	//列出所有流程图定义
 	public List<ProcessDefinition> listAllProcesses();
+	
+	//完成任务
+	public int completeTasks(String taskIds, String comments);
 }
