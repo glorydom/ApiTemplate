@@ -89,7 +89,7 @@ public class UploadController {
         return new BaseResult(Constants.SUCCESS_CODE, fileName, null);
     }
 
-    @RequestMapping("download")
+    @RequestMapping(value="download", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
     public ResponseEntity<byte[]> download(String fileName) throws IOException {
         String dfileName = new String(fileName.getBytes("utf-8"), "utf-8");
