@@ -249,3 +249,24 @@ CREATE TABLE `MEETING_Participant_Recipiant_Batch_Task` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='对一批人的安置';
 
+
+#与会者 与与会管理对应关系
+DROP TABLE IF EXISTS `MEETING_Parti_Regist`;
+CREATE TABLE `MEETING_Parti_Regist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `participantId` int(11) DEFAULT NULL,
+  `registId` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='与会者 与与会管理对应关系';
+
+
+# 与会人员注册相关
+DROP TABLE IF EXISTS `MEETING_Regist`;
+CREATE TABLE `MEETING_Regist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `feeConfirmTime` date DEFAULT NULL COMMENT '款项确认到账时间',
+  `feeSheetExcel` varchar(500) DEFAULT NULL COMMENT '财务人员上传的Excel文件',
+  `isInvoiced` varchar(20) DEFAULT NULL COMMENT '是否开票  YES | NO',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='与会人员的管理';
