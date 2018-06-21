@@ -44,7 +44,8 @@ public class UploadController {
     @ResponseBody
     public BaseResult uploadBankSheet(@RequestParam("file") MultipartFile file) throws IOException {
         String path = getFileUploadFolder();
-        String fileName = file.getOriginalFilename();
+        String originalFilename = file.getOriginalFilename();
+        String fileName = new Date().getTime()+ "_"+ originalFilename;
         
 //        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
 //        XSSFSheet worksheet = workbook.getSheetAt(0);
