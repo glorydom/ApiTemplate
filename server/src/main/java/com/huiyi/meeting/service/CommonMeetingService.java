@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.activiti.engine.history.HistoricProcessInstance;
 
-import com.huiyi.meeting.dao.model.MeetingParticipant;
+import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
 
 public interface CommonMeetingService {
 
@@ -12,5 +12,5 @@ public interface CommonMeetingService {
 	public String getObjectDescription(HistoricProcessInstance phi);
 	
 	//对账
-	public List<MeetingParticipant> reconsile(String filepath);
+	public List<ComparisonResultDto> reconsile(String filepath);
 }

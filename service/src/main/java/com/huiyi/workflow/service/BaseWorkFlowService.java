@@ -31,6 +31,9 @@ public interface BaseWorkFlowService {
 	//启动参会人员注册流程
 	public boolean startRegisterProcess(int participantId);
 	
+	//启动一次注册流程
+	public boolean startRegistProcess(int registId);
+	
 	//获取一个流程所有的用户任务
 	public List<UserTask> listAllUserTasks(String processName);
 	

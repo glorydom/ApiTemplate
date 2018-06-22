@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,7 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.dto.huiyi.meeting.util.Constants;
 import com.huiyi.meeting.dao.model.MeetingRegist;
+import com.huiyi.meeting.dao.model.MeetingRegistExample;
 import com.huiyi.meeting.rpc.api.MeetingRegistService;
+import com.huiyi.workflow.service.BaseWorkFlowService;
 import com.zheng.common.base.BaseResult;
 
 import io.swagger.annotations.Api;
@@ -38,6 +41,8 @@ public class UploadController {
 	
 	@Autowired
 	private MeetingRegistService meetingRegistService;
+	@Autowired
+	BaseWorkFlowService baseWorkFlowService;
 	
 	@RequestMapping(value = "uploadBankSheet", method = RequestMethod.POST)
     @ApiOperation(value = "上传银行账单文件")
@@ -50,30 +55,29 @@ public class UploadController {
         String path = getFileUploadFolder();
         String originalFilename = file.getOriginalFilename();
         String fileName = new Date().getTime()+ "_"+ originalFilename;
-        
-//        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
-//        XSSFSheet worksheet = workbook.getSheetAt(0);
-//        int rownum = worksheet.getLastRowNum();
-//        for(int i=1;i<rownum;i++) {
-//        	XSSFRow row = worksheet.getRow(i);
-//        	LOGGER.debug(row.getCell(0).toString());
-//        }
-//        workbook.close();
-        
+
         File dir = new File(path, fileName);
         if (!dir.exists()) {
             dir.mkdirs();
         }
+        String excelName = path+File.separator+fileName;
         //MultipartFile自带的解析方法
         file.transferTo(dir);
-        LOGGER.debug(path+File.separator+fileName);
+        LOGGER.debug(excelName);
         
         MeetingRegist record = new MeetingRegist();
-        record.setCreationtimestamp(new Date().getTime());
-        record.setFeesheetexcel(path+File.separator+fileName);
+        long createtime = new Date().getTime();
+        record.setCreationtimestamp(createtime);
+        record.setFeesheetexcel(excelName);
         record.setIsinvoiced("NO");
         int ret = meetingRegistService.insert(record);
         
+        MeetingRegistExample example = new MeetingRegistExample();
+        example.createCriteria().andCreationtimestampEqualTo(createtime).andFeesheetexcelEqualTo(excelName);
+        List<MeetingRegist> list = meetingRegistService.selectByExample(example);
+        if(list.size() ==1) {
+        	baseWorkFlowService.startRegistProcess(list.get(0).getId());
+        }
         return new BaseResult(Constants.SUCCESS_CODE, fileName, ret);
     }
 	

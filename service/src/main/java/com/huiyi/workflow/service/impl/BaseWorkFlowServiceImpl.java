@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.huiyi.meeting.dao.model.MeetingParticipant;
+import com.huiyi.meeting.dao.model.MeetingRegist;
 import com.huiyi.workflow.service.BaseWorkFlowService;
 
 @Service
@@ -100,6 +101,15 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 		return startProcess(processDefinitionKey, businessKey, param);
 	}
 	
+	@Override
+	public boolean startRegistProcess(int registId) {
+		// TODO Auto-generated method stub
+		String processDefinitionKey = "Regist";
+		String businessKey = MeetingRegist.class.getSimpleName()+"_"+ String.valueOf(registId);
+		Map<String,Object> param = new HashMap<String,Object>(1);
+		return startProcess(processDefinitionKey, businessKey, param);
+	}
+
 	@Override
 	public boolean startProcess(String processDefinitionKey, String businessKey,Map<String,Object> param) {
 		List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey, processDefinitionKey).list();

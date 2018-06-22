@@ -1,7 +1,7 @@
 package com.huiyi.meeting.controller;
 
-import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
-import com.huiyi.meeting.dao.model.MeetingParticipant;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huiyi.meeting.dao.model.MeetingRegist;
 import com.huiyi.meeting.rpc.api.MeetingRegistService;
@@ -18,9 +19,6 @@ import com.zheng.common.base.BaseResult;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequestMapping("/chqs/regist")
@@ -53,8 +51,7 @@ public class MeetingRegistController {
 
     	int registId = baseWorkFlowService.findBusinessIdbyTaskId(taskId);
     	MeetingRegist mr = meetingRegistService.selectByPrimaryKey(registId);
-    	commonMeetingService.reconsile(mr.getFeesheetexcel());
-        List<ComparisonResultDto> resultDtos = new ArrayList<>();
+        List<ComparisonResultDto> resultDtos = commonMeetingService.reconsile(mr.getFeesheetexcel());
         return new BaseResult(Constants.SUCCESS_CODE, "", resultDtos);
     }
 
