@@ -63,6 +63,8 @@ CREATE TABLE `MEETING_Participant` (
   `seat` varchar(20)  COMMENT '会场中的位置  横纵坐标',
   `forumOfInterest` varchar(100) DEFAULT NULL COMMENT '参加那几场专题会, 专场会（forum)的id使用逗号分割，',
   `charged` varchar(10) DEFAULT NULL COMMENT '是否付费: 付费|非付费',
+  `meetingFee` float(10) DEFAULT NULL COMMENT '会务费',
+  `meetingFeePaidTime` date DEFAULT NULL COMMENT '会务费付费时间',
   `invoiced`  varchar(10) DEFAULT NULL COMMENT '是否开票: 已开票|未开票',
   `disguisedGuestCardContent` varchar(30) DEFAULT NULL COMMENT '嘉宾牌内容',
   `ticketId` varchar(100) DEFAULT NULL COMMENT '门票',

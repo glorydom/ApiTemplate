@@ -1,5 +1,7 @@
 package com.huiyi.meeting.controller;
 
+import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
+import com.huiyi.meeting.dao.model.MeetingParticipant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +18,9 @@ import com.zheng.common.base.BaseResult;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/chqs/regist")
@@ -37,10 +42,20 @@ public class MeetingRegistController {
      */
     public BaseResult compare(@PathVariable String taskId){
         //todo
+//        MeetingParticipant participant = new MeetingParticipant();
+//        participant.getMeetingfee();
+//        participant.getMeetingfeepaidtime();
+//        participant.getMeetingid();
+//        participant.getCharged();
+//        participant.getName();
+//        participant.getTelephone();
+        //以上字段为participant返回必须有的字段
+
     	int registId = baseWorkFlowService.findBusinessIdbyTaskId(taskId);
     	MeetingRegist mr = meetingRegistService.selectByPrimaryKey(registId);
     	commonMeetingService.reconsile(mr.getFeesheetexcel());
-        return new BaseResult(Constants.SUCCESS_CODE, "", null);
+        List<ComparisonResultDto> resultDtos = new ArrayList<>();
+        return new BaseResult(Constants.SUCCESS_CODE, "", resultDtos);
     }
 
     @ApiOperation(value = "款项确认")
