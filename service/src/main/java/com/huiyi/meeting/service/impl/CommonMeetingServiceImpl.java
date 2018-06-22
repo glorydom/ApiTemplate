@@ -1,5 +1,7 @@
 package com.huiyi.meeting.service.impl;
 
+import java.util.List;
+
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -46,6 +48,13 @@ public class CommonMeetingServiceImpl implements CommonMeetingService {
 			return obj.toString();
 		}
 		return "不支持的businessKey"+pi.getBusinessKey();
+	}
+
+
+	@Override
+	public List<MeetingParticipant> reconsile(String filepath) {
+		// TODO Auto-generated method stub';.
+		return null;
 	}
 
 }

@@ -199,4 +199,17 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 		}
 		return cnt;
 	}
+
+	@Override
+	public int findBusinessIdbyTaskId(String taskId) {
+		// TODO Auto-generated method stub
+		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+		HistoricProcessInstance hpi = findProcessInstance(task.getExecutionId());
+		if(hpi.getBusinessKey().contains("_")) {
+			String bk = hpi.getBusinessKey().split("_")[1];
+			if(StringUtils.isNumeric(bk))
+				return Integer.parseInt(bk);
+		}
+		return -1;
+	}
 }

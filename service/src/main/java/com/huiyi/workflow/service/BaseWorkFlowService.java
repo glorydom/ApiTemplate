@@ -57,4 +57,7 @@ public interface BaseWorkFlowService {
 	
 	//完成任务
 	public int completeTasks(String taskIds, String comments);
+	
+	//根据任务ID获取业务对象ID
+	public int findBusinessIdbyTaskId(String taskId);
 }

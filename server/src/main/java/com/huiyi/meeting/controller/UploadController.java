@@ -42,6 +42,10 @@ public class UploadController {
 	@RequestMapping(value = "uploadBankSheet", method = RequestMethod.POST)
     @ApiOperation(value = "上传银行账单文件")
     @ResponseBody
+    /**
+     * 财务人员上传来自银行的对账单 excel格式的， 有两个字段  公司 | 金额
+     * 开启流程，并且完成第一个任务： 上传银行账单
+     */
     public BaseResult uploadBankSheet(@RequestParam("file") MultipartFile file) throws IOException {
         String path = getFileUploadFolder();
         String originalFilename = file.getOriginalFilename();

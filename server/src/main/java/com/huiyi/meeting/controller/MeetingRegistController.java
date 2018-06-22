@@ -1,32 +1,34 @@
 package com.huiyi.meeting.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.dto.huiyi.meeting.util.Constants;
 import com.huiyi.meeting.dao.model.MeetingRegist;
-import com.huiyi.meeting.dao.model.MeetingRoom;
+import com.huiyi.meeting.rpc.api.MeetingRegistService;
+import com.huiyi.meeting.service.CommonMeetingService;
+import com.huiyi.workflow.service.BaseWorkFlowService;
 import com.zheng.common.base.BaseResult;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/chqs/regist")
 @Api(value = "嘉宾注册", description = "对嘉宾注册相关事项的管理")
 public class MeetingRegistController {
 
-    @ApiOperation(value = "上传对账单")
-    @RequestMapping(value = "uploadSheet", method = RequestMethod.POST)
-    @ResponseBody
-    /**
-     * 财务人员上传来自银行的对账单 excel格式的， 有两个字段  公司 | 金额
-     * 开启流程，并且完成第一个任务： 上传银行账单
-     */
-    public BaseResult uploadFile(@RequestBody MeetingRegist meetingRegist){
-        //todo
-
-        return new BaseResult(Constants.SUCCESS_CODE, "", null);
-    }
-
+	@Autowired
+	private BaseWorkFlowService baseWorkFlowService;
+	@Autowired
+	private MeetingRegistService meetingRegistService;
+	@Autowired
+	private CommonMeetingService commonMeetingService;
+	
     @ApiOperation(value = "会务款项比对")
     @RequestMapping(value = "compare/{taskId}", method = RequestMethod.GET)
     @ResponseBody
@@ -35,7 +37,9 @@ public class MeetingRegistController {
      */
     public BaseResult compare(@PathVariable String taskId){
         //todo
-
+    	int registId = baseWorkFlowService.findBusinessIdbyTaskId(taskId);
+    	MeetingRegist mr = meetingRegistService.selectByPrimaryKey(registId);
+    	commonMeetingService.reconsile(mr.getFeesheetexcel());
         return new BaseResult(Constants.SUCCESS_CODE, "", null);
     }
 
