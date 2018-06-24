@@ -68,12 +68,12 @@ public class UploadController {
         MeetingRegist record = new MeetingRegist();
         long createtime = new Date().getTime();
         record.setCreationtimestamp(createtime);
-        record.setFeesheetexcel(excelName);
+//        record.setFeesheetexcel(excelName);
         record.setIsinvoiced("NO");
         int ret = meetingRegistService.insert(record);
         
         MeetingRegistExample example = new MeetingRegistExample();
-        example.createCriteria().andCreationtimestampEqualTo(createtime).andFeesheetexcelEqualTo(excelName);
+        example.createCriteria().andCreationtimestampEqualTo(createtime);
         List<MeetingRegist> list = meetingRegistService.selectByExample(example);
         if(list.size() ==1) {
         	baseWorkFlowService.startRegistProcess(list.get(0).getId());

@@ -253,7 +253,7 @@ CREATE TABLE `MEETING_Participant_Recipiant_Batch_Task` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='对一批人的安置';
 
 
-#与会者 与与会管理对应关系
+#嘉宾与嘉宾管理对应关系
 DROP TABLE IF EXISTS `MEETING_Parti_Regist`;
 CREATE TABLE `MEETING_Parti_Regist` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -262,13 +262,21 @@ CREATE TABLE `MEETING_Parti_Regist` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='与会者 与与会管理对应关系';
 
+#银行流水单与嘉宾管理对应关系
+DROP TABLE IF EXISTS `MEETING_Statement_Regist`;
+CREATE TABLE `MEETING_Statement_Regist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `participantId` int(11) DEFAULT NULL,
+  `statementID` int(11) DEFAULT NULL COMMENT '银行流水单的id',,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='银行流水单与嘉宾管理对应关系';
 
-# 与会人员注册相关
+
+# 嘉宾注册相关
 DROP TABLE IF EXISTS `MEETING_Regist`;
 CREATE TABLE `MEETING_Regist` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `feeConfirmTime` date DEFAULT NULL COMMENT '款项确认到账时间',
-  `feeSheetExcel` varchar(500) DEFAULT NULL COMMENT '财务人员上传的Excel文件',
   `isInvoiced` varchar(20) DEFAULT NULL COMMENT '是否开票  YES | NO',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -285,3 +293,17 @@ CREATE TABLE `MEETING_Statement` (
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='银行流水单';
+
+
+# （该表仅仅是用于测试， 生产环境不应该创建该表）已经注册的与会嘉宾
+DROP TABLE IF EXISTS `External_participant`;
+CREATE TABLE `External_participant` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL COMMENT '姓名',
+  `company` varchar(50) DEFAULT NULL COMMENT '公司名字',
+  `meetingFee` float DEFAULT NULL COMMENT '公司付款金额',
+  `meetingRegisterTime` date DEFAULT NULL COMMENT '注册时间',
+  `saleMan` varchar(50) DEFAULT NULL COMMENT '对应的销售人员',
+  `telephone`  varchar(20) DEFAULT NULL COMMENT '电话',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='已经注册的与会嘉宾(外部表)';

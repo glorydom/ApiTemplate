@@ -1,39 +1,29 @@
 package com.huiyi.meeting.controller;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.huiyi.dao.ExternalMeetingParticipant;
 import com.huiyi.dao.externalMapper.ExternalMeetingParticipantMapper;
-import com.huiyi.meeting.dao.model.MeetingParticipant;
-import com.huiyi.meeting.dao.model.MeetingRegistExample;
-import com.huiyi.meeting.dao.model.MeetingStatement;
+import com.huiyi.meeting.dao.model.*;
 import com.huiyi.meeting.rpc.api.MeetingStatementService;
 import com.huiyi.meeting.service.FileUploadService;
-import com.huiyi.workflow.controller.WorkflowController;
+import com.huiyi.meeting.service.MeetingRegisterService;
 import org.activiti.engine.RuntimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
 import com.dto.huiyi.meeting.util.Constants;
-import com.huiyi.meeting.dao.model.MeetingRegist;
 import com.huiyi.meeting.rpc.api.MeetingRegistService;
-import com.huiyi.meeting.service.MeetingRegisterService;
 import com.zheng.common.base.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/chqs/regist")
-@Api(value = "嘉宾注册", description = "对嘉宾注册相关事项的管理")
+@Api(value = "嘉宾注册", description = "对嘉宾注册相关事项的管理,主要是费用确认")
 public class MeetingRegistController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MeetingRegistController.class);
@@ -66,41 +56,20 @@ public class MeetingRegistController extends BaseController {
      * 财务人员上传来自银行的对账单 excel格式的， 有两个字段  公司 | 金额
      * 开启流程，并且完成第一个任务： 上传银行账单
      */
-    public BaseResult uploadBankSheet(@RequestBody List<MeetingStatement> statements) throws IOException {
+    public BaseResult uploadBankSheet(@RequestBody List<MeetingStatement> statements) {
 
         if(null == statements || statements.size() == 0){
             return new BaseResult(Constants.SUCCESS_CODE, "empty statement", null);
         }
 
-        // 保存用户上传的数据
-        for(MeetingStatement statement : statements){
-            meetingStatementService.insert(statement);
-        }
         Date now = new Date();
-
-        List<ExternalMeetingParticipant> externalMeetingParticipants = externalMeetingParticipantMapper.getExternalMeetingParticipants(now);
-        System.out.println(externalMeetingParticipants.size());
+        long creationTime= new Date().getTime();
 
         //获取外部数据库用户注册信息
+        List<ExternalMeetingParticipant> externalMeetingParticipants = externalMeetingParticipantMapper.getExternalMeetingParticipants(now);
 
+        return new BaseResult(Constants.SUCCESS_CODE, "reconsile the fee", meetingRegisterService.reconsile(statements, externalMeetingParticipants));
 
-        MeetingRegist record = new MeetingRegist();
-        long createtime = new Date().getTime();
-        record.setCreationtimestamp(createtime);
-        record.setIsinvoiced("NO");
-        meetingRegistService.insert(record);
-
-        MeetingRegistExample example = new MeetingRegistExample();
-        example.createCriteria().andCreationtimestampEqualTo(createtime);
-        List<MeetingRegist> list = meetingRegistService.selectByExample(example);
-        int registerId = 0;
-        Map<String, Object> parameters = new HashMap<>();
-
-        if(list.size() == 1) {
-            registerId = list.get(0).getId();
-        }
-        LOGGER.debug("start fee confirmation flow with MeetingRegister id: " + registerId);
-        return ControllerUtil.startNewBussinessProcess(runtimeService, record, registerId, parameters);
     }
 
     @ApiOperation(value = "会务款项比对")

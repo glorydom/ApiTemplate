@@ -8,12 +8,12 @@ import java.util.List;
 
 public interface ExternalMeetingParticipantMapper {
 
-    @Select("select * from MEETING_Participant where meetingRegisterTime >= #{registerTime}")
-//    @ResultMap("ExternalMeetingParticipantMap")
+//    @Select("select * from MEETING_Participant where meetingRegisterTime >= #{registerTime}")
+    @Select("select * from External_participant")
     @Results({@Result(property="telephone",column="telephone",javaType=String.class),
              @Result(property="companyName",column="company",javaType=String.class),
              @Result(property="participantName",column="name",javaType=String.class),
-             @Result(property="fee",column="meetingFee",javaType=Double.class),
+             @Result(property="fee",column="meetingFee",javaType=Float.class),
              @Result(property="registTime",column="meetingRegisterTime",javaType=Date.class)
                  })
     /**
