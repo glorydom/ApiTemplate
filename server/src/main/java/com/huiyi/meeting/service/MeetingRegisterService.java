@@ -6,7 +6,7 @@ import org.activiti.engine.history.HistoricProcessInstance;
 
 import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
 
-public interface CommonMeetingService {
+public interface MeetingRegisterService {
 
 	//根据实例对象获取business对象描述
 	public String getObjectDescription(HistoricProcessInstance phi);

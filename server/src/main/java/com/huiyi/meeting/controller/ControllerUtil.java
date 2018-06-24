@@ -1,6 +1,5 @@
 package com.huiyi.meeting.controller;
 
-import com.dto.huiyi.meeting.entity.CHQSResult;
 import com.dto.huiyi.meeting.util.Constants;
 import com.zheng.common.base.BaseResult;
 import org.activiti.engine.RuntimeService;
@@ -14,7 +13,6 @@ public class ControllerUtil {
                                                       ){
         String process_id = entity.getClass().getSimpleName();
         String bussiness_key = process_id + "_" + bussinessId;
-        CHQSResult result = null;
         // prepare the parameters
         // date format: 2011-03-11T12:13:14
 

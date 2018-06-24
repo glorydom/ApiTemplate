@@ -26,12 +26,12 @@ import com.huiyi.meeting.dao.model.MeetingRegist;
 import com.huiyi.meeting.rpc.api.MeetingMeetingService;
 import com.huiyi.meeting.rpc.api.MeetingParticipantService;
 import com.huiyi.meeting.rpc.api.MeetingRegistService;
-import com.huiyi.meeting.service.CommonMeetingService;
+import com.huiyi.meeting.service.MeetingRegisterService;
 
 @Service
-public class CommonMeetingServiceImpl implements CommonMeetingService {
+public class MeetingRegisterServiceImpl implements MeetingRegisterService {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(CommonMeetingServiceImpl.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MeetingRegisterServiceImpl.class);
 	
 	@Autowired
 	private MeetingMeetingService meetingMeetingService;

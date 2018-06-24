@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.huiyi.meeting.service.CommonMeetingService;
+import com.huiyi.meeting.service.MeetingRegisterService;
 import com.huiyi.workflow.service.BaseWorkFlowService;
 import com.zheng.common.base.BaseController;
 import com.zheng.common.base.BaseResult;
@@ -48,7 +48,7 @@ public class WorkflowController extends BaseController{
 	@Autowired
 	BaseWorkFlowService baseWorkFlowService;
 	@Autowired
-	CommonMeetingService commonMeetingService;
+    MeetingRegisterService meetingRegisterService;
 	
 	
 	@RequestMapping(value="/mytasks", method = RequestMethod.GET)
@@ -63,7 +63,7 @@ public class WorkflowController extends BaseController{
 			Map<String,Object> taskMap = new HashMap<>();
 			
 			HistoricProcessInstance pi = baseWorkFlowService.findProcessInstance(task.getExecutionId());
-			String objDes = commonMeetingService.getObjectDescription(pi);
+			String objDes = meetingRegisterService.getObjectDescription(pi);
 			taskMap.put("id", task.getId());
 			taskMap.put("key", task.getTaskDefinitionKey()+task.getName());
 			taskMap.put("name", objDes);

@@ -1,37 +1,108 @@
 package com.huiyi.meeting.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.huiyi.dao.ExternalMeetingParticipant;
+import com.huiyi.dao.externalMapper.ExternalMeetingParticipantMapper;
+import com.huiyi.meeting.dao.model.MeetingParticipant;
+import com.huiyi.meeting.dao.model.MeetingRegistExample;
+import com.huiyi.meeting.dao.model.MeetingStatement;
+import com.huiyi.meeting.rpc.api.MeetingStatementService;
+import com.huiyi.meeting.service.FileUploadService;
+import com.huiyi.workflow.controller.WorkflowController;
+import org.activiti.engine.RuntimeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.web.bind.annotation.*;
 import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huiyi.meeting.dao.model.MeetingRegist;
 import com.huiyi.meeting.rpc.api.MeetingRegistService;
-import com.huiyi.meeting.service.CommonMeetingService;
-import com.huiyi.workflow.service.BaseWorkFlowService;
+import com.huiyi.meeting.service.MeetingRegisterService;
 import com.zheng.common.base.BaseResult;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/chqs/regist")
 @Api(value = "嘉宾注册", description = "对嘉宾注册相关事项的管理")
-public class MeetingRegistController {
+public class MeetingRegistController extends BaseController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeetingRegistController.class);
+
+    private final String REGISTERFOLDER = "regist";
 
 	@Autowired
-	private BaseWorkFlowService baseWorkFlowService;
-	@Autowired
 	private MeetingRegistService meetingRegistService;
+
 	@Autowired
-	private CommonMeetingService commonMeetingService;
-	
+	private MeetingRegisterService meetingRegisterService;
+
+	@Autowired
+    private FileUploadService fileUploadService;
+
+	@Autowired
+    private RuntimeService runtimeService;
+
+	@Autowired
+    private MeetingStatementService meetingStatementService;
+
+    @Autowired
+    private ExternalMeetingParticipantMapper externalMeetingParticipantMapper;
+
+
+    @RequestMapping(value = "uploadBankSheet", method = RequestMethod.POST)
+    @ApiOperation(value = "上传银行账单文件")
+    @ResponseBody
+    /**
+     * 财务人员上传来自银行的对账单 excel格式的， 有两个字段  公司 | 金额
+     * 开启流程，并且完成第一个任务： 上传银行账单
+     */
+    public BaseResult uploadBankSheet(@RequestBody List<MeetingStatement> statements) throws IOException {
+
+        if(null == statements || statements.size() == 0){
+            return new BaseResult(Constants.SUCCESS_CODE, "empty statement", null);
+        }
+
+        // 保存用户上传的数据
+        for(MeetingStatement statement : statements){
+            meetingStatementService.insert(statement);
+        }
+        Date now = new Date();
+
+        List<ExternalMeetingParticipant> externalMeetingParticipants = externalMeetingParticipantMapper.getExternalMeetingParticipants(now);
+        System.out.println(externalMeetingParticipants.size());
+
+        //获取外部数据库用户注册信息
+
+
+        MeetingRegist record = new MeetingRegist();
+        long createtime = new Date().getTime();
+        record.setCreationtimestamp(createtime);
+        record.setIsinvoiced("NO");
+        meetingRegistService.insert(record);
+
+        MeetingRegistExample example = new MeetingRegistExample();
+        example.createCriteria().andCreationtimestampEqualTo(createtime);
+        List<MeetingRegist> list = meetingRegistService.selectByExample(example);
+        int registerId = 0;
+        Map<String, Object> parameters = new HashMap<>();
+
+        if(list.size() == 1) {
+            registerId = list.get(0).getId();
+        }
+        LOGGER.debug("start fee confirmation flow with MeetingRegister id: " + registerId);
+        return ControllerUtil.startNewBussinessProcess(runtimeService, record, registerId, parameters);
+    }
+
     @ApiOperation(value = "会务款项比对")
     @RequestMapping(value = "compare/{taskId}", method = RequestMethod.GET)
     @ResponseBody
@@ -49,10 +120,11 @@ public class MeetingRegistController {
 //        participant.getTelephone();
         //以上字段为participant返回必须有的字段
 
-    	int registId = baseWorkFlowService.findBusinessIdbyTaskId(taskId);
-    	MeetingRegist mr = meetingRegistService.selectByPrimaryKey(registId);
-        List<ComparisonResultDto> resultDtos = commonMeetingService.reconsile(mr.getFeesheetexcel());
-        return new BaseResult(Constants.SUCCESS_CODE, "", resultDtos);
+//    	int registId = baseWorkFlowService.findBusinessIdbyTaskId(taskId);
+//    	MeetingRegist mr = meetingRegistService.selectByPrimaryKey(registId);
+//        List<ComparisonResultDto> resultDtos = meetingRegisterService.reconsile(mr.getFeesheetexcel());
+//        return new BaseResult(Constants.SUCCESS_CODE, "", resultDtos);
+        return null;
     }
 
     @ApiOperation(value = "款项确认")

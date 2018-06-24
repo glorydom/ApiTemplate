@@ -51,6 +51,7 @@ CREATE TABLE `MEETING_Participant` (
   `gender` varchar(5)  COMMENT '性别',
   `age` int(11)  COMMENT 'age',
   `address` varchar(40)  COMMENT 'address',
+  `meetingRegisterTime` date DEFAULT NULL COMMENT '注册时间',
   `productOfInterest` varchar(100) NOT NULL COMMENT '感兴趣的产品， 使用逗号分隔',
   `hotel` varchar(10) COMMENT '酒店名',
   `hotelAddress` varchar(10) COMMENT '酒店地址',
@@ -272,3 +273,15 @@ CREATE TABLE `MEETING_Regist` (
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='与会人员的管理';
+
+# 银行流水单
+DROP TABLE IF EXISTS `MEETING_Statement`;
+CREATE TABLE `MEETING_Statement` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `companyName` varchar(50) DEFAULT NULL COMMENT '公司名字',
+  `fee` float DEFAULT NULL COMMENT '公司付款金额',
+  `uploadedDateTime` date DEFAULT NULL COMMENT '上传时间',
+  `isDisable`  varchar(20) DEFAULT NULL COMMENT '是否确认过  YES | NO',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='银行流水单';

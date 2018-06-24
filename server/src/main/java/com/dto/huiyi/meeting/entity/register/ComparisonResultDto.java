@@ -10,6 +10,7 @@ public class ComparisonResultDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String companyName;
+    private float amount;
     private List<MeetingParticipant> participants;
     private boolean match;
 
