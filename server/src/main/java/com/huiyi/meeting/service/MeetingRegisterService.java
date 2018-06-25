@@ -3,12 +3,11 @@ package com.huiyi.meeting.service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.huiyi.dao.ExternalMeetingParticipant;
+import com.huiyi.dao.ExternalSales;
+import com.huiyi.dao.externalMapper.ExternalMeetingParticipantMapper;
 import com.huiyi.meeting.dao.model.*;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +35,8 @@ public class MeetingRegisterService {
 	private MeetingParticipantService meetingParticipantService;
 	@Autowired
 	private MeetingRegistService meetingRegistService;
+	@Autowired
+	private ExternalMeetingParticipantMapper externalMeetingParticipantMapper;
 	
 	
 	public String getObjectDescription(HistoricProcessInstance pi) {
@@ -65,13 +66,13 @@ public class MeetingRegisterService {
 		return "不支持的businessKey"+pi.getBusinessKey();
 	}
 
-	public List<ComparisonResultDto> reconsile(List<MeetingStatement> statements, List<ExternalMeetingParticipant> externalMeetingParticipants) {
+	public List<ComparisonResultDto> reconsile(List<MeetingStatement> statements, List<ExternalMeetingParticipant> externalMeetingParticipants, List<String> companies) {
 		List<ComparisonResultDto> comparisonResultDtos = new ArrayList<>();
 		if(statements == null || statements.size() ==0){
 			return comparisonResultDtos;
 		}
 
-		List<String> companyies = new ArrayList<>();
+		Set<String> companyies = new HashSet<>();
 		for(MeetingStatement statement:statements){
 			companyies.add(statement.getCompanyname());
 		} // 统计所有的公司
@@ -103,6 +104,15 @@ public class MeetingRegisterService {
 			comparisonResultDtos.add(comparisonResultDto);
 		}
 
+		//如果有公司需要排除， 就放这里
+		if(companies != null){
+			for(ComparisonResultDto dto:comparisonResultDtos){
+				boolean contains = companies.contains(dto.getCompanyName());
+				if(!contains){
+					comparisonResultDtos.remove(dto);
+				}
+			}
+		}
 		return comparisonResultDtos;
 	}
 
@@ -168,6 +178,41 @@ public class MeetingRegisterService {
 			LOGGER.debug(cn+" match? "+crd.isMatch());
 		}
 		return list;
+	}
+
+
+	public List<ExternalMeetingParticipant> convertToExternalMeetingParticipants(List<MeetingParticipant> participants){
+
+		List<ExternalMeetingParticipant> externalMeetingParticipants = new ArrayList<>();
+		for(MeetingParticipant participant : participants){
+			ExternalMeetingParticipant externalMeetingParticipant = new ExternalMeetingParticipant();
+			externalMeetingParticipant.setCompanyName(participant.getCompany());
+			externalMeetingParticipant.setParticipantName(participant.getName());
+			externalMeetingParticipant.setFee(participant.getMeetingfee());
+			externalMeetingParticipant.setRegistTime(participant.getMeetingregistertime());
+			externalMeetingParticipants.add(externalMeetingParticipant);
+		}
+		return externalMeetingParticipants;
+	}
+
+
+	public List<String> getSalemanForThisCompany(String company){
+		List<ExternalSales> externalSales = externalMeetingParticipantMapper.getSalesByCompany(company);
+		List<String> sales = new ArrayList<String>();
+		for(ExternalSales sale:externalSales){
+			sales.add(sale.getSALES());
+		}
+
+		return sales;
+	}
+
+	public List<String> getCompanyBySaleman(String saleMan){
+		List<ExternalSales> externalSales = externalMeetingParticipantMapper.getCompanyBySales(saleMan);
+		List<String> companies = new ArrayList<String>();
+		for(ExternalSales sale:externalSales){
+			companies.add(sale.getCOMPANY());
+		}
+		return companies;
 	}
 
 }

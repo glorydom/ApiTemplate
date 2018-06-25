@@ -48,22 +48,23 @@ CREATE TABLE `MEETING_Participant` (
   `name` varchar(40) NOT NULL COMMENT '人员名字',
   `telephone` varchar(20) NOT NULL COMMENT 'telphone',
   `company` varchar(50) DEFAULT NULL COMMENT '所属的公司',
-  `gender` varchar(5)  COMMENT '性别',
-  `age` int(11)  COMMENT 'age',
-  `address` varchar(40)  COMMENT 'address',
+  `gender` varchar(5) DEFAULT NULL COMMENT '性别',
+  `age` int(11) DEFAULT NULL COMMENT 'age',
+  `address` varchar(40) DEFAULT NULL  COMMENT 'address',
   `meetingRegisterTime` date DEFAULT NULL COMMENT '注册时间',
-  `productOfInterest` varchar(100) NOT NULL COMMENT '感兴趣的产品， 使用逗号分隔',
-  `hotel` varchar(10) COMMENT '酒店名',
-  `hotelAddress` varchar(10) COMMENT '酒店地址',
-  `hotelStatus` varchar(10)  COMMENT '没有 | 进行中 | 结束',
-  `arrivalTime` date COMMENT '到达时间',
-  `leaveTime` date COMMENT '离开时间',
-  `trafficTool` varchar(10) COMMENT '交通工具',
-  `receptionStatus` varchar(10)  COMMENT '接人状态：人员重复需确认 | 未指定 | 进行中 | 结束',
-  `seatStatus` varchar(10)  COMMENT '会场座位是否已经安排：没有 | 进行中 | 结束',
-  `seat` varchar(20)  COMMENT '会场中的位置  横纵坐标',
+  `productOfInterest` varchar(100) DEFAULT NULL COMMENT '感兴趣的产品， 使用逗号分隔',
+  `hotel` varchar(10) DEFAULT NULL COMMENT '酒店名',
+  `hotelAddress` varchar(10) DEFAULT NULL COMMENT '酒店地址',
+  `hotelStatus` varchar(10) DEFAULT NULL COMMENT '没有 | 进行中 | 结束',
+  `arrivalTime` date  DEFAULT NULL COMMENT '到达时间',
+  `leaveTime` date DEFAULT NULL COMMENT '离开时间',
+  `trafficTool` varchar(10) DEFAULT NULL COMMENT '交通工具',
+  `receptionStatus` varchar(10) DEFAULT NULL COMMENT '接人状态：人员重复需确认 | 未指定 | 进行中 | 结束',
+  `seatStatus` varchar(10) DEFAULT NULL COMMENT '会场座位是否已经安排：没有 | 进行中 | 结束',
+  `seat` varchar(20) DEFAULT NULL COMMENT '会场中的位置  横纵坐标',
   `forumOfInterest` varchar(100) DEFAULT NULL COMMENT '参加那几场专题会, 专场会（forum)的id使用逗号分割，',
   `charged` varchar(10) DEFAULT NULL COMMENT '是否付费: 付费|非付费',
+  `paid` boolean DEFAULT NULL COMMENT '是否已经付费',
   `meetingFee` float(10) DEFAULT NULL COMMENT '会务费',
   `meetingFeePaidTime` date DEFAULT NULL COMMENT '会务费付费时间',
   `invoiced`  varchar(10) DEFAULT NULL COMMENT '是否开票: 已开票|未开票',
@@ -258,7 +259,7 @@ DROP TABLE IF EXISTS `MEETING_Parti_Regist`;
 CREATE TABLE `MEETING_Parti_Regist` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `participantId` int(11) DEFAULT NULL,
-  `registId` int(11) DEFAULT NULL,
+  `meetingRegistId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='与会者 与与会管理对应关系';
 
@@ -266,8 +267,8 @@ CREATE TABLE `MEETING_Parti_Regist` (
 DROP TABLE IF EXISTS `MEETING_Statement_Regist`;
 CREATE TABLE `MEETING_Statement_Regist` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `participantId` int(11) DEFAULT NULL,
-  `statementID` int(11) DEFAULT NULL COMMENT '银行流水单的id',,
+  `meetingRegistId` int(11) DEFAULT NULL,
+  `statementID` int(11) DEFAULT NULL COMMENT '银行流水单的id',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='银行流水单与嘉宾管理对应关系';
 
@@ -289,7 +290,7 @@ CREATE TABLE `MEETING_Statement` (
   `companyName` varchar(50) DEFAULT NULL COMMENT '公司名字',
   `fee` float DEFAULT NULL COMMENT '公司付款金额',
   `uploadedDateTime` date DEFAULT NULL COMMENT '上传时间',
-  `isDisable`  varchar(20) DEFAULT NULL COMMENT '是否确认过  YES | NO',
+  `isDisable`  boolean DEFAULT NULL COMMENT '是否确认过',
   `creationTimestamp` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='银行流水单';
@@ -307,3 +308,26 @@ CREATE TABLE `External_participant` (
   `telephone`  varchar(20) DEFAULT NULL COMMENT '电话',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='已经注册的与会嘉宾(外部表)';
+
+# （该表仅仅是用于测试， 生产环境不应该创建该表）
+DROP TABLE IF EXISTS `External_Sales`;
+CREATE TABLE `External_Sales` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `COMPANY` varchar(50) DEFAULT NULL COMMENT '公司名字',
+  `SALES` varchar(50) DEFAULT NULL COMMENT '销售人员',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='公司与对应销售负责人';
+
+# （该表仅仅是用于测试， 生产环境不应该创建该表）已经注册的与会嘉宾
+DROP TABLE IF EXISTS `JCI_ORDER_VOICE`;
+CREATE TABLE `JCI_ORDER_VOICE` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `GSMC` varchar(50) DEFAULT NULL COMMENT '公司名字',
+  `NSR` varchar(50) DEFAULT NULL COMMENT '销售人员',
+  `DZ` varchar(50) DEFAULT NULL COMMENT '地址',
+  `DH` varchar(50) DEFAULT NULL COMMENT '单号',
+  `KHH` varchar(50) DEFAULT NULL COMMENT '客户号',
+  `ZH` varchar(50) DEFAULT NULL COMMENT 'sdf',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='公司开票信息';
+

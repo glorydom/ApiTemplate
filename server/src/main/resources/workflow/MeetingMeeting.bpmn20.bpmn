@@ -119,7 +119,11 @@
     <sequenceFlow id="flow24" sourceRef="usertask10" targetRef="endevent6"></sequenceFlow>
     <endEvent id="endevent7" name="End"></endEvent>
     <sequenceFlow id="flow25" sourceRef="usertask11" targetRef="endevent7"></sequenceFlow>
-    <userTask id="usertask13" name="通用任务管理" activiti:candidateUsers="李强,沈红英,马洪岩,姚晶,王渊博,陈艳荣" activiti:formKey="commonTaskManagement"></userTask>
+    <userTask id="usertask13" name="通用任务管理" activiti:candidateUsers="李强,沈红英,马洪岩,姚晶,王渊博,陈艳荣" activiti:formKey="commonTaskManagement">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow32" sourceRef="parallelgateway2" targetRef="usertask13"></sequenceFlow>
     <startEvent id="startevent1" name="Start"></startEvent>
     <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
@@ -136,6 +140,12 @@
     </intermediateCatchEvent>
     <sequenceFlow id="flow37" sourceRef="startevent1" targetRef="timerintermediatecatchevent2"></sequenceFlow>
     <sequenceFlow id="flow38" sourceRef="timerintermediatecatchevent2" targetRef="sid-438AB38E-A235-4541-B036-538FB8EFA3D4"></sequenceFlow>
+    <userTask id="usertask14" name="嘉宾注册" activiti:formKey="meetingParticipantRegister">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow39" sourceRef="parallelgateway2" targetRef="usertask14"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_MeetingMeeting">
     <bpmndi:BPMNPlane bpmnElement="MeetingMeeting" id="BPMNPlane_MeetingMeeting">
@@ -231,6 +241,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent2" id="BPMNShape_timerintermediatecatchevent2">
         <omgdc:Bounds height="35.0" width="35.0" x="100.0" y="719.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask14" id="BPMNShape_usertask14">
+        <omgdc:Bounds height="55.0" width="105.0" x="337.0" y="-80.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="sid-7873C4E4-4527-4DE4-A7A9-606B4D83AB43" id="BPMNEdge_sid-7873C4E4-4527-4DE4-A7A9-606B4D83AB43">
         <omgdi:waypoint x="685.0" y="782.0"></omgdi:waypoint>
@@ -361,6 +374,11 @@
       <bpmndi:BPMNEdge bpmnElement="flow38" id="BPMNEdge_flow38">
         <omgdi:waypoint x="135.0" y="736.0"></omgdi:waypoint>
         <omgdi:waypoint x="242.0" y="736.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
+        <omgdi:waypoint x="272.0" y="87.0"></omgdi:waypoint>
+        <omgdi:waypoint x="272.0" y="-53.0"></omgdi:waypoint>
+        <omgdi:waypoint x="337.0" y="-53.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
