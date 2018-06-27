@@ -381,7 +381,7 @@ public class MeetingRegistController extends BaseController {
     }
 
 
-    @ApiOperation(value = "开票信息生成")
+    @ApiOperation(value = "开票完成")
     @RequestMapping(value = "invoice/complete/{taskId}", method = RequestMethod.GET)
     @ResponseBody
     /**
@@ -394,5 +394,15 @@ public class MeetingRegistController extends BaseController {
         return new BaseResult(Constants.SUCCESS_CODE, "invoice complete", null);
     }
 
+    @ApiOperation(value = "统计--所有已经付款的客户")
+    @RequestMapping(value = "summary/paidParticipants/{meetingId}", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult summary(@PathVariable int meetingId){
+        MeetingParticipantExample meetingParticipantExample = new MeetingParticipantExample();
+        meetingParticipantExample.createCriteria().andPaidEqualTo(true).andMeetingidEqualTo(meetingId);
+        List<MeetingParticipant> participants = meetingParticipantService.selectByExample(meetingParticipantExample);
+
+        return new BaseResult(Constants.SUCCESS_CODE, "all paid participants", participants);
+    }
 
 }
