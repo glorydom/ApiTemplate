@@ -287,6 +287,7 @@ CREATE TABLE `MEETING_Regist` (
 DROP TABLE IF EXISTS `MEETING_Statement`;
 CREATE TABLE `MEETING_Statement` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `meetingId` int(11) DEFAULT NULL COMMENT '会议id',
   `companyName` varchar(50) DEFAULT NULL COMMENT '公司名字',
   `fee` float DEFAULT NULL COMMENT '公司付款金额',
   `uploadedDateTime` date DEFAULT NULL COMMENT '上传时间',

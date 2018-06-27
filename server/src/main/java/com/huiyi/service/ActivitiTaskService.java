@@ -30,4 +30,13 @@ public class ActivitiTaskService {
 
         return businessKey;
     }
+
+
+    public String getExecutionIdByTaskId(String taskId){
+        Task t = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if(null!=t)
+            return t.getExecutionId();
+        else
+            return null;
+    }
 }

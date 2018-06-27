@@ -24,7 +24,7 @@ public interface ExternalMeetingParticipantMapper {
     List<ExternalMeetingParticipant> getExternalMeetingParticipants(@Param("registerTime")Date registerTime);
 
 
-    @Select("select * from External_participant where COMPANY = #{company}")
+    @Select("select * from External_Sales where COMPANY = #{company}")
     @Results({@Result(property="COMPANY",column="COMPANY",javaType=String.class),
             @Result(property="SALES",column="SALES",javaType=String.class),
                 })

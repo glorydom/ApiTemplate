@@ -66,7 +66,7 @@ public class MeetingRegisterService {
 		return "不支持的businessKey"+pi.getBusinessKey();
 	}
 
-	public List<ComparisonResultDto> reconsile(List<MeetingStatement> statements, List<ExternalMeetingParticipant> externalMeetingParticipants, List<String> companies) {
+	public List<ComparisonResultDto> reconsile(List<MeetingStatement> statements, List<ExternalMeetingParticipant> externalMeetingParticipants, List<String> excludingCompanies) {
 		List<ComparisonResultDto> comparisonResultDtos = new ArrayList<>();
 		if(statements == null || statements.size() ==0){
 			return comparisonResultDtos;
@@ -104,14 +104,16 @@ public class MeetingRegisterService {
 			comparisonResultDtos.add(comparisonResultDto);
 		}
 
+		List<ComparisonResultDto> resultDtos = new ArrayList<>();
 		//如果有公司需要排除， 就放这里
-		if(companies != null){
+		if(excludingCompanies != null){
 			for(ComparisonResultDto dto:comparisonResultDtos){
-				boolean contains = companies.contains(dto.getCompanyName());
-				if(!contains){
-					comparisonResultDtos.remove(dto);
+				boolean contains = excludingCompanies.contains(dto.getCompanyName()); //说明该公司应该被排除
+				if(contains){
+					resultDtos.add(dto);
 				}
 			}
+			return resultDtos;
 		}
 		return comparisonResultDtos;
 	}
@@ -198,7 +200,7 @@ public class MeetingRegisterService {
 
 	public List<String> getSalemanForThisCompany(String company){
 		List<ExternalSales> externalSales = externalMeetingParticipantMapper.getSalesByCompany(company);
-		List<String> sales = new ArrayList<String>();
+		List<String> sales = new ArrayList<>();
 		for(ExternalSales sale:externalSales){
 			sales.add(sale.getSALES());
 		}
@@ -208,7 +210,7 @@ public class MeetingRegisterService {
 
 	public List<String> getCompanyBySaleman(String saleMan){
 		List<ExternalSales> externalSales = externalMeetingParticipantMapper.getCompanyBySales(saleMan);
-		List<String> companies = new ArrayList<String>();
+		List<String> companies = new ArrayList<>();
 		for(ExternalSales sale:externalSales){
 			companies.add(sale.getCOMPANY());
 		}
