@@ -1,12 +1,10 @@
 package com.huiyi.meeting.controller;
 
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.dto.huiyi.meeting.entity.participantDto.ParticipantFeeSummary;
+import com.dto.huiyi.meeting.util.TimeDateFormat;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +130,54 @@ public class MeetingParticipantController extends BaseController {
         
         return new BaseResult(Constants.SUCCESS_CODE, "", result);
     }
+
+	@ApiOperation(value = "统计与会人员付费情况")
+	@RequestMapping(value = "summary/fee/{meetingId}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult summary(@PathVariable int meetingId){
+		MeetingParticipantExample meetingParticipantExample = new MeetingParticipantExample();
+		meetingParticipantExample.createCriteria().andMeetingidEqualTo(meetingId);
+		List<MeetingParticipant> meetingParticipants = meetingParticipantService.selectByExample(meetingParticipantExample);
+
+		Map<String, ParticipantFeeSummary> summaries = new HashMap<>();
+		for(MeetingParticipant participant : meetingParticipants){
+            Date feePaidTime = participant.getMeetingfeepaidtime();
+		    String key = TimeDateFormat.formatToDay(feePaidTime);
+		    if(summaries.containsKey(key)){
+                ParticipantFeeSummary existedSummary = summaries.get(key);
+                if(participant.getPaid()){
+                    existedSummary.setPaidParticipantCount(existedSummary.getPaidParticipantCount() + 1);
+                    existedSummary.setTotalFee(existedSummary.getTotalFee() + participant.getMeetingfee());
+                }else {
+                    existedSummary.setUnpaidParticipantCount(existedSummary.getUnpaidParticipantCount() + 1);
+                }
+            }else{
+                ParticipantFeeSummary summary = new ParticipantFeeSummary();
+                summary.setDate(key);
+                summary.setPaidParticipantCount(1);
+                summary.setUnpaidParticipantCount(1);
+                if(participant.getPaid()){
+                    summary.setTotalFee(participant.getMeetingfee());
+                }else {
+                    summary.setTotalFee(0);
+                }
+                summaries.put(key, summary);
+            }
+
+        }
+        List<ParticipantFeeSummary> summarySet = new ArrayList<>();
+        for(ParticipantFeeSummary summary:summaries.values()){
+		    summarySet.add(summary);
+        }
+
+        Collections.sort(summarySet, new Comparator<ParticipantFeeSummary>() {
+            @Override
+            public int compare(ParticipantFeeSummary participantFeeSummary, ParticipantFeeSummary t1) {
+                return participantFeeSummary.getDate().compareTo(t1.getDate());
+            }
+        });
+        return new BaseResult(Constants.SUCCESS_CODE, "", summarySet);
+	}
 
     @ApiOperation(value = "人员注册")
     @RequestMapping(value = "create", method = RequestMethod.POST)

@@ -173,6 +173,7 @@ public class MeetingRegistController extends BaseController {
         MeetingParticipantExample meetingParticipantExample = new MeetingParticipantExample();
         meetingParticipantExample.createCriteria().andPaidEqualTo(true);
         List<MeetingParticipant> paidMeetingParticipants = meetingParticipantService.selectByExample(meetingParticipantExample);
+        List<MeetingParticipant> collectPaidMeetingParticipants = new ArrayList<>();
         //获取本地数据库里面 已付款但是还没有确认的嘉宾
         MeetingPartiRegistExample meetingPartiRegistExample = new MeetingPartiRegistExample();
         meetingPartiRegistExample.createCriteria();
@@ -185,12 +186,14 @@ public class MeetingRegistController extends BaseController {
                     contains = true;
                 }
             }
-            if(!contains)
-                paidMeetingParticipants.add(meetingParticipantService.selectByPrimaryKey(meetingParticipantId));//该id代表嘉宾已经付款，但是还没有确认，所以应该将其加入到已付款客户里
+            if(!contains){
+                MeetingParticipant meetingParticipant = meetingParticipantService.selectByPrimaryKey(meetingParticipantId);
+                collectPaidMeetingParticipants.add(meetingParticipant);//该id代表嘉宾已经付款，但是还没有确认，所以应该将其加入到已付款客户里
+            }
         }
 
 
-        List<ExternalMeetingParticipant> unpaidMeetingParticipant = this.getUnpaidParticipant(paidMeetingParticipants, meetingId_int);
+        List<ExternalMeetingParticipant> unpaidMeetingParticipant = this.getUnpaidParticipant(collectPaidMeetingParticipants, meetingId_int);
 
         //在未付款的列表里 将已经付款的人排除
         return new BaseResult(Constants.SUCCESS_CODE, "reconsile the fee", meetingRegisterService.reconsile(statementList, unpaidMeetingParticipant, null));

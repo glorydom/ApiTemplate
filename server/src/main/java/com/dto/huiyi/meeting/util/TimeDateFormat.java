@@ -19,4 +19,9 @@ public class TimeDateFormat {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.CHINA);
         return format.format(d);
     }
+
+    public static String formatToDay(Date d){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+        return format.format(d);
+    }
 }

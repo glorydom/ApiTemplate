@@ -9,7 +9,7 @@
       <startEvent id="startevent2" name="Start"></startEvent>
       <userTask id="usertask1" name="销售人员确认银行流水账" activiti:assignee="${Saleman}" activiti:formKey="confirmFeeBySaleman"></userTask>
       <sequenceFlow id="flow2" sourceRef="startevent2" targetRef="usertask1"></sequenceFlow>
-      <userTask id="usertask2" name="开发票">
+      <userTask id="usertask2" name="开发票" activiti:formKey="meetingFeeInvoice">
         <extensionElements>
           <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
         </extensionElements>
