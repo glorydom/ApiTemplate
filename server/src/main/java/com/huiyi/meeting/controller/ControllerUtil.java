@@ -3,7 +3,10 @@ package com.huiyi.meeting.controller;
 import com.dto.huiyi.meeting.util.Constants;
 import com.zheng.common.base.BaseResult;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
+
 import java.util.Map;
 import static com.dto.huiyi.meeting.util.Constants.SUCCESS_CODE;
 
@@ -31,5 +34,19 @@ public class ControllerUtil {
         String completeUrl = Constants.CHQSURL + "task/complete";
 
         return new BaseResult(SUCCESS_CODE, "success", null);
+    }
+
+    public static int getBussinessKeyByTaskId(TaskService taskService, RuntimeService runtimeService, String taskId){
+        Task task = taskService.createTaskQuery()
+                .taskId(taskId)
+                .singleResult();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(task.getProcessInstanceId())
+                .singleResult();
+
+        String bussinessKey = processInstance.getBusinessKey();
+
+        return Integer.parseInt(bussinessKey.split("_")[1]);
     }
 }

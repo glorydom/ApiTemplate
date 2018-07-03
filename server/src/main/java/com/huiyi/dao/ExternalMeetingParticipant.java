@@ -7,6 +7,7 @@ public class ExternalMeetingParticipant implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private int id;
     private String companyName;
     private String telephone;
     private String participantName;
@@ -18,13 +19,22 @@ public class ExternalMeetingParticipant implements Serializable {
     @Override
     public String toString() {
         return "ExternalMeetingParticipant{" +
-                "companyName='" + companyName + '\'' +
+                "id=" + id +
+                ", companyName='" + companyName + '\'' +
                 ", telephone='" + telephone + '\'' +
                 ", participantName='" + participantName + '\'' +
                 ", fee=" + fee +
                 ", isDisabled='" + isDisabled + '\'' +
                 ", registTime=" + registTime +
                 '}';
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getCompanyName() {

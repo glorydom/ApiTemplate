@@ -297,6 +297,20 @@ CREATE TABLE `MEETING_Statement` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='银行流水单';
 
 
+# 退款
+DROP TABLE IF EXISTS `MEETING_Refund`;
+CREATE TABLE `MEETING_Refund` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `participantId` int(11) DEFAULT NULL COMMENT '与会嘉宾id',
+  `comment` varchar(500) DEFAULT NULL COMMENT '备注',
+  `refundFee` float DEFAULT NULL COMMENT '退款金额',
+  `applyTime` date DEFAULT NULL COMMENT '申请时间',
+  `status`  varchar(20) DEFAULT NULL COMMENT '状态： 申请|审核中|完成',
+  `creationTimestamp` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='退款申请';
+
+
 # （该表仅仅是用于测试， 生产环境不应该创建该表）已经注册的与会嘉宾
 DROP TABLE IF EXISTS `External_participant`;
 CREATE TABLE `External_participant` (
@@ -310,6 +324,7 @@ CREATE TABLE `External_participant` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='已经注册的与会嘉宾(外部表)';
 
+
 # （该表仅仅是用于测试， 生产环境不应该创建该表）
 DROP TABLE IF EXISTS `External_Sales`;
 CREATE TABLE `External_Sales` (
@@ -318,6 +333,7 @@ CREATE TABLE `External_Sales` (
   `SALES` varchar(50) DEFAULT NULL COMMENT '销售人员',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='公司与对应销售负责人';
+
 
 # （该表仅仅是用于测试， 生产环境不应该创建该表）已经注册的与会嘉宾
 DROP TABLE IF EXISTS `JCI_ORDER_VOICE`;

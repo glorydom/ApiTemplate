@@ -141,9 +141,16 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
 	
 	@Override
 	public ProcessDefinition findProcessDefinition(String processName) {
-		List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processName).orderByProcessDefinitionVersion().desc().list();
-		if(list != null && list.size()>0)
+		List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery()
+				.processDefinitionKey(processName)
+				.orderByProcessDefinitionVersion()
+				.desc()
+				.list();
+
+		if(list != null && list.size()>0){
+			ProcessDefinition pd = list.get(0);
 			return list.get(0);
+		}
 		return null;
 	}
 	

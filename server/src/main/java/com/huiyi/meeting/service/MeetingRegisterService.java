@@ -188,6 +188,7 @@ public class MeetingRegisterService {
 		List<ExternalMeetingParticipant> externalMeetingParticipants = new ArrayList<>();
 		for(MeetingParticipant participant : participants){
 			ExternalMeetingParticipant externalMeetingParticipant = new ExternalMeetingParticipant();
+			externalMeetingParticipant.setId(participant.getId());
 			externalMeetingParticipant.setCompanyName(participant.getCompany());
 			externalMeetingParticipant.setParticipantName(participant.getName());
 			externalMeetingParticipant.setFee(participant.getMeetingfee());

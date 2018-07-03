@@ -1,10 +1,6 @@
 package com.huiyi.workflow.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -66,17 +62,7 @@ public class MeetingV2Controller extends BaseController {
 	public String index(ModelMap modelMap) {
 		return "/meeting/list.jsp";
 	}
-	
-	@RequestMapping(value="/list", method = RequestMethod.GET)
-	@ApiOperation(value="工作流列表")
-	@ResponseBody
-	public Object list(ModelMap modelMap) {
-		List<MeetingMeeting> list = meetingMeetingService.selectByExample(new MeetingMeetingExample());
-		Map<String, Object> result = new HashMap<>();
-        result.put("rows", list);
-        result.put("total", list.size());
-        return result;
-	}
+
 	
 	@RequestMapping(value="/create", method = RequestMethod.GET)
 	@ApiOperation(value="新增")
@@ -102,20 +88,7 @@ public class MeetingV2Controller extends BaseController {
 	public Object delete(@PathVariable("ids") String ids) {
 		return new BaseResult(1, "success", 1);
 	}
-	
-	@ApiOperation(value="启动流程")
-	@RequestMapping(value="/process/{ids}", method = RequestMethod.GET)
-	@RequiresPermissions("meeting:index")
-	@ResponseBody
-	public Object process(@PathVariable("ids") String ids) {
-		for(String id : StringUtils.split(ids,"-")) {
-			boolean ret = baseWorkFlowService.startMeetingProcess(Integer.parseInt(id));
-			if(! ret) {
-				return new BaseResult(0, "fail",0);
-			}
-		}
-		return new BaseResult(1, "success", 1);
-	}
+
 	
 	@RequestMapping(value="/saveMeetingTaskCandidate", method = RequestMethod.GET)
 	@ApiOperation(value="保存会议任务执行人候选人")
@@ -137,15 +110,17 @@ public class MeetingV2Controller extends BaseController {
 	}
 	
 	@RequestMapping(value="/saveWholeMeetingTaskCandidates", method = RequestMethod.POST)
-	@ApiOperation(value="保存整个会议任务执行人候选人")
+	@ApiOperation(value="保存流程候选人")
 	@ResponseBody
 	@Transactional
 	public Object saveWholeMeetingTaskCandidates(@RequestBody TaskAssigneeDto taskAssigneeDto) {
 		if (taskAssigneeDto == null || taskAssigneeDto.getTaskSettings() ==null ) {
 			return new BaseResult(Constants.ERROR_CODE, "failed", "没有需要保存的数据！");
 		}
-//		int meetingId = taskAssigneeDto.getMeetingId();
-		String processName = StringUtils.defaultIfBlank(taskAssigneeDto.getProcessName(), "MeetingMeeting");
+		String key = taskAssigneeDto.getKey();
+		if(key == null){
+		    key = "MeetingMeeting";
+        }
 		List<MeetingTaskCandidate> list = new ArrayList<>();
 		for(TaskAssigneeSingleDto tasd: taskAssigneeDto.getTaskSettings()) {
 			// 前端如果传来的人是空的 怎么处理？
@@ -154,16 +129,14 @@ public class MeetingV2Controller extends BaseController {
 			String taskId = tasd.getTaskId();
 			for(Integer uid : tasd.getUserList()) {
 				MeetingTaskCandidate meetingTaskCandidate = new MeetingTaskCandidate();
-//				meetingTaskCandidate.setMeetingid(meetingId);
-				meetingTaskCandidate.setProcessname(processName);
+				meetingTaskCandidate.setProcessname(key);
 				meetingTaskCandidate.setTaskid(taskId);
 				meetingTaskCandidate.setUserid(uid);
 				list.add(meetingTaskCandidate);
 			}
 		}
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
-		example.createCriteria().andProcessnameEqualTo(processName);
-//		example.createCriteria().andMeetingidEqualTo(taskAssigneeDto.getMeetingId());
+		example.createCriteria().andProcessnameEqualTo(key);
 		if(list.size()==0) {
 			meetingTaskCandidateService.deleteByExample(example);
 			return new BaseResult(Constants.SUCCESS_CODE, "success", 0);
@@ -195,22 +168,15 @@ public class MeetingV2Controller extends BaseController {
 	}
 	
 	@RequestMapping(value="/findWholeMeetingTaskCandidates", method = RequestMethod.GET)
-	@ApiOperation(value="查询整个会议任务执行人候选人")
+	@ApiOperation(value="查询整个会议任务执行人候选人 //默认查询整个会议的流程")
 	@ResponseBody
-	public Object findWholeMeetingTaskCandidates() {
-//		int meetingId = 2;
-//		MeetingMeeting meeting = meetingMeetingService.selectByPrimaryKey(meetingId);
-
+	public BaseResult findWholeMeetingTaskCandidates(@RequestParam(required = false, defaultValue = "MeetingMeeting") String key) {
 		TaskAssigneeDto taskAssigneeDto = new TaskAssigneeDto();
-//		taskAssigneeDto.setMeetingId(meetingId);
-//		taskAssigneeDto.setMeetingsubject(meeting.getMeetingsubject());
-		String processName = StringUtils.defaultIfBlank(taskAssigneeDto.getProcessName(), "MeetingMeeting");
 		List<TaskAssigneeSingleDto> taskSettings = new ArrayList<>();
 		taskAssigneeDto.setTaskSettings(taskSettings);
 		
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
-//		example.createCriteria().andMeetingidEqualTo(meetingId);
-		example.createCriteria().andProcessnameEqualTo(processName);
+		example.createCriteria().andProcessnameEqualTo(key);
 		List<MeetingTaskCandidate> list = meetingTaskCandidateService.selectByExample(example);
 		Map<String,List<Integer>> existingTaskAssignee = new HashMap<>();
 		for(MeetingTaskCandidate mtc: list) {
@@ -223,7 +189,7 @@ public class MeetingV2Controller extends BaseController {
 			if(!userIds.contains(mtc.getUserid()))
 				userIds.add(mtc.getUserid());
 		}
-		List<UserTask> allTasks = baseWorkFlowService.listAllUserTasks(MeetingMeeting.class.getSimpleName());
+		List<UserTask> allTasks = baseWorkFlowService.listAllUserTasks(key);
 		for(UserTask t : allTasks) {
 			TaskAssigneeSingleDto tasd = new TaskAssigneeSingleDto();
 			tasd.setTaskId(t.getId());
@@ -235,15 +201,16 @@ public class MeetingV2Controller extends BaseController {
 	}
 	
 	@RequestMapping(value="/listAllProcesses", method = RequestMethod.GET)
-	@ApiOperation(value="列出所有流程")
+	@ApiOperation(value="列出所有流程的名字")
 	@ResponseBody
-	public Object listAllProcesses() {
+	public BaseResult listAllProcesses() {
 		List<ProcessDefinition> pdList = baseWorkFlowService.listAllProcesses();
-		List<ProcessDto> list = new ArrayList<>();
+		Set<ProcessDto> set = new HashSet<>();
 		for(ProcessDefinition definition : pdList) {
+
 			ProcessDto pd = new ProcessDto(definition);
-			list.add(pd);
+			set.add(pd);
 		}
-		return new BaseResult(Constants.SUCCESS_CODE, "success", list);
+		return new BaseResult(Constants.SUCCESS_CODE, "success", set);
 	}
 }

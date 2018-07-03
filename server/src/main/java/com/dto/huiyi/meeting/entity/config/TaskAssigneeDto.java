@@ -7,18 +7,10 @@ public class TaskAssigneeDto implements Serializable {
 
     private static final long serialVersionUID = 478113514195354529L;
 
-//    private int meetingId;
     private String processName;
+    private String key;
     private List<TaskAssigneeSingleDto> taskSettings;
 
-//    public int getMeetingId() {
-//        return meetingId;
-//    }
-//
-//    public void setMeetingId(int meetingId) {
-//        this.meetingId = meetingId;
-//    }
-//
 
     public List<TaskAssigneeSingleDto> getTaskSettings() {
         return taskSettings;
@@ -34,5 +26,13 @@ public class TaskAssigneeDto implements Serializable {
 
 	public void setTaskSettings(List<TaskAssigneeSingleDto> taskSettings) {
         this.taskSettings = taskSettings;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
