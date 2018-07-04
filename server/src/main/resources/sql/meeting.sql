@@ -311,6 +311,93 @@ CREATE TABLE `MEETING_Refund` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='退款申请';
 
 
+# （该表仅仅是用于测试， 生产环境不应该创建该表）嘉宾的注册表
+DROP TABLE IF EXISTS `JCI_ORDER`;
+CREATE TABLE `JCI_ORDER` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NO` varchar(50) DEFAULT NULL COMMENT '订单号（全称关联）',
+  `GSMC` varchar(50) DEFAULT NULL COMMENT '公司名',
+  `GSMCYW` varchar(50) DEFAULT NULL COMMENT '公司名英文',
+  `FPTT` varchar(50) DEFAULT NULL COMMENT '发票抬头',
+  `DZ` varchar(50) DEFAULT NULL COMMENT '地址',
+  `XM` varchar(50) DEFAULT NULL COMMENT '姓名',
+  `XMYW` varchar(50) DEFAULT NULL COMMENT '姓名',
+  `ZW` varchar(50) DEFAULT NULL COMMENT '职务',
+  `ZWYW` varchar(50) DEFAULT NULL COMMENT '职务英文',
+  `DH` varchar(50) DEFAULT NULL COMMENT '电话',
+  `SJ` varchar(50) DEFAULT NULL COMMENT '手机',
+  `LXDH` varchar(50) DEFAULT NULL COMMENT '联系电话',
+  `YJ` varchar(50) DEFAULT NULL COMMENT 'sdf',
+  `WX` varchar(50) DEFAULT NULL COMMENT 'sdf',
+  `CN` varchar(50) DEFAULT NULL COMMENT '玉米（1）',
+  `SM` varchar(50) DEFAULT NULL COMMENT '豆粕（1）',
+  `FM` varchar(50) DEFAULT NULL COMMENT '鱼粉（1）',
+  `TOTAL` float DEFAULT NULL COMMENT '参会金额',
+  `NOTE` varchar(50) DEFAULT NULL COMMENT '备注',
+  `RE_DATE` date DEFAULT NULL COMMENT '提交日期',
+  `CJWY` varchar(50) DEFAULT NULL COMMENT '参加晚宴',
+  `WYWZ` varchar(50) DEFAULT NULL COMMENT '晚宴位置',
+  `TJ` varchar(50) DEFAULT NULL COMMENT '提交来路',
+  `SFHY` varchar(50) DEFAULT NULL COMMENT '是否会员',
+  `SEX` varchar(50) DEFAULT NULL COMMENT '性别',
+  `BOOKED` varchar(50) DEFAULT NULL COMMENT '酒店',
+  `RM_IP` varchar(50) DEFAULT NULL COMMENT 'IP地址',
+  `CG` varchar(50) DEFAULT NULL COMMENT '参加活水（是否）',
+  `JDNO` varchar(50) DEFAULT NULL ,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='嘉宾的注册表';
+
+
+
+# （该表仅仅是用于测试， 生产环境不应该创建该表）嘉宾的注册表  正式表
+DROP TABLE IF EXISTS `CZH`;
+CREATE TABLE `CZH` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NO` varchar(50) DEFAULT NULL COMMENT '订单号（全称关联）',
+  `L_NO` varchar(50) DEFAULT NULL COMMENT '导入单号',
+  `COMPANY` varchar(50) DEFAULT NULL COMMENT '公司名',
+  `COMPANY_EN` varchar(50) DEFAULT NULL COMMENT '公司名英文',
+  `PERSON` varchar(50) DEFAULT NULL COMMENT '参会人',
+  `PERSON_EN` varchar(50) DEFAULT NULL COMMENT '参会人英文',
+  `ZHIWU` varchar(50) DEFAULT NULL COMMENT '职务',
+  `ZHIWU_EN` varchar(50) DEFAULT NULL COMMENT '职务英文',
+  `TEL` varchar(50) DEFAULT NULL COMMENT '电话',
+  `FAX` varchar(50) DEFAULT NULL COMMENT '传真',
+  `MOBILE` varchar(50) DEFAULT NULL COMMENT '手机',
+  `LXDH` varchar(50) DEFAULT NULL COMMENT '联系电话',
+  `EMAIL` varchar(50) DEFAULT NULL COMMENT '邮件',
+  `SFJB` varchar(50) DEFAULT NULL COMMENT '是否嘉宾',
+  `SFXC` varchar(50) DEFAULT NULL COMMENT '是否现场付费',
+  `XCFF` varchar(50) DEFAULT NULL COMMENT '现场付费',
+  `CM` varchar(50) DEFAULT NULL COMMENT '玉米（1）',
+  `SM` varchar(50) DEFAULT NULL COMMENT '豆粕（1）',
+  `FM` varchar(50) DEFAULT NULL COMMENT '鱼粉（1）',
+  `SFHY` varchar(50) DEFAULT NULL COMMENT '是否会员（是）',
+  `CASH` int(11) DEFAULT NULL COMMENT '参会金额',
+  `SFDK` varchar(50) DEFAULT NULL COMMENT '是否到款（是，否）',
+  `SFCJWY` varchar(50) DEFAULT NULL COMMENT '是否参加晚宴（是否）',
+  `WYZW` varchar(50) DEFAULT NULL COMMENT '晚宴位置',
+  `HOTEL` varchar(50) DEFAULT NULL COMMENT '宾馆名称',
+  `ORDER_NO` varchar(50) DEFAULT NULL COMMENT '订单号（全称关联）',
+  `SFQD` varchar(50) DEFAULT NULL COMMENT '是否签到（是否）',
+  `SFLQZL` varchar(50) DEFAULT NULL COMMENT '是否领取资料（是否）',
+  `SCZT` varchar(50) DEFAULT NULL COMMENT '场次状态（出）',
+  `RE_DATE` date DEFAULT NULL COMMENT '导入日期',
+  `IF_DEL` varchar(50) DEFAULT NULL COMMENT '是否删除',
+  `NOTE` varchar(50) DEFAULT NULL COMMENT '备注',
+  `CODE` varchar(50) DEFAULT NULL COMMENT '扫描码',
+  `LW` varchar(50) DEFAULT NULL COMMENT '是否老外',
+  `PASS` varchar(50) DEFAULT NULL COMMENT '登录密码',
+  `WXH` varchar(50) DEFAULT NULL COMMENT '微信号',
+  `PIC` varchar(50) DEFAULT NULL COMMENT '二维码',
+  `YJDZ` varchar(50) DEFAULT NULL COMMENT '邮件地址',
+  `CG` varchar(50) DEFAULT NULL COMMENT ' 是否活水（是否）',
+  `JDNO` varchar(50) DEFAULT NULL COMMENT '酒店编号',
+  `TJ` varchar(50) DEFAULT NULL COMMENT '提交来路',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='嘉宾的注册表  正式表';
+
+
 # （该表仅仅是用于测试， 生产环境不应该创建该表）已经注册的与会嘉宾
 DROP TABLE IF EXISTS `External_participant`;
 CREATE TABLE `External_participant` (
@@ -323,6 +410,41 @@ CREATE TABLE `External_participant` (
   `telephone`  varchar(20) DEFAULT NULL COMMENT '电话',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='已经注册的与会嘉宾(外部表)';
+
+# （该表仅仅是用于测试， 生产环境不应该创建该表）嘉宾注册用的表，主要是统计注册信息
+DROP TABLE IF EXISTS `JCI_ORDER`;
+CREATE TABLE `JCI_ORDER` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NO` varchar(50) DEFAULT NULL COMMENT '订单号（全称关联）',
+  `GSMC` varchar(50) DEFAULT NULL COMMENT '公司名字',
+  `GSMCYW` varchar(50) DEFAULT NULL COMMENT '公司名英文',
+  `FPTT` varchar(50) DEFAULT NULL COMMENT '发票抬头',
+  `DZ` varchar(50) DEFAULT NULL COMMENT '地址',
+  `XM` varchar(50) DEFAULT NULL COMMENT '姓名',
+  `XMYW` varchar(50) DEFAULT NULL COMMENT '姓名英文',
+  `ZW` varchar(50) DEFAULT NULL COMMENT '职务',
+  `DH` varchar(50) DEFAULT NULL COMMENT '电话',
+  `SJ` varchar(50) DEFAULT NULL COMMENT '手机',
+  `LXDH` varchar(50) DEFAULT NULL COMMENT '联系电话',
+  `YJ` varchar(50) DEFAULT NULL COMMENT '邮件',
+  `WX` varchar(50) DEFAULT NULL COMMENT '微信',
+  `CN` varchar(50) DEFAULT NULL COMMENT '玉米（1）',
+  `SM` varchar(50) DEFAULT NULL COMMENT '豆粕（1）',
+  `FM` varchar(50) DEFAULT NULL COMMENT '鱼粉（1）',
+  `TOTAL` float DEFAULT NULL COMMENT '参会金额',
+  `NOTE` varchar(500) DEFAULT NULL COMMENT '备注',
+  `RE_DATE` date DEFAULT NULL COMMENT '提交日期',
+  `CJWY` varchar(50) DEFAULT NULL COMMENT '参加晚宴',
+  `WYWZ` varchar(50) DEFAULT NULL COMMENT '晚宴位置',
+  `TJ` varchar(50) DEFAULT NULL COMMENT '提交来路',
+  `SFHY` varchar(50) DEFAULT NULL COMMENT '是否会员',
+  `SEX` varchar(50) DEFAULT NULL COMMENT '性别',
+  `BOOKED` varchar(50) DEFAULT NULL COMMENT '酒店',
+  `RM_IP` varchar(50) DEFAULT NULL COMMENT 'IP地址',
+  `CG` varchar(50) DEFAULT NULL COMMENT '参加活水（是否）',
+  `JDNO` varchar(50) DEFAULT NULL ,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='嘉宾注册用的表，主要是统计注册信息(外部表)';
 
 
 # （该表仅仅是用于测试， 生产环境不应该创建该表）

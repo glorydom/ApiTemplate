@@ -5,6 +5,7 @@ import java.util.*;
 import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
 import com.huiyi.dao.ExternalMeetingParticipant;
 import com.huiyi.dao.Invoice;
+import com.huiyi.dao.externalMapper.CZH;
 import com.huiyi.dao.externalMapper.ExternalMeetingParticipantMapper;
 import com.huiyi.meeting.dao.mapper.MeetingRegistMapper;
 import com.huiyi.meeting.dao.model.*;
@@ -283,6 +284,9 @@ public class MeetingRegistController extends BaseController {
                     participant.setMeetingfee(externalMeetingParticipant.getFee());
                     meetingParticipantService.updateByPrimaryKey(participant); // 跟新数据库
 
+                    // 更新马经理的数据库
+//                    meetingRegisterService.insertIntoCZH(participant);
+
                     meetingPartiRegist.setParticipantid(participant.getId());
 
                     meetingPartiRegistService.insert(meetingPartiRegist);
@@ -305,6 +309,8 @@ public class MeetingRegistController extends BaseController {
 
         return ControllerUtil.startNewBussinessProcess(runtimeService, meetingRegist, meetingRegist.getId(), parameters);
     }
+
+
 
 
     @ApiOperation(value = "销售人员查看客户付款情况")

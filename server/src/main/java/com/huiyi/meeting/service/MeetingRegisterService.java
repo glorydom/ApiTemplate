@@ -7,6 +7,7 @@ import java.util.*;
 
 import com.huiyi.dao.ExternalMeetingParticipant;
 import com.huiyi.dao.ExternalSales;
+import com.huiyi.dao.externalMapper.CZH;
 import com.huiyi.dao.externalMapper.ExternalMeetingParticipantMapper;
 import com.huiyi.meeting.dao.model.*;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -136,6 +137,22 @@ public class MeetingRegisterService {
 				result += participant.getFee();
 		}
 		return result;
+	}
+
+
+	// 将已经确认的人员付费信息插入外部表:CZH
+	public void insertIntoCZH(MeetingParticipant meetingParticipant){
+		// 根据手机号检查该人是否已经在数据库里面了，如果在就不添加了
+		String mobile = meetingParticipant.getTelephone();
+		CZH czh = externalMeetingParticipantMapper.getByPhone(mobile);
+		if(null == czh){
+            CZH czhNew = new CZH();
+
+
+        }else {
+		    //已经存在，直接返回
+		    return;
+        }
 	}
 
 	public List<ComparisonResultDto> reconsile(String filepath) {
