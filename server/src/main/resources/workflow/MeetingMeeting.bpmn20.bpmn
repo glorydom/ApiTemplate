@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
-  <process id="MeetingMeeting" name="MeetingMeeting" isExecutable="true">
+  <process id="MeetingMeeting" name="会议流程" isExecutable="true">
     <userTask id="sid-CF0261CE-C292-40CE-87D8-ED9714E331E1" name="印刷资料收集" activiti:candidateGroups="负责人协助" activiti:formKey="printingMaterialCollection">
       <extensionElements>
         <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>

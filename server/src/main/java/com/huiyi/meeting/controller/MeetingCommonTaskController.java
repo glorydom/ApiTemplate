@@ -336,7 +336,52 @@ public class MeetingCommonTaskController extends BaseController {
     }
 
 
+    @ApiOperation(value = "获取我的任务历史")
+    @RequestMapping(value = "history/mytask/{meetingId}", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult getMyTaskHisotry(@PathVariable final int meetingId){
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
 
+        MeetingCommonTaskExample example = new MeetingCommonTaskExample();
+        example.createCriteria().andTaskownerEqualTo(userId)
+                .andMeetingidEqualTo(meetingId)
+                .andTaskstatusEqualTo(taskStatus[3]);
 
+        List<MeetingCommonTask> commonTasks = meetingCommonTaskService.selectByExample(example);
+
+        return  new BaseResult(Constants.SUCCESS_CODE, "got one commont task", commonTasks);
+    }
+
+    @ApiOperation(value = "获取我能查看的历史任务")
+    @RequestMapping(value = "history/myviews/{meetingId}", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult getMyviewHisotry(@PathVariable final int meetingId){
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
+
+        MeetingCommonTaskExample example = new MeetingCommonTaskExample();
+        example.createCriteria().andTaskviewersLike(userId)
+                .andMeetingidEqualTo(meetingId)
+                .andTaskstatusEqualTo(taskStatus[3]);
+
+        List<MeetingCommonTask> commonTasks = meetingCommonTaskService.selectByExample(example);
+
+        return  new BaseResult(Constants.SUCCESS_CODE, "got one commont task", commonTasks);
+    }
+
+    @ApiOperation(value = "获取我执行的历史任务")
+    @RequestMapping(value = "history/myviews/{meetingId}", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult getMyExecuteHisotry(@PathVariable final int meetingId){
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
+
+        MeetingCommonTaskExample example = new MeetingCommonTaskExample();
+        example.createCriteria().andTaskexecutorsLike(userId)
+                .andMeetingidEqualTo(meetingId)
+                .andTaskstatusEqualTo(taskStatus[3]);
+
+        List<MeetingCommonTask> commonTasks = meetingCommonTaskService.selectByExample(example);
+
+        return  new BaseResult(Constants.SUCCESS_CODE, "got one commont task", commonTasks);
+    }
 
 }
