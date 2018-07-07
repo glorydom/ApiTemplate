@@ -57,7 +57,7 @@ public interface ExternalMeetingParticipantMapper {
             "#{SCZT,jdbcType=VARCHAR}, #{RE_DATE,jdbcType=DATE}, #{IF_DEL,jdbcType=VARCHAR}, #{NOTE,jdbcType=VARCHAR}, " +
             "#{CODE,jdbcType=VARCHAR}, #{LW,jdbcType=VARCHAR}, #{PASS,jdbcType=VARCHAR}, #{WXH,jdbcType=VARCHAR}, " +
             "#{PIC,jdbcType=VARCHAR}, #{YJDZ,jdbcType=VARCHAR}, #{CG,jdbcType=VARCHAR}, #{JDNO,jdbcType=VARCHAR}, #{TJ,jdbcType=VARCHAR})")
-    int confirmParticipantFee(CZH czh);
+    int insertIntoCZH(CZH czh);
 
 
     @Delete("delete from CZH where NO = #{NO}")
@@ -73,7 +73,8 @@ public interface ExternalMeetingParticipantMapper {
     @Select("select * from CZH where NO = #{NO}")
     CZH getCZHOrderByOrderno(@Param("NO")String NO);
 
-    @Select("select * from JCI_ORDER where NO not in (select NO from CZH)")
+    @Select("select * from JCI_ORDER where NO not in " +
+            "(select NO from CZH where SFDK = '是')")
     List<JCI_ORDER> getAllUnpaidOrders();
 
 

@@ -249,7 +249,7 @@ public class MeetingRegisterService {
 
 
     public List<JCI_ORDER> getUnpaidOrders(){
-	    //如何判断是未付的呢？
+	    //如何判断是未付的呢？  1, 存在JCI_ORDER表中但是不存在CZH表中  2， 再CZH表中，但是SFDK为否的
 //        List<JCI_ORDER> jci_orders = externalMeetingParticipantMapper.getAllUnpaidOrders();
 //        List<JCI_ORDER> jci_unpaid_orders = new ArrayList<>();
 //        for(JCI_ORDER unpaidOrder:jci_orders){
@@ -363,7 +363,22 @@ public class MeetingRegisterService {
                         czh.setSFCJWY(order.getCJWY());
                         czh.setCASH((int) order.getTOTAL());
                         czh.setID(null);
-                        externalMeetingParticipantMapper.confirmParticipantFee(czh);
+                        czh.setCOMPANY(order.getGSMC());
+                        czh.setCOMPANY_EN(order.getGSMCYW());
+                        czh.setPERSON(order.getXM());
+                        czh.setPERSON_EN(order.getXMYW());
+                        czh.setTEL(order.getDH());
+                        czh.setMOBILE(order.getSJ());
+                        czh.setEMAIL(order.getYJ());
+                        czh.setCASH((int) order.getTOTAL());
+                        czh.setSFCJWY(order.getCJWY());
+                        czh.setWYZW(order.getWYWZ());
+                        czh.setHOTEL(order.getBOOKED());
+                        czh.setWXH(order.getWX());
+                        czh.setZHIWU(order.getZW());
+                        czh.setZHIWU_EN(order.getZWYW());
+                        czh.setSFDK("是");
+                        externalMeetingParticipantMapper.insertIntoCZH(czh);
                         //检查是否有酒店订单
                         String orderNo = order.getNO();
                         //更改酒店订单为已经付费

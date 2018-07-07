@@ -405,7 +405,7 @@ public class MeetingRegistController extends BaseController {
     }
 
 
-    @ApiOperation(value = "销售人员确认退款  这会删除用户缴费信息，谨慎")
+    @ApiOperation(value = "销售人员确认退款 ")
     @RequestMapping(value = "cancelOrder/{NO}", method = RequestMethod.POST)
     @ResponseBody
     public BaseResult cancelOrder(@PathVariable String NO){
