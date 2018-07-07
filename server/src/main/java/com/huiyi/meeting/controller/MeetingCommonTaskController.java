@@ -369,7 +369,7 @@ public class MeetingCommonTaskController extends BaseController {
     }
 
     @ApiOperation(value = "获取我执行的历史任务")
-    @RequestMapping(value = "history/myviews/{meetingId}", method = RequestMethod.GET)
+    @RequestMapping(value = "history/myexecuted/{meetingId}", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult getMyExecuteHisotry(@PathVariable final int meetingId){
         String userId = (String) SecurityUtils.getSubject().getPrincipal();

@@ -1,8 +1,6 @@
 package com.huiyi.dao.externalMapper;
 
-import com.huiyi.dao.ExternalMeetingParticipant;
-import com.huiyi.dao.ExternalSales;
-import com.huiyi.dao.Invoice;
+import com.huiyi.dao.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.Date;
@@ -28,13 +26,13 @@ public interface ExternalMeetingParticipantMapper {
     @Results({@Result(property="COMPANY",column="COMPANY",javaType=String.class),
             @Result(property="SALES",column="SALES",javaType=String.class),
                 })
-    List<ExternalSales> getSalesByCompany(String company);
+    List<ExternalSales> getSalesByCompany(@Param("company")String company);
 
     @Select("select * from External_Sales where SALES = #{sales}")
     @Results({@Result(property="COMPANY",column="COMPANY",javaType=String.class),
             @Result(property="SALES",column="SALES",javaType=String.class),
     })
-    List<ExternalSales> getCompanyBySales(String sales);
+    List<ExternalSales> getCompanyBySales(@Param("sales")String sales);
 
 
     @Select("select * from JCI_ORDER_VOICE where GSMC = #{company}")
@@ -45,27 +43,44 @@ public interface ExternalMeetingParticipantMapper {
             @Result(property="KHH",column="KHH",javaType=String.class),
             @Result(property="ZH",column="ZH",javaType=String.class)
     })
-    Invoice getCompanyInvoiceInfo(String company);
+    Invoice getCompanyInvoiceInfo(@Param("company")String company);
 
 
     @Insert(" insert into CZH values (#{ID,jdbcType=INTEGER}, #{NO,jdbcType=VARCHAR}, #{L_NO,jdbcType=VARCHAR}, " +
             "#{COMPANY,jdbcType=VARCHAR}, #{COMPANY_EN,jdbcType=VARCHAR}, #{PERSON,jdbcType=VARCHAR}, " +
             "#{PERSON_EN,jdbcType=VARCHAR}, #{ZHIWU,jdbcType=VARCHAR}, #{ZHIWU_EN,jdbcType=VARCHAR}, " +
-            "#{TEL,jdbcType=VARCHAR}, #{FAX,jdbcType=VARCHAR}, #{MOBIL,jdbcType=VARCHAR}, #{LXDH,jdbcType=VARCHAR}, " +
+            "#{TEL,jdbcType=VARCHAR}, #{FAX,jdbcType=VARCHAR}, #{MOBILE,jdbcType=VARCHAR}, #{LXDH,jdbcType=VARCHAR}, " +
             "#{EMAIL,jdbcType=VARCHAR}, #{SFJB,jdbcType=VARCHAR}, #{SFXC,jdbcType=VARCHAR}, #{XCFF,jdbcType=VARCHAR}, " +
             "#{CM,jdbcType=VARCHAR}, #{SM,jdbcType=VARCHAR}, #{FM,jdbcType=VARCHAR}, #{SFHY,jdbcType=VARCHAR}, " +
-            "#{CASH,jdbcType=INTEGER}, #{SFDK,jdbcType=VARCHAR}, #{SFCJW,jdbcType=VARCHAR}, #{WYZW,jdbcType=VARCHAR}, " +
-            "#{HOTEL,jdbcType=VARCHAR}, #{ORDER,jdbcType=VARCHAR}, #{SFQD,jdbcType=VARCHAR}, #{SFLQZ,jdbcType=VARCHAR}, " +
-            "#{SCZT,jdbcType=VARCHAR}, #{RE_DATE,jdbcType=}, #{IF_DE,jdbcType=VARCHAR}, #{NOTE,jdbcType=VARCHAR}, " +
+            "#{CASH,jdbcType=INTEGER}, #{SFDK,jdbcType=VARCHAR}, #{SFCJWY,jdbcType=VARCHAR}, #{WYZW,jdbcType=VARCHAR}, " +
+            "#{HOTEL,jdbcType=VARCHAR}, #{ORDER_NO,jdbcType=VARCHAR}, #{SFQD,jdbcType=VARCHAR}, #{SFLQZL,jdbcType=VARCHAR}, " +
+            "#{SCZT,jdbcType=VARCHAR}, #{RE_DATE,jdbcType=DATE}, #{IF_DEL,jdbcType=VARCHAR}, #{NOTE,jdbcType=VARCHAR}, " +
             "#{CODE,jdbcType=VARCHAR}, #{LW,jdbcType=VARCHAR}, #{PASS,jdbcType=VARCHAR}, #{WXH,jdbcType=VARCHAR}, " +
             "#{PIC,jdbcType=VARCHAR}, #{YJDZ,jdbcType=VARCHAR}, #{CG,jdbcType=VARCHAR}, #{JDNO,jdbcType=VARCHAR}, #{TJ,jdbcType=VARCHAR})")
     int confirmParticipantFee(CZH czh);
 
 
-    @Select("select * from CZH where MOBILE = #{phoneNumber}")
-    CZH getByPhone(String phoneNumber);
+    @Delete("delete from CZH where NO = #{NO}")
+    int deleteMeetingFee(@Param("NO")String NO);
 
-    @Select("select * from JCI_ORDER")
-    List<JCI_ORDER> getAll();
+    @Delete("delete from JCI_ORDER_HOTEL where NO = #{NO}")
+    int deleteHotelFee(@Param("NO")String NO);
+
+
+    @Select("select * from CZH where MOBILE = #{phoneNumber}")
+    CZH getByPhone(@Param("phoneNumber")String phoneNumber);
+
+    @Select("select * from CZH where NO = #{NO}")
+    CZH getCZHOrderByOrderno(@Param("NO")String NO);
+
+    @Select("select * from JCI_ORDER where NO not in (select NO from CZH)")
+    List<JCI_ORDER> getAllUnpaidOrders();
+
+
+    @Select("select * from JCI_ORDER_HOTEL where NO = #{NO}")
+    JCI_ORDER_HOTEL getHotelOrderByOrderno(@Param("NO")String NO);
+
+    @Update("update JCI_ORDER_HOTEL set ST= #{st} where NO= #{NO}")
+    int updateHotelOrder(@Param("st") String st, @Param("NO")String NO);
 
 }

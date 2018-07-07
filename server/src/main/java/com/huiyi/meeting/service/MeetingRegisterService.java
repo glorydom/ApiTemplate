@@ -5,11 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import com.huiyi.dao.ExternalMeetingParticipant;
-import com.huiyi.dao.ExternalSales;
-import com.huiyi.dao.externalMapper.CZH;
+import com.huiyi.dao.*;
 import com.huiyi.dao.externalMapper.ExternalMeetingParticipantMapper;
 import com.huiyi.meeting.dao.model.*;
+import com.huiyi.meeting.rpc.api.*;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -17,13 +16,12 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
-import com.huiyi.meeting.rpc.api.MeetingMeetingService;
-import com.huiyi.meeting.rpc.api.MeetingParticipantService;
-import com.huiyi.meeting.rpc.api.MeetingRegistService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MeetingRegisterService {
@@ -38,6 +36,11 @@ public class MeetingRegisterService {
 	private MeetingRegistService meetingRegistService;
 	@Autowired
 	private ExternalMeetingParticipantMapper externalMeetingParticipantMapper;
+	@Autowired
+	private MeetingStatementRegistService meetingStatementRegistService;
+
+	@Autowired
+    private MeetingStatementService meetingStatementService;
 	
 	
 	public String getObjectDescription(HistoricProcessInstance pi) {
@@ -101,7 +104,7 @@ public class MeetingRegisterService {
 				if(participant.getCompanyName().equalsIgnoreCase(company))
 					company_participants.add(participant);
 			}
-			comparisonResultDto.setParticipants(company_participants);
+//			comparisonResultDto.setParticipants(company_participants);
 			comparisonResultDtos.add(comparisonResultDto);
 		}
 
@@ -235,4 +238,176 @@ public class MeetingRegisterService {
 		return companies;
 	}
 
+
+	public List<MeetingStatement> getStatementsForComparison(int meetingId){
+        MeetingStatementExample meetingStatementExample = new MeetingStatementExample();
+        meetingStatementExample.createCriteria()
+                .andIsdisableEqualTo(false)
+                .andMeetingidEqualTo(meetingId);
+        return meetingStatementService.selectByExample(meetingStatementExample);
+    }
+
+
+    public List<JCI_ORDER> getUnpaidOrders(){
+	    //如何判断是未付的呢？
+//        List<JCI_ORDER> jci_orders = externalMeetingParticipantMapper.getAllUnpaidOrders();
+//        List<JCI_ORDER> jci_unpaid_orders = new ArrayList<>();
+//        for(JCI_ORDER unpaidOrder:jci_orders){
+//            CZH paidOrder = externalMeetingParticipantMapper.getCZHOrderByOrderno(unpaidOrder.getNO());
+//            if(null == paidOrder){
+//                jci_unpaid_orders.add(unpaidOrder);
+//            }
+//            //如果会费未付，那么酒店的肯定未付
+//        }
+//        return jci_unpaid_orders;
+
+        return externalMeetingParticipantMapper.getAllUnpaidOrders();
+    }
+
+    public List<ComparisonResultDto> reconcileStatementAndUnpaidOrders(List<MeetingStatement> statementList, List<JCI_ORDER> jci_orders){
+        //银行流水过来的单据  公司|金额
+        //jci_orders为所有未确认的订单  金额可能是会务费  也可能是酒店费
+        if(statementList == null || statementList.size() ==0){
+            return new ArrayList<>();  //返回空
+        }
+
+        // 将银行流水按照公司合并
+        Map<String, List<MeetingStatement>> groupedStatements = this.aggreateStatementByCompany(statementList);
+
+        List<ComparisonResultDto>  comparisonResultDtos = new ArrayList<>();
+        for(String company:groupedStatements.keySet()){
+                ComparisonResultDto resultDto = new ComparisonResultDto();
+                resultDto.setCompanyName(company);
+                List<MeetingStatement> statements = groupedStatements.get(company);
+                resultDto.setStatements(statements);
+
+                for(MeetingStatement statement:statements){
+                    List<JCI_ORDER> gsmcOrder = new ArrayList<>();
+                    float totalShouldPay = 0;
+                    for(JCI_ORDER order:jci_orders){ //计算总价
+                        if(order.getGSMC().equalsIgnoreCase(company)){
+                            gsmcOrder.add(order);
+                            totalShouldPay += order.getTOTAL();
+                        }
+                    }
+
+                    List<JCI_ORDER_HOTEL> hotel_orders = new ArrayList<>();
+
+                    for(JCI_ORDER order:gsmcOrder){
+                        JCI_ORDER_HOTEL order_hotel = externalMeetingParticipantMapper.getHotelOrderByOrderno(order.getNO()); //试图获取酒店订单
+                        if(null == order_hotel)
+                            continue;
+                        else{
+                            hotel_orders.add(order_hotel);
+                        }
+                    }
+
+                    resultDto.setStatementTotal(statement.getFee());
+                    resultDto.setJci_orders(gsmcOrder);
+                    resultDto.setJci_order_hotels(hotel_orders);
+                    resultDto.setParticipantFeeTotal(totalShouldPay);
+                    if(totalShouldPay == statement.getFee()){
+                        resultDto.setMatch(true);
+                    }else{
+                        resultDto.setMatch(false);
+                    }
+                    comparisonResultDtos.add(resultDto);
+                }
+        }
+
+
+        return comparisonResultDtos;
+    }
+
+    private Map<String, List<MeetingStatement>> aggreateStatementByCompany(List<MeetingStatement> statements){
+        if(null == statements)
+            return new HashMap<>();
+        Map<String, List<MeetingStatement>> companyNameGrouped = new HashMap<>();
+        for(MeetingStatement statement:statements){
+            String company = statement.getCompanyname();
+            MeetingStatement containingStatement = null;
+
+            if(companyNameGrouped.keySet().contains(company)){
+                companyNameGrouped.get(company).add(statement);
+            }else{
+                List<MeetingStatement> statementList = new ArrayList<>();
+                statementList.add(statement);
+                companyNameGrouped.put(company, statementList);
+            }
+
+
+        }
+
+        return companyNameGrouped;
+    }
+
+
+    //财务人员确认费用是否正确
+//    @Transactional
+    public boolean confirmMeetingFeeAndHotelFeeByAccount(List<ComparisonResultDto> comparisonResultDtos, MeetingRegist meetingRegist){
+		for(ComparisonResultDto dto:comparisonResultDtos) {
+			for (MeetingStatement statement : dto.getStatements()) {
+                //将那些match的记录插入CZH表
+                if(dto.isMatch()) {
+                    List<JCI_ORDER> orders = dto.getJci_orders();
+                    MeetingStatementRegist meetingStatementRegist = new MeetingStatementRegist();
+                    meetingStatementRegist.setStatementid(statement.getId());
+                    meetingStatementRegist.setMeetingregistid(meetingRegist.getId());
+                    meetingStatementRegistService.insert(meetingStatementRegist);//设置关联关系
+                    statement.setIsdisable(true); //防止以后对比账户再次出现
+                    meetingStatementService.updateByPrimaryKey(statement);  //将银行流水设置为已经被确认
+                    for (JCI_ORDER order : orders) {
+                        CZH czh = new CZH();
+                        BeanUtils.copyProperties(order, czh);
+                        czh.setCM(order.getCN());
+                        czh.setSFCJWY(order.getCJWY());
+                        czh.setCASH((int) order.getTOTAL());
+                        czh.setID(null);
+                        externalMeetingParticipantMapper.confirmParticipantFee(czh);
+                        //检查是否有酒店订单
+                        String orderNo = order.getNO();
+                        //更改酒店订单为已经付费
+                        externalMeetingParticipantMapper.updateHotelOrder("1", orderNo);
+                    }
+                }
+			}
+		}
+        return true;
+    }
+
+
+    public List<ComparisonResultDto> salemanViewPayment(String userId, List<ComparisonResultDto> items){
+        List<ComparisonResultDto> result = new ArrayList<>();
+        List<ExternalSales> externalSales = externalMeetingParticipantMapper.getCompanyBySales(userId);
+        for(ComparisonResultDto dto:items){
+            boolean isBelongToThisUser = false;
+            for(ExternalSales sales:externalSales){
+                if(sales.getCOMPANY().equalsIgnoreCase(dto.getCompanyName())){
+                    isBelongToThisUser = true;
+                }
+            }
+            if(isBelongToThisUser){
+                result.add(dto);
+            }
+        }
+        return result;
+    }
+
+    //根据orderNo 将会费或者酒店费记录删除
+//    @Transactional
+    public boolean refundFee(String orderNo){
+        CZH czh = externalMeetingParticipantMapper.getCZHOrderByOrderno(orderNo);
+        if(null == czh ){
+            return false;
+        }
+
+        externalMeetingParticipantMapper.deleteMeetingFee(orderNo);
+
+        JCI_ORDER_HOTEL hotel_order = externalMeetingParticipantMapper.getHotelOrderByOrderno(orderNo);
+        if(null != hotel_order){
+            externalMeetingParticipantMapper.deleteHotelFee(orderNo);
+        }
+
+        return true;
+    }
 }

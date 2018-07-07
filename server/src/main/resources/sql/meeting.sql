@@ -447,6 +447,24 @@ CREATE TABLE `JCI_ORDER` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='嘉宾注册用的表，主要是统计注册信息(外部表)';
 
 
+# （该表仅仅是用于测试， 生产环境不应该创建该表） 酒店订房数据表
+DROP TABLE IF EXISTS `JCI_ORDER_HOTEL`;
+CREATE TABLE `JCI_ORDER_HOTEL` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `YY` varchar(50) DEFAULT NULL COMMENT '英文，中文网站（AA中文，BB英文）',
+  `NO` varchar(50) DEFAULT NULL COMMENT '订单号（全称关联）',
+  `FX` varchar(50) DEFAULT NULL COMMENT '房型',
+  `NUM` int(11) DEFAULT NULL COMMENT '数量',
+  `RZSJ` date DEFAULT NULL COMMENT '入住时间',
+  `LKSJ` date DEFAULT NULL COMMENT '离开时间',
+  `ST` varchar(50) DEFAULT NULL COMMENT '酒店付款状态（默认0,1为付款）',
+  `RE_DATE` date DEFAULT NULL COMMENT '提交日期',
+  `JDNO` varchar(50) DEFAULT NULL COMMENT '',
+  `TZXMA` varchar(50) DEFAULT NULL COMMENT '同住人姓名',
+  `TZXMB` varchar(50) DEFAULT NULL COMMENT '同住人姓名',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='酒店订房数据表';
+
 # （该表仅仅是用于测试， 生产环境不应该创建该表）
 DROP TABLE IF EXISTS `External_Sales`;
 CREATE TABLE `External_Sales` (

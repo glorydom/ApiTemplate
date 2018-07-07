@@ -1,4 +1,4 @@
-package com.huiyi.dao.externalMapper;
+package com.huiyi.dao;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -7,7 +7,7 @@ public class CZH implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int ID;
+    private Integer ID;
     private String NO;
     private String L_NO;
     private String COMPANY;
@@ -50,11 +50,11 @@ public class CZH implements Serializable {
     private String JDNO;
     private String TJ;
 
-    public int getID() {
+    public Integer getID() {
         return ID;
     }
 
-    public void setID(int ID) {
+    public void setID(Integer ID) {
         this.ID = ID;
     }
 

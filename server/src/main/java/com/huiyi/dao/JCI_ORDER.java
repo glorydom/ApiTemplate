@@ -1,4 +1,4 @@
-package com.huiyi.dao.externalMapper;
+package com.huiyi.dao;
 
 import java.io.Serializable;
 import java.util.Date;

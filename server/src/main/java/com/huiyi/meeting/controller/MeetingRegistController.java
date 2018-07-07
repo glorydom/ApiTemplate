@@ -5,7 +5,7 @@ import java.util.*;
 import com.dto.huiyi.meeting.entity.register.ComparisonResultDto;
 import com.huiyi.dao.ExternalMeetingParticipant;
 import com.huiyi.dao.Invoice;
-import com.huiyi.dao.externalMapper.CZH;
+import com.huiyi.dao.JCI_ORDER;
 import com.huiyi.dao.externalMapper.ExternalMeetingParticipantMapper;
 import com.huiyi.meeting.dao.mapper.MeetingRegistMapper;
 import com.huiyi.meeting.dao.model.*;
@@ -34,7 +34,7 @@ public class MeetingRegistController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MeetingRegistController.class);
 
     private final String REGISTERFOLDER = "regist";
-
+    private final String ACCOUNANT_CONFIRMED_ITEMS = "ACCOUNANT_CONFIRMED_ITEMS";
     private final String MATCHEDSTATEMENT = "MATCHEDSTATEMENT";
 
 	@Autowired
@@ -112,9 +112,27 @@ public class MeetingRegistController extends BaseController {
         return new BaseResult(Constants.SUCCESS_CODE, "", null);
     }
 
-
     @RequestMapping(value = "compare/{meetingId}", method = RequestMethod.GET)
     @ApiOperation(value = "比对银行流水与客户付款的记录")
+    @ResponseBody
+    public BaseResult reconcile(@PathVariable int meetingId) {
+        // 查找历史statement记录
+        List<MeetingStatement> statementList = meetingRegisterService.getStatementsForComparison(meetingId);
+
+        List<JCI_ORDER> jci_orders = meetingRegisterService.getUnpaidOrders();
+
+
+        List<ComparisonResultDto> dtos = meetingRegisterService.reconcileStatementAndUnpaidOrders(statementList, jci_orders);
+
+
+
+        return new BaseResult(Constants.SUCCESS_CODE, "reconcile the meeting fee and hotel fee", dtos);
+
+    }
+
+
+//    @RequestMapping(value = "compare/{meetingId}", method = RequestMethod.GET)
+    @ApiOperation(value = "弃用：比对银行流水与客户付款的记录")
     @ResponseBody
     /**
      * 财务人员上传来自银行的对账单 excel格式的， 有两个字段  公司 | 金额
@@ -259,53 +277,60 @@ public class MeetingRegistController extends BaseController {
             meetingRegist = meetingRegists.get(0);
         }
 
-        //更新银行流水
-        for(ComparisonResultDto dto:comparisonResultDtos){
-            for(MeetingStatement statement:dto.getStatements()){
-                statement.setIsdisable(true); //防止以后对比账户再次出现
-                MeetingStatementRegist meetingStatementRegist = new MeetingStatementRegist();
-                meetingStatementRegist.setStatementid(statement.getId());
-                meetingStatementRegist.setMeetingregistid(meetingRegist.getId());
-                meetingStatementRegistService.insert(meetingStatementRegist);//设置关联关系
-                meetingStatementService.updateByPrimaryKey(statement);
 
-                //更新嘉宾信息
-                for(ExternalMeetingParticipant externalMeetingParticipant:dto.getParticipants()){
-                    MeetingPartiRegist meetingPartiRegist = new MeetingPartiRegist();
-                    meetingPartiRegist.setMeetingregistid(meetingRegist.getId());
 
-                    String phoneNumber = externalMeetingParticipant.getTelephone();
-                    MeetingParticipantExample meetingParticipantExample = new MeetingParticipantExample();
-                    meetingParticipantExample.createCriteria().andTelephoneEqualTo(phoneNumber);
-                    List<MeetingParticipant> meetingParticipants = meetingParticipantService.selectByExample(meetingParticipantExample);
-                    MeetingParticipant participant = meetingParticipants.get(0);  // phoneNumber是唯一的，因此只要第一个
-                    participant.setPaid(true);
-                    participant.setMeetingfeepaidtime(now);
-                    participant.setMeetingfee(externalMeetingParticipant.getFee());
-                    meetingParticipantService.updateByPrimaryKey(participant); // 跟新数据库
 
-                    // 更新马经理的数据库
-//                    meetingRegisterService.insertIntoCZH(participant);
+        boolean proceed = meetingRegisterService.confirmMeetingFeeAndHotelFeeByAccount(comparisonResultDtos, meetingRegist);
+//        //更新银行流水
+//        for(ComparisonResultDto dto:comparisonResultDtos){
+//            for(MeetingStatement statement:dto.getStatements()){
+//                statement.setIsdisable(true); //防止以后对比账户再次出现
+//                MeetingStatementRegist meetingStatementRegist = new MeetingStatementRegist();
+//                meetingStatementRegist.setStatementid(statement.getId());
+//                meetingStatementRegist.setMeetingregistid(meetingRegist.getId());
+//                meetingStatementRegistService.insert(meetingStatementRegist);//设置关联关系
+//                meetingStatementService.updateByPrimaryKey(statement);
+//
+//                //更新嘉宾信息
+//                for(ExternalMeetingParticipant externalMeetingParticipant:dto.getParticipants()){
+//                    MeetingPartiRegist meetingPartiRegist = new MeetingPartiRegist();
+//                    meetingPartiRegist.setMeetingregistid(meetingRegist.getId());
+//
+//                    String phoneNumber = externalMeetingParticipant.getTelephone();
+//                    MeetingParticipantExample meetingParticipantExample = new MeetingParticipantExample();
+//                    meetingParticipantExample.createCriteria().andTelephoneEqualTo(phoneNumber);
+//                    List<MeetingParticipant> meetingParticipants = meetingParticipantService.selectByExample(meetingParticipantExample);
+//                    MeetingParticipant participant = meetingParticipants.get(0);  // phoneNumber是唯一的，因此只要第一个
+//                    participant.setPaid(true);
+//                    participant.setMeetingfeepaidtime(now);
+//                    participant.setMeetingfee(externalMeetingParticipant.getFee());
+//                    meetingParticipantService.updateByPrimaryKey(participant); // 跟新数据库
+//
+//                    // 更新马经理的数据库
+////                    meetingRegisterService.insertIntoCZH(participant);
+//
+//                    meetingPartiRegist.setParticipantid(participant.getId());
+//
+//                    meetingPartiRegistService.insert(meetingPartiRegist);
+//
+//                }
+//
+//            }
+//        }
 
-                    meetingPartiRegist.setParticipantid(participant.getId());
-
-                    meetingPartiRegistService.insert(meetingPartiRegist);
-
-                }
-
-            }
-        }
 
         Map<String, Object> parameters = new HashMap<>();
         List<String> users = new ArrayList<>();
         for(ComparisonResultDto dto : comparisonResultDtos){
             List<String> saleMans = meetingRegisterService.getSalemanForThisCompany(dto.getCompanyName());
             for(String user:saleMans){
-                if(!users.contains(user))
+                if(!users.contains(user) && dto.isMatch())
                     users.add(user);
             }
         }
         parameters.put("Salemans", users);
+        //同时将比较结果也放进流程变量
+        parameters.put(ACCOUNANT_CONFIRMED_ITEMS, comparisonResultDtos);
 
         return ControllerUtil.startNewBussinessProcess(runtimeService, meetingRegist, meetingRegist.getId(), parameters);
     }
@@ -313,10 +338,10 @@ public class MeetingRegistController extends BaseController {
 
 
 
-    @ApiOperation(value = "销售人员查看客户付款情况")
-    @RequestMapping(value = "getParticipantFee/{taskId}", method = RequestMethod.GET)
-    @ResponseBody
-    public BaseResult confirm(@PathVariable String taskId){
+//    @ApiOperation(value = "销售人员查看客户付款情况")
+//    @RequestMapping(value = "getParticipantFee/{taskId}", method = RequestMethod.GET)
+//    @ResponseBody
+    public BaseResult Depraced_confirm(@PathVariable String taskId){
         String userId = (String) SecurityUtils.getSubject().getPrincipal();
         String bussinessKey = activitiTaskService.getBusinessObjId(taskId);
         if(null == bussinessKey){
@@ -327,7 +352,7 @@ public class MeetingRegistController extends BaseController {
         MeetingStatementRegistExample meetingStatementRegistExample = new MeetingStatementRegistExample();
         meetingStatementRegistExample.createCriteria().andMeetingregistidEqualTo(meetingRegistId);
         List<MeetingStatementRegist> meetingStatementRegists = meetingStatementRegistService.selectByExample(meetingStatementRegistExample);
-        List<MeetingStatement> statementList = new ArrayList<>(); //统计该
+        List<MeetingStatement> statementList = new ArrayList<>(); //统计所有的银行流水
         for(MeetingStatementRegist statementRegist:meetingStatementRegists){
             int statementId = statementRegist.getStatementid();
             statementList.add(meetingStatementService.selectByPrimaryKey(statementId));
@@ -356,6 +381,18 @@ public class MeetingRegistController extends BaseController {
         return new BaseResult(Constants.SUCCESS_CODE, "reconsile the fee", meetingRegisterService.reconsile(statementList, unpaidMeetingParticipant, filterCompanies));
     }
 
+
+    @ApiOperation(value = "销售人员查看客户付款情况")
+    @RequestMapping(value = "getParticipantFee/{taskId}", method = RequestMethod.GET)
+    @ResponseBody
+    public BaseResult viewPayment(@PathVariable String taskId) {
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
+
+        List<ComparisonResultDto> items = (List<ComparisonResultDto>) runtimeService.getVariable(activitiTaskService.getExecutionIdByTaskId(taskId), ACCOUNANT_CONFIRMED_ITEMS);
+
+        return new BaseResult(Constants.SUCCESS_CODE, "reconsile the fee", meetingRegisterService.salemanViewPayment(userId, items));
+    }
+
     @ApiOperation(value = "销售人员确认付费情况")
     @RequestMapping(value = "salesConfirm/{taskId}", method = RequestMethod.POST)
     @ResponseBody
@@ -366,6 +403,22 @@ public class MeetingRegistController extends BaseController {
         taskService.complete(taskId, parameters); //将匹配的流水放入流程变量
         return new BaseResult(Constants.SUCCESS_CODE, "sales confirmed", null);
     }
+
+
+    @ApiOperation(value = "销售人员确认退款  这会删除用户缴费信息，谨慎")
+    @RequestMapping(value = "cancelOrder/{NO}", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResult cancelOrder(@PathVariable String NO){
+        //
+        boolean isSuccess = meetingRegisterService.refundFee(NO);
+        if(isSuccess){
+            return new BaseResult(Constants.SUCCESS_CODE, "refund", null);
+        }else {
+
+            return new BaseResult(Constants.ERROR_CODE, "system issue", null);
+        }
+    }
+
 
     @ApiOperation(value = "开票信息生成")
     @RequestMapping(value = "invoice/list/{taskId}", method = RequestMethod.GET)
@@ -397,9 +450,7 @@ public class MeetingRegistController extends BaseController {
      * 开票信息会在客户数据库里面获取
      */
     public BaseResult invoiceComplete(@PathVariable String taskId){
-
         taskService.complete(taskId);
-
         return new BaseResult(Constants.SUCCESS_CODE, "invoice complete", null);
     }
 
