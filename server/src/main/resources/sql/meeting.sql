@@ -301,7 +301,7 @@ CREATE TABLE `MEETING_Statement` (
 DROP TABLE IF EXISTS `MEETING_Refund`;
 CREATE TABLE `MEETING_Refund` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `participantId` int(11) DEFAULT NULL COMMENT '与会嘉宾id',
+  `orderNo` varchar(10) DEFAULT NULL COMMENT '订单号，来自表CZH',
   `comment` varchar(500) DEFAULT NULL COMMENT '备注',
   `refundFee` float DEFAULT NULL COMMENT '退款金额',
   `applyTime` date DEFAULT NULL COMMENT '申请时间',

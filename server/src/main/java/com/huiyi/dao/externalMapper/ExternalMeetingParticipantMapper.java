@@ -73,9 +73,18 @@ public interface ExternalMeetingParticipantMapper {
     @Select("select * from CZH where NO = #{NO}")
     CZH getCZHOrderByOrderno(@Param("NO")String NO);
 
+    @Select("select * from CZH")
+    List<CZH> getAllCzh();
+
+    @Select("select * from CZH where COMPANY = #{company}")
+    List<CZH> getAllCzh(@Param("company") String company);
+
     @Select("select * from JCI_ORDER where NO not in " +
             "(select NO from CZH where SFDK = '是')")
     List<JCI_ORDER> getAllUnpaidOrders();
+
+    @Update("update CZH set SFDK = '否' where NO = #{NO}")
+    int updateSFDKinCZHasFalse(@Param("NO")String NO);
 
 
     @Select("select * from JCI_ORDER_HOTEL where NO = #{NO}")

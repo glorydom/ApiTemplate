@@ -41,34 +41,6 @@ public class MeetingRegisterService {
 
 	@Autowired
     private MeetingStatementService meetingStatementService;
-	
-	
-	public String getObjectDescription(HistoricProcessInstance pi) {
-		// TODO Auto-generated method stub
-		String[] businessKeyArray = pi.getBusinessKey().split("_");
-		if(businessKeyArray.length != 2) {
-			return "无法解析businessKey或未指定"+pi.getBusinessKey();
-		}
-		String objectType = businessKeyArray[0];
-		if(!StringUtils.isNumeric(businessKeyArray[1])) {
-			return "业务对象ID异常"+businessKeyArray[1];
-		}
-		int objectId = Integer.parseInt(businessKeyArray[1]);
-		LOGGER.debug("对象类型："+objectType +",对象ID："+objectId);
-		if(objectType.equals(MeetingMeeting.class.getSimpleName())) {
-			MeetingMeeting obj = meetingMeetingService.selectByPrimaryKey(objectId);
-			return obj.toString();
-		}
-		else if(objectType.equals(MeetingParticipant.class.getSimpleName())) {
-			MeetingParticipant obj = meetingParticipantService.selectByPrimaryKey(objectId);
-			return obj.toString();
-		}
-		else if(objectType.equals(MeetingRegist.class.getSimpleName())) {
-			MeetingRegist obj = meetingRegistService.selectByPrimaryKey(objectId);
-			return obj.toString();
-		}
-		return "不支持的businessKey"+pi.getBusinessKey();
-	}
 
 	public List<ComparisonResultDto> reconsile(List<MeetingStatement> statements, List<ExternalMeetingParticipant> externalMeetingParticipants, List<String> excludingCompanies) {
 		List<ComparisonResultDto> comparisonResultDtos = new ArrayList<>();
@@ -158,49 +130,7 @@ public class MeetingRegisterService {
         }
 	}
 
-	public List<ComparisonResultDto> reconsile(String filepath) {
-		// TODO Auto-generated method stub';
-		double per = 1000.0;
-		Map<String,List<MeetingParticipant>> indexes = new HashMap<>();
-		Map<String,Integer> companyMap = new HashMap<>();
-		try {
-			InputStream is = new FileInputStream(filepath);
-			XSSFWorkbook workbook = new XSSFWorkbook(is);
-			XSSFSheet worksheet = workbook.getSheetAt(0);
-			int rownum = worksheet.getLastRowNum();
-			for(int i=1;i<rownum;i++) {
-				XSSFRow row = worksheet.getRow(i);
-				if(row.getCell(1)==null)
-					continue;
-				String companyName = row.getCell(0).toString();
-				indexes.put(companyName, new ArrayList<MeetingParticipant>());
-				companyMap.put(companyName, (int)(row.getCell(1).getNumericCellValue()/per));
-			}
-			workbook.close();
-		}catch(IOException ioe) {
-			LOGGER.error(ioe.getMessage());
-		}
-		List<MeetingParticipant> mpList = meetingParticipantService.selectByExample(new MeetingParticipantExample());
-		for(MeetingParticipant mp : mpList) {
-			List<MeetingParticipant> vList = indexes.get(mp.getCompany());
-			if(vList == null) {
-				vList = new ArrayList<>();
-				indexes.put(mp.getCompany(), vList);
-			}
-			vList.add(mp);
-			Integer left = companyMap.get(mp.getCompany());
-			companyMap.put(mp.getCompany(),left==null?-1:left-1);
-		}
-		List<ComparisonResultDto> list = new ArrayList<>();
-		for(String cn : indexes.keySet()) {
-			ComparisonResultDto crd = new ComparisonResultDto();
-			crd.setCompanyName(cn);
-			crd.setMatch(companyMap.get(cn)==0);
-			list.add(crd);
-			LOGGER.debug(cn+" match? "+crd.isMatch());
-		}
-		return list;
-	}
+
 
 
 	public List<ExternalMeetingParticipant> convertToExternalMeetingParticipants(List<MeetingParticipant> participants){
@@ -357,26 +287,7 @@ public class MeetingRegisterService {
                     statement.setIsdisable(true); //防止以后对比账户再次出现
                     meetingStatementService.updateByPrimaryKey(statement);  //将银行流水设置为已经被确认
                     for (JCI_ORDER order : orders) {
-                        CZH czh = new CZH();
-                        BeanUtils.copyProperties(order, czh);
-                        czh.setCM(order.getCN());
-                        czh.setSFCJWY(order.getCJWY());
-                        czh.setCASH((int) order.getTOTAL());
-                        czh.setID(null);
-                        czh.setCOMPANY(order.getGSMC());
-                        czh.setCOMPANY_EN(order.getGSMCYW());
-                        czh.setPERSON(order.getXM());
-                        czh.setPERSON_EN(order.getXMYW());
-                        czh.setTEL(order.getDH());
-                        czh.setMOBILE(order.getSJ());
-                        czh.setEMAIL(order.getYJ());
-                        czh.setCASH((int) order.getTOTAL());
-                        czh.setSFCJWY(order.getCJWY());
-                        czh.setWYZW(order.getWYWZ());
-                        czh.setHOTEL(order.getBOOKED());
-                        czh.setWXH(order.getWX());
-                        czh.setZHIWU(order.getZW());
-                        czh.setZHIWU_EN(order.getZWYW());
+                        CZH czh = this.convertFromJCItoCZH(order);
                         czh.setSFDK("是");
                         externalMeetingParticipantMapper.insertIntoCZH(czh);
                         //检查是否有酒店订单
@@ -424,5 +335,32 @@ public class MeetingRegisterService {
         }
 
         return true;
+    }
+
+
+    public CZH convertFromJCItoCZH(JCI_ORDER order){
+        if(null == order)
+            return null;
+        CZH czh = new CZH();
+        BeanUtils.copyProperties(order, czh);
+        czh.setCM(order.getCN());
+        czh.setSFCJWY(order.getCJWY());
+        czh.setCASH((int) order.getTOTAL());
+        czh.setID(null);
+        czh.setCOMPANY(order.getGSMC());
+        czh.setCOMPANY_EN(order.getGSMCYW());
+        czh.setPERSON(order.getXM());
+        czh.setPERSON_EN(order.getXMYW());
+        czh.setTEL(order.getDH());
+        czh.setMOBILE(order.getSJ());
+        czh.setEMAIL(order.getYJ());
+        czh.setCASH((int) order.getTOTAL());
+        czh.setSFCJWY(order.getCJWY());
+        czh.setWYZW(order.getWYWZ());
+        czh.setHOTEL(order.getBOOKED());
+        czh.setWXH(order.getWX());
+        czh.setZHIWU(order.getZW());
+        czh.setZHIWU_EN(order.getZWYW());
+        return czh;
     }
 }

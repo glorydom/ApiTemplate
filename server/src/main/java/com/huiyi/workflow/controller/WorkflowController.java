@@ -49,34 +49,7 @@ public class WorkflowController extends BaseController{
 	BaseWorkFlowService baseWorkFlowService;
 	@Autowired
     MeetingRegisterService meetingRegisterService;
-	
-	
-	@RequestMapping(value="/mytasks", method = RequestMethod.GET)
-	@ApiOperation(value="工作流列表")
-	@ResponseBody
-	public Object mytasks() {
-		Subject subject = SecurityUtils.getSubject();
-		String userName = (String)subject.getPrincipal();
-		List<Task> taskList = baseWorkFlowService.findTasksByUserName(userName);
-		List<Map<String,Object>> list = new ArrayList<>(taskList.size());
-		for(Task task : taskList) {
-			Map<String,Object> taskMap = new HashMap<>();
-			
-			HistoricProcessInstance pi = baseWorkFlowService.findProcessInstance(task.getExecutionId());
-			String objDes = meetingRegisterService.getObjectDescription(pi);
-			taskMap.put("id", task.getId());
-			taskMap.put("key", task.getTaskDefinitionKey()+task.getName());
-			taskMap.put("name", objDes);
-			taskMap.put("dueDate", task.getDueDate());
-			list.add(taskMap);
-		}
-			
-		LOGGER.debug("list size:"+list.size());
-		Map<String, Object> result = new HashMap<>();
-        result.put("rows", list);
-        result.put("total", list.size());
-        return result;
-	}
+
 	
 	@RequestMapping(value="/tasks", method = RequestMethod.GET)
 	@ApiOperation(value="任务列表")

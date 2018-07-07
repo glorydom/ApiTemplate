@@ -3,11 +3,19 @@ package com.huiyi.meeting.controller;
 
 import java.util.*;
 
+import com.dto.huiyi.meeting.entity.participantDto.ParticipantCZHdto;
 import com.dto.huiyi.meeting.entity.participantDto.ParticipantFeeSummary;
 import com.dto.huiyi.meeting.util.TimeDateFormat;
+import com.huiyi.dao.CZH;
+import com.huiyi.dao.JCI_ORDER;
+import com.huiyi.dao.externalMapper.ExternalMeetingParticipantMapper;
+import com.huiyi.meeting.service.CZHService;
+import com.huiyi.meeting.service.MeetingRegisterService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,9 +48,17 @@ import io.swagger.annotations.ApiOperation;
 @Api(value = "与会人员管理", description = "对与会嘉宾的注册，撤销")
 public class MeetingParticipantController extends BaseController {
 	private static Logger LOGGER = LoggerFactory.getLogger(MeetingParticipantController.class);
+
+	private static String[] STATUS = new String[]{"未付款", "已付款", "已退款", "改为下一届"};
 	
 	@Autowired
-	private MeetingParticipantService meetingParticipantService;
+	private CZHService czhService;
+
+	@Autowired
+    private MeetingRegisterService meetingRegisterService;
+
+	@Autowired
+    private ExternalMeetingParticipantMapper externalMeetingParticipantMapper;
 	
     @ApiOperation(value = "查询所有与会人员, 要分页")
     @RequestMapping(value = "list", method = RequestMethod.GET)
@@ -57,29 +73,9 @@ public class MeetingParticipantController extends BaseController {
     		){
     	int offset = pageIndex * pageSize;
     	int limit = pageSize;
-    	MeetingParticipantExample example = new MeetingParticipantExample();
-//    	if(!StringUtils.isBlank(businessKey) && businessKey.startsWith(MeetingParticipant.class.getSimpleName()+"_")) {
-//    		String meetingIdStr = businessKey.substring((MeetingParticipant.class.getSimpleName()+"_").length());
-//    		if(StringUtils.isNumeric(meetingIdStr))
-//    			example.createCriteria().andMeetingidEqualTo(Integer.parseInt(meetingIdStr));
-//    		else
-//    			LOGGER.info("传入参数businessKey不能解析出会议ID");
-//    	}
-        //businessKey 是meeting的bussinesskey
-        int meetingId = Integer.parseInt(businessKey.split("_")[1]);
-        example.createCriteria().andMeetingidEqualTo(meetingId);
-    	if (!StringUtils.isBlank(sort) && !StringUtils.isBlank(order)) {
-    		example.setOrderByClause(StringUtil.humpToLine(sort) + " " + order);
-    	}
-    	if (StringUtils.isNotBlank(search)) {
-    		example.or().andNameLike("%" + search + "%");
-    	}
-    	List<MeetingParticipant> list = meetingParticipantService.selectByExampleForOffsetPage(example, offset, limit);
-    	long total = meetingParticipantService.countByExample(example);
-    	Map<String, Object> result = new HashMap<>();
-        result.put("rows", list);
-        result.put("total", total);
-        return new BaseResult(Constants.SUCCESS_CODE, "", result);
+
+
+    	return null;
     }
 
     @ApiOperation(value = "查询条件所有与会人员, 要分页")
@@ -91,168 +87,42 @@ public class MeetingParticipantController extends BaseController {
     }
 
     @ApiOperation(value = "统计所有与会人员")
-    @RequestMapping(value = "statistics", method = RequestMethod.GET)
+    @RequestMapping(value = "list/{meetingId}", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResult statistics(@RequestParam(value="meetingId") int meetingId){
-    	MeetingParticipantExample example = new MeetingParticipantExample();
-        example.createCriteria().andMeetingidEqualTo(meetingId);
-        List<MeetingParticipant> all = meetingParticipantService.selectByExample(example);
-        Map<String,List<MeetingParticipant>> interestMap = new HashMap<>();
-        for(MeetingParticipant mp : all) {
-//        	String[] arrays = StringUtils.defaultIfBlank(mp.getProductofinterest(),"").split(",");
-        	String poi = StringUtils.defaultIfBlank(mp.getProductofinterest(),"未关注任何产品");
-        	List<MeetingParticipant> list = interestMap.get(poi);
-        	if (list == null) {
-        		list = new ArrayList<>();
-        		interestMap.put(poi, list);
-        	}
-        	list.add(mp);
+    public BaseResult statistics(@PathVariable int meetingId, @RequestParam boolean getAllIndicator){
+        //meetingId是不必要的，因为开会前，历史订单会被删掉的
+        //getAllIndicator 就是说是否查询所有的， 如果用户点击某个任务，则传递为false， 如果客户点击dashboard，则传递true
+        List<CZH> resultCzh = new ArrayList<>();
+        if(getAllIndicator){
+            resultCzh = czhService.getParticipants(null);
+        } else {
+            String userId = (String) SecurityUtils.getSubject().getPrincipal();
+            resultCzh = czhService.getParticipants(userId);
         }
-        List<ParticipantStatisticsDto> result = new ArrayList<>();
-        for(String poi : interestMap.keySet()) {
-        	List<MeetingParticipant> list = interestMap.get(poi);
-        	ParticipantStatisticsDto psd = new ParticipantStatisticsDto();
-        	result.add(psd);
-        	psd.setInterestedProduct(poi);
-        	for(MeetingParticipant mp : list) {
-        		psd.setTotal(psd.getTotal()+1);
-        		if("Y".equals(mp.getCharged())) {
-        			psd.setCharged(psd.getCharged()+1);
-        		}
-        		if("Y".equals(mp.getInvoiced())) {
-        			psd.setInvoiced(psd.getInvoiced()+1);
-        		}
-        		if(StringUtils.defaultIfBlank(mp.getHoteladdress(), "").length()>5) {
-        			psd.setHoteled(psd.getHoteled()+1);
-        		}
-        	}
-        }
-        
-        return new BaseResult(Constants.SUCCESS_CODE, "", result);
-    }
+        List<ParticipantCZHdto> dtos = new ArrayList<>();
+        for(CZH czh : resultCzh){
+            ParticipantCZHdto participantCZHdto = new ParticipantCZHdto();
+            BeanUtils.copyProperties(czh, participantCZHdto);
+            if("是".equalsIgnoreCase(czh.getSFDK()))
+                participantCZHdto.setStatus(STATUS[1]); //已付款
+            else
+                participantCZHdto.setStatus(STATUS[2]); //再CZH表中，并且是否付款为否，则代表该客户是退款的
 
-	@ApiOperation(value = "统计与会人员付费情况")
-	@RequestMapping(value = "summary/fee/{meetingId}", method = RequestMethod.GET)
-	@ResponseBody
-	public BaseResult summary(@PathVariable int meetingId){
-		MeetingParticipantExample meetingParticipantExample = new MeetingParticipantExample();
-		meetingParticipantExample.createCriteria().andMeetingidEqualTo(meetingId);
-		List<MeetingParticipant> meetingParticipants = meetingParticipantService.selectByExample(meetingParticipantExample);
-
-		Map<String, ParticipantFeeSummary> summaries = new HashMap<>();
-		for(MeetingParticipant participant : meetingParticipants){
-            Date feePaidTime = participant.getMeetingfeepaidtime();
-		    String key = TimeDateFormat.formatToDay(feePaidTime);
-		    if(summaries.containsKey(key)){
-                ParticipantFeeSummary existedSummary = summaries.get(key);
-                if(participant.getPaid()){
-                    existedSummary.setPaidParticipantCount(existedSummary.getPaidParticipantCount() + 1);
-                    existedSummary.setTotalFee(existedSummary.getTotalFee() + participant.getMeetingfee());
-                }else {
-                    existedSummary.setUnpaidParticipantCount(existedSummary.getUnpaidParticipantCount() + 1);
-                }
-            }else{
-                ParticipantFeeSummary summary = new ParticipantFeeSummary();
-                summary.setDate(key);
-                summary.setPaidParticipantCount(1);
-                summary.setUnpaidParticipantCount(1);
-                if(participant.getPaid()){
-                    summary.setTotalFee(participant.getMeetingfee());
-                }else {
-                    summary.setTotalFee(0);
-                }
-                summaries.put(key, summary);
-            }
-
-        }
-        List<ParticipantFeeSummary> summarySet = new ArrayList<>();
-        for(ParticipantFeeSummary summary:summaries.values()){
-		    summarySet.add(summary);
+            dtos.add(participantCZHdto);
         }
 
-        Collections.sort(summarySet, new Comparator<ParticipantFeeSummary>() {
-            @Override
-            public int compare(ParticipantFeeSummary participantFeeSummary, ParticipantFeeSummary t1) {
-                return participantFeeSummary.getDate().compareTo(t1.getDate());
-            }
-        });
-        return new BaseResult(Constants.SUCCESS_CODE, "", summarySet);
-	}
+        List<JCI_ORDER> jci_orders = externalMeetingParticipantMapper.getAllUnpaidOrders();
+        for(JCI_ORDER order:jci_orders){
+            ParticipantCZHdto participantCZHdto = new ParticipantCZHdto();
+            CZH czh = meetingRegisterService.convertFromJCItoCZH(order);
+            BeanUtils.copyProperties(czh, participantCZHdto);
+            participantCZHdto.setStatus(STATUS[0]);
+            dtos.add(participantCZHdto);
+        }
 
-    @ApiOperation(value = "人员注册")
-    @RequestMapping(value = "create", method = RequestMethod.POST)
-    @ResponseBody
-    public BaseResult regist(@RequestBody MeetingParticipant meetingParticipant){
-    	ComplexResult result = FluentValidator.checkAll()
-				.on(meetingParticipant.getName(), new LengthValidator(1, 20, "名字"))
-				.on(meetingParticipant.getTelephone(), new LengthValidator(1, 20, "电话"))
-				.doValidate()
-				.result(ResultCollectors.toComplex());
-		if (!result.isSuccess()) {
-			return new UpmsResult(UpmsResultConstant.INVALID_LENGTH, result.getErrors());
-		}
-    	meetingParticipant.setCreationtimestamp(new Date().getTime());
-    	int ret = meetingParticipantService.insert(meetingParticipant);
-    	if(ret ==0) {
-    		return new BaseResult(Constants.ERROR_CODE, "人员注册失败", meetingParticipant);
-    	}
-        return new BaseResult(Constants.SUCCESS_CODE, "", meetingParticipant);
+        return new BaseResult(Constants.SUCCESS_CODE, "", dtos);
     }
 
-
-    @ApiOperation(value = "人员撤销")
-    @RequestMapping(value = "delete/{id}", method = RequestMethod.GET)
-    @ResponseBody
-    /**
-     * 这个API肯定是在搜寻之后才发起的，所以传入参数必须有id,如果没有就返回 Constants.ERROR_CODE
-     */
-    public BaseResult deregist(@PathVariable int id){
-    	int ret = meetingParticipantService.deleteByPrimaryKey(id);
-    	if(ret == 0) {
-    		return new BaseResult(Constants.ERROR_CODE, "未查到相关人员信息", id);
-    	}
-        return new BaseResult(Constants.SUCCESS_CODE, "", ret);
-    }
-
-    @ApiOperation(value = "人员详情")
-    @RequestMapping(value = "get/{id}", method = RequestMethod.GET)
-    @ResponseBody
-    /**
-     * 这个API肯定是在搜寻之后才发起的，所以传入参数必须有id,如果没有就返回 Constants.ERROR_CODE
-     */
-    public BaseResult get(@PathVariable int id){
-    	MeetingParticipant mp = meetingParticipantService.selectByPrimaryKey(id);
-    	if(mp == null) {
-    		return new BaseResult(Constants.ERROR_CODE, "未查到相关人员信息", mp);
-    	}
-        return new BaseResult(Constants.SUCCESS_CODE, "", mp);
-    }
-
-
-    @ApiOperation(value = "人员信息更新")
-    @RequestMapping(value = "update/{id}", method = RequestMethod.POST)
-    @ResponseBody
-    /**
-     * 这个API肯定是在搜寻之后才发起的，所以传入参数必须有id,如果没有就返回 Constants.ERROR_CODE
-     */
-    public BaseResult update(@RequestBody MeetingParticipant meetingParticipant){
-    	if(meetingParticipant.getId() == null) {
-    		return new BaseResult(Constants.ERROR_CODE, "未查到相关人员ID", meetingParticipant);
-    	}
-    	ComplexResult result = FluentValidator.checkAll()
-				.on(meetingParticipant.getName(), new LengthValidator(1, 20, "名字"))
-				.on(meetingParticipant.getTelephone(), new LengthValidator(1, 20, "电话"))
-				.doValidate()
-				.result(ResultCollectors.toComplex());
-		if (!result.isSuccess()) {
-			return new UpmsResult(UpmsResultConstant.INVALID_LENGTH, result.getErrors());
-		}
-		int ret = meetingParticipantService.updateByPrimaryKey(meetingParticipant);
-		if(ret ==0) {
-    		return new BaseResult(Constants.ERROR_CODE, "更新失败", ret);
-    	}
-        return new BaseResult(Constants.SUCCESS_CODE, "", ret);
-    }
 
 
 }
