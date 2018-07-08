@@ -26,7 +26,7 @@ public class CZHService {
      * @return
      */
     public List<CZH> getParticipants(String saleMan){
-        List<CZH> list = externalMeetingParticipantMapper.getAllCzh();
+        List<CZH> list = externalMeetingParticipantMapper.getAllCzhWithoutAnyCondition();
         if(null == saleMan)
             return list;
 

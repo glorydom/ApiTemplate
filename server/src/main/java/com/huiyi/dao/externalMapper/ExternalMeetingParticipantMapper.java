@@ -74,7 +74,7 @@ public interface ExternalMeetingParticipantMapper {
     CZH getCZHOrderByOrderno(@Param("NO")String NO);
 
     @Select("select * from CZH")
-    List<CZH> getAllCzh();
+    List<CZH> getAllCzhWithoutAnyCondition();
 
     @Select("select * from CZH where COMPANY = #{company}")
     List<CZH> getAllCzh(@Param("company") String company);
