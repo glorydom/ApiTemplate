@@ -89,9 +89,13 @@ public class MeetingParticipantController extends BaseController {
     @ApiOperation(value = "统计所有与会人员")
     @RequestMapping(value = "list/{meetingId}", method = RequestMethod.GET)
     @ResponseBody
-    public BaseResult statistics(@PathVariable int meetingId, @RequestParam boolean getAllIndicator){
+    public BaseResult statistics(@PathVariable String meetingId, @RequestParam boolean getAllIndicator){
         //meetingId是不必要的，因为开会前，历史订单会被删掉的
         //getAllIndicator 就是说是否查询所有的， 如果用户点击某个任务，则传递为false， 如果客户点击dashboard，则传递true
+        if(meetingId.contains("_")){
+            meetingId = meetingId.split("_")[1];
+        }
+        int meetingIdint = Integer.parseInt(meetingId);
         List<CZH> resultCzh = new ArrayList<>();
         if(getAllIndicator){
             resultCzh = czhService.getParticipants(null);
