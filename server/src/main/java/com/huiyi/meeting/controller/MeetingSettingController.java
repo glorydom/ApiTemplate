@@ -1,4 +1,4 @@
-package com.huiyi.workflow.controller;
+package com.huiyi.meeting.controller;
 
 import java.util.*;
 
@@ -28,7 +28,6 @@ import com.dto.huiyi.meeting.entity.config.TaskAssigneeSingleDto;
 import com.dto.huiyi.meeting.util.Constants;
 import com.huicong.upms.rpc.api.UpmsUserService;
 import com.huiyi.meeting.dao.model.MeetingMeeting;
-import com.huiyi.meeting.dao.model.MeetingMeetingExample;
 import com.huiyi.meeting.dao.model.MeetingTaskCandidate;
 import com.huiyi.meeting.dao.model.MeetingTaskCandidateExample;
 import com.huiyi.meeting.rpc.api.MeetingMeetingService;
@@ -45,9 +44,9 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/chqs/meetingManagement")
 @Controller
 @Api(value="会议管理")
-public class MeetingV2Controller extends BaseController {
+public class MeetingSettingController extends BaseController {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(MeetingV2Controller.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MeetingSettingController.class);
 	@Autowired
     MeetingMeetingService meetingMeetingService;
 	@Autowired
@@ -57,43 +56,16 @@ public class MeetingV2Controller extends BaseController {
 	
 	@Autowired
 	BaseWorkFlowService baseWorkFlowService;
-	
-	@RequestMapping(value="/index", method = RequestMethod.GET)
-	public String index(ModelMap modelMap) {
-		return "/meeting/list.jsp";
-	}
 
-	
-	@RequestMapping(value="/create", method = RequestMethod.GET)
-	@ApiOperation(value="新增")
-	public String create(ModelMap modelMap) {
-		return "/meeting/create.jsp";
-	}
-	
-	@ApiOperation(value = "新增")
-	@RequiresPermissions("meeting:index")
-	@ResponseBody
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public Object create(MeetingMeeting meeting) {
-		LOGGER.info(meeting.getMeetingsubject());
-		meeting.setCreationtimestamp(new Date().getTime());
-		meetingMeetingService.insert(meeting);
-		return new BaseResult(1, "success", 1);
-	}
-
-	@ApiOperation(value = "删除系统")
-	@RequiresPermissions("meeting:index")
-	@RequestMapping(value = "/delete/{ids}",method = RequestMethod.GET)
-	@ResponseBody
-	public Object delete(@PathVariable("ids") String ids) {
-		return new BaseResult(1, "success", 1);
-	}
 
 	
 	@RequestMapping(value="/saveMeetingTaskCandidate", method = RequestMethod.GET)
 	@ApiOperation(value="保存会议任务执行人候选人")
 	@ResponseBody
-	public Object saveMeetingTaskCandidate(@RequestParam("taskId") String taskId, @RequestParam("userId") String userId) {
+	public Object saveMeetingTaskCandidate(	@RequestParam(required = false, name = "meetingId") Integer meetingId,
+										   	@RequestParam("processName") String processName,
+											@RequestParam("taskId") String taskId,
+										   	@RequestParam("userId") String userId	) {
 		ComplexResult result = FluentValidator.checkAll()
                 .on(taskId, new LengthValidator(1, 64, "工作流任务ID"))
                 .on(userId, new NumberValidator("用户"))
@@ -102,8 +74,12 @@ public class MeetingV2Controller extends BaseController {
         if (!result.isSuccess()) {
             return new BaseResult(Constants.ERROR_CODE, "failed", result.getErrors());
         }
+
 		MeetingTaskCandidate record = new MeetingTaskCandidate();
 		record.setTaskid(taskId);
+		record.setProcessname(processName);
+		if(null != meetingId)
+			record.setMeetingid(meetingId);
 		record.setUserid(Integer.parseInt(userId));
 		meetingTaskCandidateService.insert(record);
 		return new BaseResult(Constants.SUCCESS_CODE, "success", record);
@@ -130,50 +106,62 @@ public class MeetingV2Controller extends BaseController {
 			for(Integer uid : tasd.getUserList()) {
 				MeetingTaskCandidate meetingTaskCandidate = new MeetingTaskCandidate();
 				meetingTaskCandidate.setProcessname(key);
+				if(null != taskAssigneeDto.getMeetingId()){
+					meetingTaskCandidate.setMeetingid(taskAssigneeDto.getMeetingId());
+				}
 				meetingTaskCandidate.setTaskid(taskId);
 				meetingTaskCandidate.setUserid(uid);
 				list.add(meetingTaskCandidate);
 			}
 		}
+
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
-		example.createCriteria().andProcessnameEqualTo(key);
-		if(list.size()==0) {
-			meetingTaskCandidateService.deleteByExample(example);
-			return new BaseResult(Constants.SUCCESS_CODE, "success", 0);
+		MeetingTaskCandidateExample.Criteria criteria = example.createCriteria().andProcessnameEqualTo(key);
+		if(taskAssigneeDto.getMeetingId() != null){
+			criteria.andMeetingidEqualTo(taskAssigneeDto.getMeetingId());
 		}
-		List<MeetingTaskCandidate> existing = meetingTaskCandidateService.selectByExample(example);
-		Map<MeetingTaskCandidate,Integer> existingMap = new HashMap<>();
-		List<Integer> existingIds = new ArrayList<Integer>();
-		for(MeetingTaskCandidate mtc : existing) {
-			int id = mtc.getId();
-			mtc.setId(null);
-			existingIds.add(id);
-			existingMap.put(mtc, id);
+		//先删除所有的
+		meetingTaskCandidateService.deleteByExample(example);
+
+		for(MeetingTaskCandidate candidate:list){
+			meetingTaskCandidateService.insert(candidate);
 		}
-		int total = 0;
-		List<Integer> duplicatedIds = new ArrayList<Integer>();
-		for(MeetingTaskCandidate mtc : list) {
-			if(existing.contains(mtc)) {
-				duplicatedIds.add(existingMap.get(mtc));
-				continue;
-			}
-			total += meetingTaskCandidateService.insert(mtc);
-		}
-		existingIds.removeAll(duplicatedIds);
-		if(existingIds.size()>0) {
-			String ids = StringUtils.join(existingIds, "-");
-			total += meetingTaskCandidateService.deleteByPrimaryKeys(ids);
-		}
-		return new BaseResult(Constants.SUCCESS_CODE, "success", total);
+
+//		List<MeetingTaskCandidate> existing = meetingTaskCandidateService.selectByExample(example);
+//		Map<MeetingTaskCandidate,Integer> existingMap = new HashMap<>();
+//		List<Integer> existingIds = new ArrayList<Integer>();
+//		for(MeetingTaskCandidate mtc : existing) {
+//			int id = mtc.getId();
+//			mtc.setId(null);
+//			existingIds.add(id);
+//			existingMap.put(mtc, id);
+//		}
+//		int total = 0;
+//		List<Integer> duplicatedIds = new ArrayList<Integer>();
+//		for(MeetingTaskCandidate mtc : list) {
+//			if(existing.contains(mtc)) {
+//				duplicatedIds.add(existingMap.get(mtc));
+//				continue;
+//			}
+//			total += meetingTaskCandidateService.insert(mtc);
+//		}
+//		existingIds.removeAll(duplicatedIds);
+//		if(existingIds.size()>0) {
+//			String ids = StringUtils.join(existingIds, "-");
+//			total += meetingTaskCandidateService.deleteByPrimaryKeys(ids);
+//		}
+		return new BaseResult(Constants.SUCCESS_CODE, "success", null);
 	}
 	
 	@RequestMapping(value="/findWholeMeetingTaskCandidates", method = RequestMethod.GET)
 	@ApiOperation(value="查询整个会议任务执行人候选人 //默认查询整个会议的流程")
 	@ResponseBody
-	public BaseResult findWholeMeetingTaskCandidates(@RequestParam(required = false, defaultValue = "MeetingMeeting") String key) {
+	public BaseResult findWholeMeetingTaskCandidates(@RequestParam(required = false, defaultValue = "MeetingMeeting") String key
+													,@RequestParam(required = false, name = "meetingId") String meetingId) {
 		TaskAssigneeDto taskAssigneeDto = new TaskAssigneeDto();
 		List<TaskAssigneeSingleDto> taskSettings = new ArrayList<>();
 		taskAssigneeDto.setTaskSettings(taskSettings);
+		taskAssigneeDto.setKey(key);
 		
 		MeetingTaskCandidateExample example = new MeetingTaskCandidateExample();
 		example.createCriteria().andProcessnameEqualTo(key);

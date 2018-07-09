@@ -237,22 +237,6 @@ CREATE TABLE `MEETING_Participant_Recipiant_Task` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='人员安置任务';
 
 
-#任务批处理  对一批人的安置
-DROP TABLE IF EXISTS `MEETING_Participant_Recipiant_Batch_Task`;
-CREATE TABLE `MEETING_Participant_Recipiant_Batch_Task` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(20) DEFAULT NULL COMMENT '任务类型，仅仅支持以下类型： 接机 | 安排酒店 | 安排会议室',
-  `stationId` int(11)  DEFAULT NULL COMMENT '火车站，机场id',
-  `hotelId` int(11)  DEFAULT NULL COMMENT '酒店id',
-  `meetingRoomId` int(11)  DEFAULT NULL COMMENT '会议室id',
-  `startTime` date DEFAULT NULL COMMENT '有效截止期',
-  `endTime` date DEFAULT NULL COMMENT '有效截止期',
-  `personInCharge` varchar(20) DEFAULT NULL COMMENT '负责人ID',
-  `attachment` varchar(500) DEFAULT NULL COMMENT '相关附件',
-  `creationTimestamp` bigint DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='对一批人的安置';
-
 
 #嘉宾与嘉宾管理对应关系
 DROP TABLE IF EXISTS `MEETING_Parti_Regist`;

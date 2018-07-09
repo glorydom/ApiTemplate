@@ -55,6 +55,20 @@ public class MeetingRefundController extends BaseController {
             return new BaseResult(Constants.ERROR_CODE, "order number is not valid", null);
         }
 
+        //校验是否已经再申请中了，如果是就不要再次提交
+        MeetingRefundExample refundExample = new MeetingRefundExample();
+        refundExample.createCriteria().andOrdernoEqualTo(orderNo);
+        List<MeetingRefund> refunds = meetingRefundService.selectByExample(refundExample);
+        if(null != refunds && refunds.size()>0){
+            MeetingRefund refund = refunds.get(0);
+            if(refund.getStatus().equalsIgnoreCase(STATUS[0]))
+                return new BaseResult(Constants.ERROR_CODE, "该订单已经在退款中了", null);
+            else if(refund.getStatus().equalsIgnoreCase(STATUS[1]))
+                return new BaseResult(Constants.ERROR_CODE, "该订单的退款再审核中，不要再次提交", null);
+            else if(refund.getStatus().equalsIgnoreCase(STATUS[2]))
+                return new BaseResult(Constants.ERROR_CODE, "该订单已经退款完成了", null);
+        }
+
         Date now = new Date();
         long currentTime = now.getTime();
         meetingRefund.setCreationtimestamp(currentTime);
