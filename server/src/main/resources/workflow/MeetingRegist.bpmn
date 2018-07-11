@@ -9,7 +9,7 @@
       <startEvent id="startevent2" name="Start"></startEvent>
       <userTask id="usertask1" name="销售人员确认银行流水账" activiti:assignee="${Saleman}" activiti:formKey="confirmFeeBySaleman"></userTask>
       <sequenceFlow id="flow2" sourceRef="startevent2" targetRef="usertask1"></sequenceFlow>
-      <userTask id="usertask22" name="开发票" activiti:assignee="王渊博" activiti:formKey="meetingFeeInvoice">
+      <userTask id="usertask22" name="开发票" activiti:formKey="meetingFeeInvoice">
         <extensionElements>
           <activiti:taskListener event="create" class="com.huiyi.meeting.activiti.TaskAssigneeListener"></activiti:taskListener>
         </extensionElements>
@@ -25,7 +25,7 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_MeetingRegist">
     <bpmndi:BPMNPlane bpmnElement="MeetingRegist" id="BPMNPlane_MeetingRegist">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="271.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="79.0" y="272.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="meetingFeeConfirmationSubProcess" id="BPMNShape_meetingFeeConfirmationSubProcess">
         <omgdc:Bounds height="221.0" width="771.0" x="230.0" y="179.0"></omgdc:Bounds>
@@ -58,7 +58,7 @@
         <omgdi:waypoint x="740.0" y="291.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="85.0" y="288.0"></omgdi:waypoint>
+        <omgdi:waypoint x="114.0" y="289.0"></omgdi:waypoint>
         <omgdi:waypoint x="230.0" y="289.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">

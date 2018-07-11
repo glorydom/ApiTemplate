@@ -7,6 +7,7 @@ import com.dto.huiyi.meeting.entity.participantDto.ParticipantCZHdto;
 import com.dto.huiyi.meeting.entity.participantDto.ParticipantFeeSummary;
 import com.dto.huiyi.meeting.util.TimeDateFormat;
 import com.huiyi.dao.CZH;
+import com.huiyi.dao.ExternalSales;
 import com.huiyi.dao.JCI_ORDER;
 import com.huiyi.dao.externalMapper.ExternalMeetingParticipantMapper;
 import com.huiyi.meeting.service.CZHService;
@@ -96,13 +97,15 @@ public class MeetingParticipantController extends BaseController {
             meetingId = meetingId.split("_")[1];
         }
         int meetingIdint = Integer.parseInt(meetingId);
+
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
         List<CZH> resultCzh = new ArrayList<>();
         if(getAllIndicator){
             resultCzh = czhService.getParticipants(null);
         } else {
-            String userId = (String) SecurityUtils.getSubject().getPrincipal();
             resultCzh = czhService.getParticipants(userId);
         }
+        Set<String> orders = new HashSet<>();
         List<ParticipantCZHdto> dtos = new ArrayList<>();
         for(CZH czh : resultCzh){
             ParticipantCZHdto participantCZHdto = new ParticipantCZHdto();
@@ -113,6 +116,13 @@ public class MeetingParticipantController extends BaseController {
                 participantCZHdto.setStatus(STATUS[2]); //再CZH表中，并且是否付款为否，则代表该客户是退款的
 
             dtos.add(participantCZHdto);
+            orders.add(participantCZHdto.getNO());
+        }
+
+        List<ExternalSales> sales = externalMeetingParticipantMapper.getCompanyBySales(userId);
+        Set<String> companies = new HashSet<>();
+        for(ExternalSales es:sales){
+            companies.add(es.getCOMPANY());
         }
 
         List<JCI_ORDER> jci_orders = externalMeetingParticipantMapper.getAllUnpaidOrders();
@@ -121,7 +131,8 @@ public class MeetingParticipantController extends BaseController {
             CZH czh = meetingRegisterService.convertFromJCItoCZH(order);
             BeanUtils.copyProperties(czh, participantCZHdto);
             participantCZHdto.setStatus(STATUS[0]);
-            dtos.add(participantCZHdto);
+            if(companies.contains(order.getGSMC()) &&(!orders.contains(participantCZHdto.getNO()))) // 该销售负责该公司，并且该订单没有再CZH表中
+                dtos.add(participantCZHdto);
         }
 
         return new BaseResult(Constants.SUCCESS_CODE, "", dtos);

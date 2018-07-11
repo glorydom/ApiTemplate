@@ -16,6 +16,7 @@ import java.util.zip.ZipInputStream;
 
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -133,6 +134,17 @@ private Logger LOGGER = LoggerFactory.getLogger(BaseWorkFlowService.class);
                 if( e instanceof UserTask) {
                 	taskList.add((UserTask) e);
                 }
+
+                if( e instanceof SubProcess) {
+                	SubProcess subProcess = (SubProcess) e;
+					Collection<FlowElement> subElements = subProcess.getFlowElements();
+					for(FlowElement subElement : subElements){
+                        if( subElement instanceof UserTask) {
+                            taskList.add((UserTask) subElement);
+                        }
+
+					}
+				}
             }
         }
 
